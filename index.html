@@ -1,0 +1,1582 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Granary Luggage Storage</title>
+  <style>
+    :root {
+      --ink: #17201b;
+      --muted: #647067;
+      --paper: #faf8f1;
+      --panel: #ffffff;
+      --line: #ded8c7;
+      --brand: #2f6b4f;
+      --brand-dark: #214f3a;
+      --accent: #c77a35;
+      --accent-soft: #f4dfc8;
+      --danger: #9a372f;
+      --ok: #287a56;
+      --shadow: 0 20px 60px rgba(31, 39, 34, .13);
+      --shadow-soft: 0 10px 30px rgba(31, 39, 34, .08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(199, 122, 53, .14), transparent 280px),
+        linear-gradient(140deg, rgba(47, 107, 79, .13), transparent 390px),
+        linear-gradient(180deg, rgba(255, 255, 255, .4), transparent 260px),
+        var(--paper);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .28;
+      background-image:
+        linear-gradient(rgba(23, 32, 27, .04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 32, 27, .04) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: linear-gradient(180deg, #000, transparent 62%);
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      border-bottom: 1px solid rgba(222, 216, 199, .9);
+      background: rgba(250, 248, 241, .9);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .topbar {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .mark {
+      width: 46px;
+      height: 46px;
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.16), transparent 48%),
+        var(--brand);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      letter-spacing: .04em;
+      flex: 0 0 auto;
+      box-shadow: 0 10px 24px rgba(47, 107, 79, .22);
+    }
+
+    .brand-title {
+      font-size: 18px;
+      line-height: 1.1;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .brand-subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .62);
+    }
+
+    .nav button {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .nav button.active {
+      background: linear-gradient(180deg, var(--brand), var(--brand-dark));
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(47, 107, 79, .18);
+    }
+
+    main {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 34px 18px 52px;
+      flex: 1;
+      position: relative;
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .booking-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 410px;
+      gap: 34px;
+      align-items: start;
+    }
+
+    .hero-copy {
+      padding: 18px 0 4px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+      padding: 0 10px;
+      border: 1px solid rgba(47, 107, 79, .22);
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      color: var(--brand-dark);
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(38px, 6vw, 68px);
+      line-height: .96;
+      letter-spacing: 0;
+      max-width: 760px;
+    }
+
+    .lead {
+      margin: 18px 0 0;
+      color: #3f4c44;
+      font-size: 18px;
+      line-height: 1.55;
+      max-width: 650px;
+    }
+
+    .service-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px;
+      margin-top: 24px;
+      max-width: 740px;
+      overflow: hidden;
+      border: 1px solid rgba(222, 216, 199, .9);
+      border-radius: 8px;
+      background: var(--line);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .service-strip div {
+      background: rgba(255,255,255,.78);
+      padding: 14px;
+    }
+
+    .service-strip span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .service-strip strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 20px;
+      line-height: 1.1;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 26px;
+      max-width: 740px;
+    }
+
+    .step {
+      position: relative;
+      border: 1px solid rgba(222, 216, 199, .9);
+      border-radius: 8px;
+      padding: 14px;
+      background: rgba(255,255,255,.68);
+      color: #3f4c44;
+      font-weight: 700;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .step::before {
+      content: "";
+      display: block;
+      width: 36px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+      max-width: 740px;
+    }
+
+    .info-block {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .76);
+      padding: 16px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .info-block h2 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .info-block p {
+      margin: 0;
+      color: #4a554d;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .notice {
+      margin-top: 12px;
+      max-width: 740px;
+      border: 1px solid rgba(47, 107, 79, .18);
+      border-left: 5px solid var(--brand);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .76);
+      padding: 13px 14px;
+      color: #3f4c44;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .booking-panel {
+      padding: 20px;
+      position: sticky;
+      top: 96px;
+      border-color: rgba(47, 107, 79, .18);
+    }
+
+    .booking-panel h2 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .booking-panel h2::after {
+      content: "£7/item";
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #6d441f;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .panel h2 {
+      margin: 0 0 16px;
+      font-size: 22px;
+      line-height: 1.15;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .form-note {
+      margin: -6px 0 2px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    label {
+      font-weight: 800;
+      font-size: 14px;
+      color: #2d3830;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid #d7cfbd;
+      background: #fffdf8;
+      color: var(--ink);
+      border-radius: 7px;
+      min-height: 50px;
+      padding: 12px 13px;
+      outline: none;
+      transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 82px;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(47, 107, 79, .16);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .helper-text {
+      margin: -2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .item-options {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .item-option {
+      min-height: 54px;
+      border: 1px solid #d7cfbd;
+      border-radius: 8px;
+      background: #fffdf8;
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 900;
+      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease, background .14s ease;
+    }
+
+    .item-option.active {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(47, 107, 79, .2);
+    }
+
+    .item-option:hover {
+      transform: translateY(-1px);
+      border-color: var(--brand);
+    }
+
+    .terms {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 10px;
+      align-items: start;
+      color: #455148;
+      font-size: 14px;
+      line-height: 1.45;
+      padding: 10px 0;
+    }
+
+    .terms input {
+      width: 20px;
+      height: 20px;
+      min-height: auto;
+      margin-top: 1px;
+    }
+
+    .price-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px;
+      border: 1px solid rgba(47, 107, 79, .22);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(47, 107, 79, .12), rgba(199, 122, 53, .12)),
+        #fff;
+      color: #284537;
+      font-weight: 800;
+    }
+
+    .price-summary strong {
+      font-size: 22px;
+      color: var(--brand-dark);
+      white-space: nowrap;
+    }
+
+    .availability {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px 12px;
+      background: #fff8ed;
+      color: #4a554d;
+      font-size: 14px;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .availability.closed {
+      background: #f9e8e5;
+      border-color: #e4b9b3;
+      color: var(--danger);
+    }
+
+    .terms-details {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px 12px;
+      background: #fff;
+      color: #4a554d;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .terms-details summary {
+      cursor: pointer;
+      color: var(--brand);
+      font-weight: 900;
+    }
+
+    .terms-details ul {
+      margin: 10px 0 0;
+      padding-left: 19px;
+    }
+
+    .terms-details li + li {
+      margin-top: 6px;
+    }
+
+    .primary, .secondary, .ghost, .danger {
+      border: 0;
+      border-radius: 7px;
+      min-height: 46px;
+      padding: 0 16px;
+      cursor: pointer;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+    }
+
+    .primary {
+      background: linear-gradient(180deg, var(--brand), var(--brand-dark));
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(47, 107, 79, .2);
+    }
+
+    .primary:hover { background: var(--brand-dark); }
+    .primary:hover, .secondary:hover, .ghost:hover { transform: translateY(-1px); }
+
+    .secondary {
+      background: #fff8ed;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .ghost {
+      background: rgba(255,255,255,.66);
+      color: var(--brand);
+      border: 1px solid rgba(47, 107, 79, .35);
+    }
+
+    .danger {
+      background: #f9e8e5;
+      color: var(--danger);
+      border: 1px solid #e4b9b3;
+    }
+
+    .confirmation {
+      display: none;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid rgba(40, 122, 86, .24);
+      background:
+        linear-gradient(135deg, rgba(40, 122, 86, .12), rgba(255,255,255,.72)),
+        #eff8f2;
+    }
+
+    .confirmation.active {
+      display: block;
+    }
+
+    .confirmation-actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .payment-note {
+      margin: 10px 0 0;
+      color: #3f4c44;
+      font-size: 14px;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .amount-due {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 12px 0;
+      padding: 12px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #cfe2d5;
+      color: #284537;
+      font-weight: 900;
+    }
+
+    .amount-due strong {
+      font-size: 24px;
+      color: var(--brand-dark);
+      white-space: nowrap;
+    }
+
+    .ref {
+      display: inline-flex;
+      margin: 12px 0;
+      padding: 10px 13px;
+      border-radius: 7px;
+      background: #fff;
+      border: 1px solid #cfe2d5;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: .04em;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .dashboard {
+      display: grid;
+      gap: 18px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .staff-login {
+      max-width: 420px;
+      margin: 32px auto;
+      padding: 22px;
+      border-color: rgba(47, 107, 79, .18);
+    }
+
+    .staff-login h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .staff-login p {
+      color: var(--muted);
+      line-height: 1.45;
+      margin: 0 0 16px;
+      font-weight: 700;
+    }
+
+    .dash-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.72);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .dash-head h1 {
+      font-size: clamp(30px, 4vw, 44px);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      padding: 16px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,253,248,.9));
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto auto auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      background: rgba(255,255,255,.78);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .toolbar input {
+      min-height: 44px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow-soft);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 920px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ebe5d8;
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      color: #4a554d;
+      background: #f7f1e8;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      position: sticky;
+      top: 0;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .status {
+      display: inline-flex;
+      min-height: 26px;
+      align-items: center;
+      border-radius: 999px;
+      padding: 0 9px;
+      font-size: 12px;
+      font-weight: 900;
+      background: #eee6d8;
+      color: #594d3d;
+      white-space: nowrap;
+    }
+
+    .status.arrived { background: #e7f1ff; color: #24548a; }
+    .status.paid { background: #f3ecff; color: #5e3f88; }
+    .status.collected { background: #e9f5ed; color: #287a56; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      min-width: 250px;
+    }
+
+    .actions button, .tag-select {
+      min-height: 36px;
+      border-radius: 7px;
+      padding: 0 10px;
+      font-size: 13px;
+    }
+
+    .tag-select {
+      width: 92px;
+      border: 1px solid #cfc7b5;
+    }
+
+    .whatsapp-button[disabled] {
+      cursor: not-allowed;
+      opacity: .5;
+      transform: none;
+    }
+
+    .empty {
+      padding: 26px;
+      text-align: center;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .module-strip {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .module {
+      padding: 15px;
+      border: 1px dashed #c8bda8;
+      border-radius: 8px;
+      color: #59645c;
+      background: rgba(255,255,255,.68);
+      font-weight: 800;
+      box-shadow: var(--shadow-soft);
+    }
+
+    @media (max-width: 860px) {
+      .topbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .nav {
+        width: 100%;
+      }
+
+      .nav button {
+        flex: 1;
+      }
+
+      .booking-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .booking-panel {
+        position: static;
+      }
+
+      .steps, .stats, .module-strip, .info-grid, .service-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .dash-head {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      main {
+        padding: 18px 12px 32px;
+      }
+
+      .topbar {
+        padding: 12px;
+      }
+
+      .brand-title {
+        font-size: 16px;
+      }
+
+      .brand-subtitle {
+        font-size: 12px;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .booking-panel {
+        padding: 14px;
+      }
+
+      h1 {
+        font-size: 36px;
+      }
+
+      .lead {
+        font-size: 16px;
+      }
+
+      .service-strip strong {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="topbar">
+        <div class="brand" aria-label="The Granary Luggage Storage">
+          <div class="mark">G</div>
+          <div>
+            <div class="brand-title">THE GRANARY</div>
+            <div class="brand-subtitle">Luggage Storage</div>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Main navigation">
+          <button type="button" data-view-button="booking">Booking</button>
+          <button type="button" data-view-button="staff">Staff</button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="bookingView" class="view">
+        <div class="booking-layout">
+          <div class="hero-copy">
+            <div class="eyebrow">The Granary Luggage Storage</div>
+            <h1>Luggage storage in the heart of Portree.</h1>
+            <p class="lead">Reserve same-day storage for your items, get a booking reference, then pay when you drop them off.</p>
+            <div class="service-strip" aria-label="Luggage storage summary">
+              <div>
+                <span>Price</span>
+                <strong>£7 per item</strong>
+              </div>
+              <div>
+                <span>Drop-off</span>
+                <strong>From 8:00am</strong>
+              </div>
+              <div>
+                <span>Collection</span>
+                <strong>By 5:00pm</strong>
+              </div>
+            </div>
+            <div class="steps" aria-label="Booking steps">
+              <div class="step">1. Enter your details</div>
+              <div class="step">2. Get a reference</div>
+              <div class="step">3. Pay at drop-off</div>
+            </div>
+            <div class="info-grid" aria-label="Luggage storage details">
+              <div class="info-block">
+                <h2>What this booking does</h2>
+                <p>It lets the team prepare for your drop-off and find your details quickly when you arrive.</p>
+              </div>
+              <div class="info-block">
+                <h2>Payment</h2>
+                <p>Storage costs £7 per item. Staff confirm the total and take payment when you drop off your items.</p>
+              </div>
+              <div class="info-block">
+                <h2>At drop-off</h2>
+                <p>Drop-off is available from 8:00am. Give your name or booking reference when you arrive.</p>
+              </div>
+              <div class="info-block">
+                <h2>Collection</h2>
+                <p>Items must be collected the same day by 5:00pm. Show your reference or tag when collecting.</p>
+              </div>
+            </div>
+            <div class="notice">Same-day bookings only. Storage is subject to available space. Please keep valuables, travel documents and medication with you.</div>
+          </div>
+
+          <div class="panel booking-panel">
+            <form id="bookingForm">
+              <h2>Luggage storage</h2>
+              <p class="form-note">Same-day bookings only. Drop off from 8:00am and collect by 5:00pm.</p>
+              <div id="bookingAvailability" class="availability" aria-live="polite"></div>
+              <div class="field">
+                <label for="customerName">Name</label>
+                <input id="customerName" name="customerName" autocomplete="name" required>
+              </div>
+              <div class="field">
+                <label for="mobile">Mobile number</label>
+                <input id="mobile" name="mobile" autocomplete="tel" inputmode="tel" required>
+              </div>
+              <div class="field">
+                <label for="email">Email <span aria-hidden="true">(optional)</span></label>
+                <input id="email" name="email" autocomplete="email" inputmode="email" type="email">
+                <p class="helper-text">Optional — useful if you'd like a confirmation.</p>
+              </div>
+              <div class="field">
+                <label>How many items are you storing?</label>
+                <div class="item-options" aria-label="Number of items">
+                  <button class="item-option active" type="button" data-item-count="1">1 item</button>
+                  <button class="item-option" type="button" data-item-count="2">2 items</button>
+                  <button class="item-option" type="button" data-item-count="3">3 items</button>
+                  <button class="item-option" type="button" data-item-count="4">4 items</button>
+                  <button class="item-option" type="button" data-item-count="5+">5+ items</button>
+                </div>
+                <input id="items" name="items" type="hidden" value="1">
+              </div>
+              <div id="exactItemsField" class="field hidden">
+                <label for="exactItems">Exact number of items</label>
+                <input id="exactItems" type="number" min="5" max="30" value="5">
+              </div>
+              <div class="field">
+                <label for="collectionTime">Expected collection</label>
+                <input id="collectionTime" name="collectionTime" type="time" min="08:00" max="17:00" required>
+              </div>
+              <div class="price-summary">
+                <span id="priceBreakdown">£7 × 1 item</span>
+                <strong id="priceTotal">£7</strong>
+              </div>
+              <div class="field">
+                <label for="notes">Notes <span aria-hidden="true">(optional)</span></label>
+                <textarea id="notes" name="notes" placeholder="Large cases, pushchair, fragile items..."></textarea>
+              </div>
+              <details class="terms-details">
+                <summary>Storage terms</summary>
+                <ul>
+                  <li>Bookings are for same-day luggage storage only.</li>
+                  <li>Items must be collected by 5:00pm on the day of booking.</li>
+                  <li>Storage is subject to available space when you arrive.</li>
+                  <li>Keep valuables, money, travel documents and medication with you.</li>
+                  <li>Payment is taken at drop-off before items are stored.</li>
+                </ul>
+              </details>
+              <label class="terms">
+                <input id="terms" name="terms" type="checkbox" required>
+                <span>I accept The Granary luggage storage terms and understand payment is due at drop-off.</span>
+              </label>
+              <button class="primary" type="submit">Submit booking</button>
+            </form>
+
+            <div id="confirmation" class="confirmation" aria-live="polite">
+              <h2>Booking received</h2>
+              <p>Please show this reference to staff when you arrive.</p>
+              <div id="confirmationRef" class="ref"></div>
+              <p id="confirmationSummary"></p>
+              <div class="amount-due">
+                <span>Total due at drop-off</span>
+                <strong id="confirmationTotal">£7</strong>
+              </div>
+              <p class="payment-note" id="paymentInstruction">Staff will confirm the number of items and take payment before storage.</p>
+              <div class="confirmation-actions">
+                <button class="secondary" type="button" id="newBookingButton">New booking</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="staffView" class="view">
+        <div id="staffDashboard" class="dashboard">
+          <div class="dash-head">
+            <div>
+              <h1>Staff dashboard</h1>
+              <p class="lead">Today's active bookings, tags, arrivals, payments and collections.</p>
+            </div>
+            <div class="actions">
+              <button class="primary" type="button" id="printQrButton">Print booking QR</button>
+            </div>
+          </div>
+
+          <div class="stats" aria-label="Dashboard stats">
+            <div class="stat"><strong id="statActive">0</strong><span>Active today</span></div>
+            <div class="stat"><strong id="statArrived">0</strong><span>Arrived</span></div>
+            <div class="stat"><strong id="statPaid">0</strong><span>Paid</span></div>
+            <div class="stat"><strong id="statCollected">0</strong><span>Collected</span></div>
+            <div class="stat"><strong id="statCapacity">0/60</strong><span>Item capacity</span></div>
+          </div>
+
+          <div class="toolbar">
+            <input id="searchInput" type="search" placeholder="Search by name or reference">
+            <button class="secondary" type="button" id="showTodayButton">Today's active</button>
+            <button class="ghost" type="button" id="showHistoryButton">History</button>
+            <button class="ghost" type="button" id="exportCsvButton">Export CSV</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Customer</th>
+                  <th>Items</th>
+                  <th>Tags</th>
+                  <th>Collection time</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bookingRows"></tbody>
+            </table>
+            <div id="emptyState" class="empty">No bookings to show.</div>
+          </div>
+
+          <div>
+            <h2>Future modules</h2>
+            <div class="module-strip">
+              <div class="module">Bike hire</div>
+              <div class="module">Equipment hire</div>
+              <div class="module">Visitor services</div>
+              <div class="module">Gift vouchers</div>
+              <div class="module">Event bookings</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "granaryHubBookings";
+    const WHATSAPP_ENABLED = false;
+    const WHATSAPP_BUSINESS_NUMBER = "";
+    const TAG_COUNT = 60;
+    const DAILY_ITEM_CAPACITY = TAG_COUNT;
+    const viewButtons = document.querySelectorAll("[data-view-button]");
+    const bookingView = document.getElementById("bookingView");
+    const staffView = document.getElementById("staffView");
+    const bookingForm = document.getElementById("bookingForm");
+    const bookingAvailability = document.getElementById("bookingAvailability");
+    const confirmation = document.getElementById("confirmation");
+    const confirmationRef = document.getElementById("confirmationRef");
+    const confirmationSummary = document.getElementById("confirmationSummary");
+    const confirmationTotal = document.getElementById("confirmationTotal");
+    const paymentInstruction = document.getElementById("paymentInstruction");
+    const newBookingButton = document.getElementById("newBookingButton");
+    const itemsInput = document.getElementById("items");
+    const itemButtons = document.querySelectorAll("[data-item-count]");
+    const exactItemsField = document.getElementById("exactItemsField");
+    const exactItemsInput = document.getElementById("exactItems");
+    const collectionTimeInput = document.getElementById("collectionTime");
+    const priceBreakdown = document.getElementById("priceBreakdown");
+    const priceTotal = document.getElementById("priceTotal");
+    const bookingRows = document.getElementById("bookingRows");
+    const emptyState = document.getElementById("emptyState");
+    const searchInput = document.getElementById("searchInput");
+    const showTodayButton = document.getElementById("showTodayButton");
+    const showHistoryButton = document.getElementById("showHistoryButton");
+    const exportCsvButton = document.getElementById("exportCsvButton");
+    const printQrButton = document.getElementById("printQrButton");
+    const staffDashboard = document.getElementById("staffDashboard");
+    let dashboardMode = "today";
+
+    function todayKey() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function loadBookings() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveBookings(bookings) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
+      if (bookingAvailability) updateBookingAvailability();
+    }
+
+    function todayActiveItemCount(bookings = loadBookings()) {
+      return bookings
+        .filter((booking) => !booking.collectedAt)
+        .reduce((total, booking) => total + getTagNumbers(booking).length, 0);
+    }
+
+    function remainingItemCapacity(bookings = loadBookings()) {
+      return availableTags(bookings).length;
+    }
+
+    function bookingsClosedNow() {
+      const now = new Date();
+      const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      return currentTime > "17:00";
+    }
+
+    function makeReference(bookings) {
+      const todaysRefs = bookings
+        .filter((booking) => booking.createdDate === todayKey())
+        .map((booking) => /^G(\d{3})$/.exec(booking.reference || ""))
+        .filter(Boolean)
+        .map((match) => Number(match[1]));
+      const nextNumber = (todaysRefs.length ? Math.max(...todaysRefs) : 0) + 1;
+      return `G${String(nextNumber).padStart(3, "0")}`;
+    }
+
+    function makeId() {
+      if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
+      return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function formatTime(time) {
+      if (!time) return "-";
+      const [hours, minutes] = time.split(":");
+      return `${hours}:${minutes}`;
+    }
+
+    function formatMoney(value) {
+      return `£${value}`;
+    }
+
+    function selectedItemCount() {
+      return Math.max(1, Number(itemsInput.value) || 1);
+    }
+
+    function setItemCount(value) {
+      const isExact = value === "5+";
+      exactItemsField.classList.toggle("hidden", !isExact);
+      if (isExact) {
+        exactItemsInput.value = Math.max(5, Number(exactItemsInput.value) || 5);
+        itemsInput.value = exactItemsInput.value;
+      } else {
+        itemsInput.value = value;
+      }
+      itemButtons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.itemCount === value);
+      });
+      updatePriceTotal();
+      validateStorageTimes();
+    }
+
+    itemButtons.forEach((button) => {
+      button.addEventListener("click", () => setItemCount(button.dataset.itemCount));
+    });
+
+    function updatePriceTotal() {
+      const items = selectedItemCount();
+      priceBreakdown.textContent = `£7 × ${items} item${items === 1 ? "" : "s"}`;
+      priceTotal.textContent = formatMoney(items * 7);
+      updateBookingAvailability();
+    }
+
+    function updateBookingAvailability() {
+      const remaining = remainingItemCapacity();
+      const requested = selectedItemCount();
+      const isClosed = bookingsClosedNow();
+      bookingAvailability.classList.toggle("closed", isClosed || remaining <= 0 || requested > remaining);
+      bookingForm.querySelector("button[type='submit']").disabled = isClosed || remaining <= 0 || requested > remaining;
+
+      if (isClosed) {
+        bookingAvailability.textContent = "Bookings for today are now closed. Items must be collected by 5:00pm.";
+      } else if (remaining <= 0) {
+        bookingAvailability.textContent = "Storage is currently full for today.";
+      } else if (requested > remaining) {
+        bookingAvailability.textContent = `Only ${remaining} item space${remaining === 1 ? "" : "s"} left today. Please reduce the number of items.`;
+      } else {
+        bookingAvailability.textContent = `${remaining} item space${remaining === 1 ? "" : "s"} currently available today.`;
+      }
+    }
+
+    function validateStorageTimes() {
+      collectionTimeInput.setCustomValidity("");
+      itemsInput.setCustomValidity("");
+
+      if (bookingsClosedNow()) {
+        collectionTimeInput.setCustomValidity("Bookings for today are now closed.");
+      }
+
+      if (collectionTimeInput.value && collectionTimeInput.value > "17:00") {
+        collectionTimeInput.setCustomValidity("Items must be collected by 5:00pm.");
+      }
+
+      if (selectedItemCount() > remainingItemCapacity()) {
+        itemsInput.setCustomValidity("There is not enough luggage storage space remaining today.");
+      }
+    }
+
+    function statusFor(booking) {
+      if (booking.collectedAt) return "Collected";
+      if (booking.paymentReceivedAt) return "Paid";
+      if (booking.arrivedAt) return "Arrived";
+      return "Booked";
+    }
+
+    function statusClass(booking) {
+      return statusFor(booking).toLowerCase();
+    }
+
+    function activeToday(bookings) {
+      const key = todayKey();
+      return bookings.filter((booking) => booking.createdDate === key && !booking.collectedAt);
+    }
+
+    function formatTagNumber(tag) {
+      return String(tag).padStart(3, "0");
+    }
+
+    function getTagNumbers(booking) {
+      if (Array.isArray(booking.tagNumbers)) return booking.tagNumbers.map(String).filter(Boolean);
+      if (booking.tagNumber) return [String(booking.tagNumber)];
+      return [];
+    }
+
+    function usedTagNumbers(bookings, currentId = "") {
+      return new Set(
+        bookings
+          .filter((booking) => !booking.collectedAt && booking.id !== currentId)
+          .flatMap((booking) => getTagNumbers(booking))
+          .map(String)
+      );
+    }
+
+    function availableTags(bookings = loadBookings(), currentId = "") {
+      const used = usedTagNumbers(bookings, currentId);
+      return Array.from({ length: TAG_COUNT }, (_, index) => String(index + 1)).filter((tag) => !used.has(tag));
+    }
+
+    function assignNextTags(itemCount, bookings = loadBookings()) {
+      return availableTags(bookings).slice(0, itemCount);
+    }
+
+    function editTagsForBooking(booking) {
+      const currentTags = getTagNumbers(booking).map(formatTagNumber).join(", ");
+      const entered = prompt("Edit tags for this booking. Use commas between tag numbers.", currentTags);
+      if (entered === null) return;
+      const tagNumbers = entered
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean)
+        .map((tag) => String(Number(tag)));
+      const uniqueTags = [...new Set(tagNumbers)].filter((tag) => Number(tag) >= 1 && Number(tag) <= TAG_COUNT);
+      if (uniqueTags.length !== Number(booking.items)) {
+        alert(`This booking needs ${booking.items} tag${Number(booking.items) === 1 ? "" : "s"}.`);
+        return;
+      }
+      const used = usedTagNumbers(loadBookings(), booking.id);
+      const duplicate = uniqueTags.find((tag) => used.has(tag));
+      if (duplicate) {
+        alert(`Tag ${formatTagNumber(duplicate)} is already assigned to another active booking.`);
+        return;
+      }
+      updateBooking(booking.id, { tagNumbers: uniqueTags });
+    }
+
+    function migrateLegacyBookings(bookings) {
+      return bookings.map((booking) => {
+        if (Array.isArray(booking.tagNumbers)) return booking;
+        const { tagNumber, ...rest } = booking;
+        return {
+          ...rest,
+          tagNumbers: tagNumber ? [String(tagNumber)] : []
+        };
+      });
+    }
+
+    function ensureLegacyBookingsMigrated() {
+      const bookings = loadBookings();
+      const migrated = migrateLegacyBookings(bookings);
+      if (JSON.stringify(bookings) !== JSON.stringify(migrated)) saveBookings(migrated);
+    }
+
+    function updateStats(bookings) {
+      const todays = bookings.filter((booking) => booking.createdDate === todayKey());
+      document.getElementById("statActive").textContent = activeToday(bookings).length;
+      document.getElementById("statArrived").textContent = todays.filter((booking) => booking.arrivedAt && !booking.collectedAt).length;
+      document.getElementById("statPaid").textContent = todays.filter((booking) => booking.paymentReceivedAt && !booking.collectedAt).length;
+      document.getElementById("statCollected").textContent = todays.filter((booking) => booking.collectedAt).length;
+      document.getElementById("statCapacity").textContent = `${todayActiveItemCount(bookings)}/${DAILY_ITEM_CAPACITY}`;
+    }
+
+    function normalisePhoneForWhatsApp(mobile) {
+      let number = String(mobile || "").replace(/[\s()\-]/g, "");
+      if (number.startsWith("07")) number = `44${number.slice(1)}`;
+      if (number.startsWith("+44")) number = number.slice(1);
+      if (!number.startsWith("44") || !/^\d{11,15}$/.test(number)) return "";
+      return number;
+    }
+
+    function buildWhatsAppMessage(booking) {
+      return `Hi ${booking.name}, this is The Granary in Portree regarding your luggage storage booking ${booking.reference}.`;
+    }
+
+    function openWhatsAppForBooking(booking) {
+      const customerNumber = normalisePhoneForWhatsApp(booking.mobile);
+      if (!WHATSAPP_ENABLED || !customerNumber) return;
+      const encodedMessage = encodeURIComponent(buildWhatsAppMessage(booking));
+      window.open(`https://wa.me/${customerNumber}?text=${encodedMessage}`, "_blank", "noopener");
+    }
+
+    function renderRows() {
+      const bookings = loadBookings();
+      const query = searchInput.value.trim().toLowerCase();
+      const baseRows = dashboardMode === "today" ? activeToday(bookings) : bookings;
+      const filtered = baseRows.filter((booking) => {
+        const haystack = `${booking.reference} ${booking.name} ${booking.mobile} ${booking.email}`.toLowerCase();
+        return haystack.includes(query);
+      }).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+      updateStats(bookings);
+      bookingRows.innerHTML = "";
+      emptyState.style.display = filtered.length ? "none" : "block";
+
+      filtered.forEach((booking) => {
+        const row = document.createElement("tr");
+        const bookingTags = getTagNumbers(booking);
+        row.innerHTML = `
+          <td><strong>${booking.reference}</strong><br><span>${new Date(booking.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span></td>
+          <td><strong>${escapeHtml(booking.name)}</strong><br>${escapeHtml(booking.mobile)}${booking.email ? `<br>${escapeHtml(booking.email)}` : ""}${booking.notes ? `<br><span>${escapeHtml(booking.notes)}</span>` : ""}</td>
+          <td>${booking.items}<br><span>Expected ${formatMoney(booking.totalCost || booking.items * 7)}</span></td>
+          <td><strong>${bookingTags.length ? bookingTags.map(formatTagNumber).join(", ") : "Unassigned"}</strong></td>
+          <td>${formatTime(booking.collectionTime)}</td>
+          <td><span class="status ${statusClass(booking)}">${statusFor(booking)}</span></td>
+          <td></td>
+        `;
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+        actions.appendChild(actionButton("Arrived", () => updateBooking(booking.id, { arrivedAt: new Date().toISOString() }), Boolean(booking.arrivedAt || booking.collectedAt)));
+        actions.appendChild(actionButton("Paid", () => updateBooking(booking.id, { paymentReceivedAt: new Date().toISOString(), arrivedAt: booking.arrivedAt || new Date().toISOString() }), Boolean(booking.paymentReceivedAt || booking.collectedAt)));
+        actions.appendChild(actionButton("Collected", () => updateBooking(booking.id, { collectedAt: new Date().toISOString() }), Boolean(booking.collectedAt)));
+        actions.appendChild(actionButton("Edit tags", () => editTagsForBooking(booking), Boolean(booking.collectedAt), "ghost"));
+        const whatsAppButton = actionButton("WhatsApp", () => openWhatsAppForBooking(booking), !WHATSAPP_ENABLED || !normalisePhoneForWhatsApp(booking.mobile), "ghost");
+        whatsAppButton.classList.add("whatsapp-button");
+        if (!WHATSAPP_ENABLED) whatsAppButton.title = "WhatsApp contact not live yet";
+        actions.appendChild(whatsAppButton);
+        actions.appendChild(actionButton("Remove", () => removeBooking(booking.id), false, "danger"));
+        row.children[6].appendChild(actions);
+        bookingRows.appendChild(row);
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function actionButton(label, onClick, disabled, kind = "secondary") {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = kind;
+      button.textContent = label;
+      button.disabled = disabled;
+      button.addEventListener("click", onClick);
+      return button;
+    }
+
+    function updateBooking(id, patch) {
+      const bookings = loadBookings().map((booking) => booking.id === id ? { ...booking, ...patch } : booking);
+      saveBookings(bookings);
+      renderRows();
+    }
+
+    function removeBooking(id) {
+      if (!confirm("Remove this booking?")) return;
+      saveBookings(loadBookings().filter((booking) => booking.id !== id));
+      renderRows();
+    }
+
+    function setView(view) {
+      const isStaff = view === "staff";
+      bookingView.classList.toggle("active", !isStaff);
+      staffView.classList.toggle("active", isStaff);
+      viewButtons.forEach((button) => button.classList.toggle("active", button.dataset.viewButton === view));
+      location.hash = isStaff ? "staff" : "book";
+      if (isStaff) {
+        renderRows();
+      } else {
+        updateBookingAvailability();
+      }
+    }
+
+    function downloadCsv() {
+      const rows = loadBookings().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      const headers = ["Reference", "Name", "Mobile", "Email", "Items", "Total", "Collection", "Tags", "Status", "Customer notes", "Created", "Arrived", "Paid", "Collected"];
+      const csvRows = [headers, ...rows.map((booking) => [
+        booking.reference,
+        booking.name,
+        booking.mobile,
+        booking.email,
+        booking.items,
+        booking.totalCost || booking.items * 7,
+        booking.collectionTime,
+        getTagNumbers(booking).map(formatTagNumber).join(", "),
+        statusFor(booking),
+        booking.notes,
+        booking.createdAt,
+        booking.arrivedAt,
+        booking.paymentReceivedAt,
+        booking.collectedAt
+      ])];
+      const csv = csvRows.map((row) => row.map((value) => `"${String(value || "").replace(/"/g, '""')}"`).join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `granary-luggage-bookings-${todayKey()}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    bookingForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      validateStorageTimes();
+      if (!bookingForm.reportValidity()) return;
+      const form = new FormData(bookingForm);
+      const now = new Date();
+      const bookings = loadBookings();
+      const items = Number(form.get("items"));
+      const tagNumbers = assignNextTags(items, bookings);
+      if (tagNumbers.length < items) {
+        itemsInput.setCustomValidity("There are not enough luggage tags available for that number of items.");
+        bookingForm.reportValidity();
+        return;
+      }
+      const booking = {
+        id: makeId(),
+        reference: makeReference(bookings),
+        name: form.get("customerName").trim(),
+        mobile: form.get("mobile").trim(),
+        email: form.get("email").trim(),
+        items,
+        collectionTime: form.get("collectionTime"),
+        totalCost: items * 7,
+        tagNumbers,
+        notes: form.get("notes").trim(),
+        createdAt: now.toISOString(),
+        createdDate: todayKey(),
+        arrivedAt: "",
+        paymentReceivedAt: "",
+        collectedAt: ""
+      };
+      bookings.push(booking);
+      saveBookings(bookings);
+      confirmationRef.textContent = booking.reference;
+      confirmationSummary.textContent = `Your booking reference is ${booking.reference}. Staff will attach your luggage tags when you arrive. Number of items: ${booking.items}. Expected collection time: ${formatTime(booking.collectionTime)}. Payment due at drop-off: ${formatMoney(booking.totalCost)}.`;
+      confirmationTotal.textContent = formatMoney(booking.totalCost);
+      paymentInstruction.textContent = `Please pay ${formatMoney(booking.totalCost)} at drop-off before your items are stored.`;
+      bookingForm.style.display = "none";
+      confirmation.classList.add("active");
+    });
+
+    newBookingButton.addEventListener("click", () => {
+      bookingForm.reset();
+      setItemCount("1");
+      updatePriceTotal();
+      confirmation.classList.remove("active");
+      bookingForm.style.display = "grid";
+    });
+
+    exactItemsInput.addEventListener("input", () => {
+      itemsInput.value = Math.max(5, Number(exactItemsInput.value) || 5);
+      updatePriceTotal();
+      validateStorageTimes();
+    });
+    collectionTimeInput.addEventListener("input", validateStorageTimes);
+
+    viewButtons.forEach((button) => {
+      button.addEventListener("click", () => setView(button.dataset.viewButton));
+    });
+
+    searchInput.addEventListener("input", renderRows);
+    exportCsvButton.addEventListener("click", downloadCsv);
+    showTodayButton.addEventListener("click", () => {
+      dashboardMode = "today";
+      showTodayButton.className = "secondary";
+      showHistoryButton.className = "ghost";
+      renderRows();
+    });
+    showHistoryButton.addEventListener("click", () => {
+      dashboardMode = "history";
+      showTodayButton.className = "ghost";
+      showHistoryButton.className = "secondary";
+      renderRows();
+    });
+
+    printQrButton.addEventListener("click", () => {
+      const bookingUrl = location.href.replace(/#.*$/, "") + "#book";
+      const printWindow = window.open("", "granaryQr", "width=560,height=760");
+      printWindow.document.write(`
+        <!doctype html>
+        <html lang="en">
+        <head>
+          <title>The Granary booking QR</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 0; padding: 40px; text-align: center; color: #17201b; }
+            h1 { font-size: 42px; margin: 0 0 12px; }
+            p { font-size: 20px; line-height: 1.4; }
+            .box { border: 3px solid #17201b; padding: 26px; display: inline-block; margin: 18px auto; }
+            img { width: 300px; height: 300px; }
+            .url { font-size: 12px; overflow-wrap: anywhere; color: #555; }
+          </style>
+        </head>
+        <body>
+          <h1>Book luggage storage</h1>
+          <p>Scan to book same-day luggage storage, then pay when you drop off your items.</p>
+          <div class="box">
+            <img alt="Booking QR code" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(bookingUrl)}">
+          </div>
+          <p class="url">${bookingUrl}</p>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+    });
+
+    ensureLegacyBookingsMigrated();
+    updatePriceTotal();
+    setView(location.hash === "#staff" ? "staff" : "booking");
+  </script>
+</body>
+</html>
