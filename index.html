@@ -7,14 +7,17 @@
   <style>
     :root {
       --ink: #17201b;
-      --muted: #647067;
-      --paper: #faf8f1;
+      --muted: #62716d;
+      --paper: #f7f3e9;
       --panel: #ffffff;
-      --line: #ded8c7;
-      --brand: #2f6b4f;
-      --brand-dark: #214f3a;
-      --accent: #c77a35;
-      --accent-soft: #f4dfc8;
+      --line: #d9d4c5;
+      --brand: #2f665a;
+      --brand-dark: #1f4b43;
+      --accent: #b76f3c;
+      --accent-soft: #f0ddc6;
+      --sea: #dce9e7;
+      --sky: #edf3f1;
+      --heather: #75607c;
       --danger: #9a372f;
       --ok: #287a56;
       --shadow: 0 20px 60px rgba(31, 39, 34, .13);
@@ -28,9 +31,10 @@
       margin: 0;
       color: var(--ink);
       background:
-        radial-gradient(circle at 18% 12%, rgba(199, 122, 53, .14), transparent 280px),
-        linear-gradient(140deg, rgba(47, 107, 79, .13), transparent 390px),
-        linear-gradient(180deg, rgba(255, 255, 255, .4), transparent 260px),
+        radial-gradient(circle at 18% 10%, rgba(255, 255, 255, .9), transparent 230px),
+        linear-gradient(165deg, rgba(220, 233, 231, .95), transparent 420px),
+        linear-gradient(120deg, rgba(117, 96, 124, .12), transparent 360px),
+        linear-gradient(180deg, rgba(255, 255, 255, .38), transparent 260px),
         var(--paper);
       min-height: 100vh;
     }
@@ -42,9 +46,9 @@
       pointer-events: none;
       opacity: .28;
       background-image:
-        linear-gradient(rgba(23, 32, 27, .04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(23, 32, 27, .04) 1px, transparent 1px);
-      background-size: 34px 34px;
+        linear-gradient(rgba(31, 75, 67, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31, 75, 67, .035) 1px, transparent 1px);
+      background-size: 38px 38px;
       mask-image: linear-gradient(180deg, #000, transparent 62%);
     }
 
@@ -154,12 +158,39 @@
     .booking-layout {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 410px;
-      gap: 34px;
+      gap: 38px;
       align-items: start;
     }
 
     .hero-copy {
       padding: 18px 0 4px;
+    }
+
+    .skye-scene {
+      position: relative;
+      max-width: 740px;
+      height: 178px;
+      margin-bottom: 26px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(217, 212, 197, .92);
+      background:
+        linear-gradient(180deg, rgba(23, 32, 27, .08), rgba(23, 32, 27, .18)),
+        url("https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Portree_Isle_of_Skye_-_September_2023.jpg/1200px-Portree_Isle_of_Skye_-_September_2023.jpg");
+      background-size: cover;
+      background-position: center 58%;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .skye-scene::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(23, 32, 27, .32), transparent 58%);
+    }
+
+    .skye-scene::after {
+      content: none;
     }
 
     .eyebrow {
@@ -170,7 +201,7 @@
       padding: 0 10px;
       border: 1px solid rgba(47, 107, 79, .22);
       border-radius: 999px;
-      background: rgba(255,255,255,.72);
+      background: rgba(255,253,248,.78);
       color: var(--brand-dark);
       font-size: 13px;
       font-weight: 900;
@@ -184,6 +215,7 @@
       line-height: .96;
       letter-spacing: 0;
       max-width: 760px;
+      color: #15231f;
     }
 
     .lead {
@@ -201,14 +233,14 @@
       margin-top: 24px;
       max-width: 740px;
       overflow: hidden;
-      border: 1px solid rgba(222, 216, 199, .9);
+      border: 1px solid rgba(217, 212, 197, .92);
       border-radius: 8px;
       background: var(--line);
       box-shadow: var(--shadow-soft);
     }
 
     .service-strip div {
-      background: rgba(255,255,255,.78);
+      background: rgba(255,253,248,.82);
       padding: 14px;
     }
 
@@ -253,7 +285,7 @@
       width: 36px;
       height: 4px;
       border-radius: 999px;
-      background: var(--accent);
+      background: linear-gradient(90deg, var(--accent), var(--heather));
       margin-bottom: 12px;
     }
 
@@ -268,7 +300,7 @@
     .info-block {
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: rgba(255, 255, 255, .76);
+      background: rgba(255,253,248,.8);
       padding: 16px;
       box-shadow: var(--shadow-soft);
     }
@@ -886,10 +918,6 @@
             <div class="brand-subtitle">Luggage Storage</div>
           </div>
         </div>
-        <nav class="nav" aria-label="Main navigation">
-          <button type="button" data-view-button="booking">Booking</button>
-          <button type="button" data-view-button="staff">Staff</button>
-        </nav>
       </div>
     </header>
 
@@ -897,6 +925,7 @@
       <section id="bookingView" class="view">
         <div class="booking-layout">
           <div class="hero-copy">
+            <div class="skye-scene" aria-hidden="true"></div>
             <div class="eyebrow">The Granary Luggage Storage</div>
             <h1>Luggage storage in the heart of Portree.</h1>
             <p class="lead">Reserve same-day storage for your items, get a booking reference, then pay when you drop them off.</p>
@@ -922,7 +951,7 @@
             <div class="info-grid" aria-label="Luggage storage details">
               <div class="info-block">
                 <h2>What this booking does</h2>
-                <p>It lets the team prepare for your drop-off and find your details quickly when you arrive.</p>
+                <p>It reserves space for your items and gives staff your details before you arrive.</p>
               </div>
               <div class="info-block">
                 <h2>Payment</h2>
@@ -930,14 +959,14 @@
               </div>
               <div class="info-block">
                 <h2>At drop-off</h2>
-                <p>Drop-off is available from 8:00am. Give your name or booking reference when you arrive.</p>
+                <p>Drop-off is available from 8:00am. Give your name or reference at The Granary.</p>
               </div>
               <div class="info-block">
                 <h2>Collection</h2>
                 <p>Items must be collected the same day by 5:00pm. Show your reference or tag when collecting.</p>
               </div>
             </div>
-            <div class="notice">Same-day bookings only. Storage is subject to available space. Please keep valuables, travel documents and medication with you.</div>
+            <div class="notice">Same-day bookings only. Please keep valuables, travel documents and medication with you.</div>
           </div>
 
           <div class="panel booking-panel">
@@ -1028,6 +1057,7 @@
               <p class="lead">Today's active bookings, tags, arrivals, payments and collections.</p>
             </div>
             <div class="actions">
+              <button class="secondary" type="button" id="staffBookingButton">Booking</button>
               <button class="primary" type="button" id="printQrButton">Print booking QR</button>
             </div>
           </div>
@@ -1086,7 +1116,6 @@
     const WHATSAPP_BUSINESS_NUMBER = "";
     const TAG_COUNT = 60;
     const DAILY_ITEM_CAPACITY = TAG_COUNT;
-    const viewButtons = document.querySelectorAll("[data-view-button]");
     const bookingView = document.getElementById("bookingView");
     const staffView = document.getElementById("staffView");
     const bookingForm = document.getElementById("bookingForm");
@@ -1111,6 +1140,7 @@
     const showHistoryButton = document.getElementById("showHistoryButton");
     const exportCsvButton = document.getElementById("exportCsvButton");
     const printQrButton = document.getElementById("printQrButton");
+    const staffBookingButton = document.getElementById("staffBookingButton");
     const staffDashboard = document.getElementById("staffDashboard");
     let dashboardMode = "today";
 
@@ -1424,12 +1454,18 @@
       renderRows();
     }
 
-    function setView(view) {
+    function staffRouteIsActive() {
+      return new URLSearchParams(window.location.search).get("staff") === "1" || window.location.hash === "#staff";
+    }
+
+    function setView(view, updateUrl = true) {
       const isStaff = view === "staff";
       bookingView.classList.toggle("active", !isStaff);
       staffView.classList.toggle("active", isStaff);
-      viewButtons.forEach((button) => button.classList.toggle("active", button.dataset.viewButton === view));
-      location.hash = isStaff ? "staff" : "book";
+      if (updateUrl) {
+        const url = isStaff ? `${window.location.pathname}#staff` : window.location.pathname;
+        window.history.replaceState(null, "", url);
+      }
       if (isStaff) {
         renderRows();
       } else {
@@ -1524,9 +1560,7 @@
     });
     collectionTimeInput.addEventListener("input", validateStorageTimes);
 
-    viewButtons.forEach((button) => {
-      button.addEventListener("click", () => setView(button.dataset.viewButton));
-    });
+    staffBookingButton.addEventListener("click", () => setView("booking"));
 
     searchInput.addEventListener("input", renderRows);
     exportCsvButton.addEventListener("click", downloadCsv);
@@ -1544,7 +1578,7 @@
     });
 
     printQrButton.addEventListener("click", () => {
-      const bookingUrl = location.href.replace(/#.*$/, "") + "#book";
+      const bookingUrl = location.href.split(/[?#]/)[0] + "#book";
       const printWindow = window.open("", "granaryQr", "width=560,height=760");
       printWindow.document.write(`
         <!doctype html>
@@ -1576,7 +1610,7 @@
 
     ensureLegacyBookingsMigrated();
     updatePriceTotal();
-    setView(location.hash === "#staff" ? "staff" : "booking");
+    setView(staffRouteIsActive() ? "staff" : "booking", false);
   </script>
 </body>
 </html>
