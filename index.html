@@ -821,7 +821,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: 12px;
     }
 
@@ -846,6 +846,42 @@
       color: var(--muted);
       font-weight: 700;
       font-size: 13px;
+    }
+
+    .staff-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .summary-card {
+      min-height: 86px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.78);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .summary-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .summary-card strong {
+      display: block;
+      color: var(--brand-dark);
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .summary-card.warning strong {
+      color: var(--danger);
     }
 
     .toolbar {
@@ -950,6 +986,15 @@
     .status.arrived { background: #e7f1ff; color: #24548a; }
     .status.paid { background: #f3ecff; color: #5e3f88; }
     .status.collected { background: #e9f5ed; color: #287a56; }
+
+    .staff-flag {
+      display: block;
+      margin-top: 6px;
+      color: var(--danger);
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.25;
+    }
 
     .actions {
       display: flex;
@@ -1103,7 +1148,7 @@
         position: static;
       }
 
-      .steps, .stats, .module-strip, .info-grid, .service-strip {
+      .steps, .stats, .staff-summary, .module-strip, .info-grid, .service-strip {
         grid-template-columns: 1fr;
       }
 
@@ -1180,10 +1225,6 @@
             <div class="brand-subtitle">Luggage Storage</div>
           </div>
         </div>
-        <nav class="nav" aria-label="Main navigation">
-          <button type="button" id="bookingNavButton" class="active">Booking</button>
-          <button type="button" id="staffNavButton">Staff</button>
-        </nav>
       </div>
     </header>
 
@@ -1335,10 +1376,27 @@
             <div class="stat"><strong id="statPaid">0</strong><span>Paid</span></div>
             <div class="stat"><strong id="statCollected">0</strong><span>Collected</span></div>
             <div class="stat"><strong id="statCapacity">0/60</strong><span>Item capacity</span></div>
+            <div class="stat"><strong id="statExpectedTakings">£0</strong><span>Expected today</span></div>
+            <div class="stat"><strong id="statPaidTakings">£0</strong><span>Paid so far</span></div>
+          </div>
+
+          <div class="staff-summary" aria-label="End of day checklist">
+            <div class="summary-card" id="summaryUncollectedCard">
+              <span>Uncollected items</span>
+              <strong id="summaryUncollected">0</strong>
+            </div>
+            <div class="summary-card" id="summaryUnpaidCard">
+              <span>Unpaid bookings</span>
+              <strong id="summaryUnpaid">0</strong>
+            </div>
+            <div class="summary-card">
+              <span>Tags still out</span>
+              <strong id="summaryTagsOut">None</strong>
+            </div>
           </div>
 
           <div class="toolbar">
-            <input id="searchInput" type="search" placeholder="Search by name or reference">
+            <input id="searchInput" type="search" placeholder="Search name, reference or tag">
             <input id="staffDate" type="date" aria-label="Dashboard date">
             <button class="secondary" type="button" id="showTodayButton">Today's active</button>
             <button class="ghost" type="button" id="showHistoryButton">History</button>
@@ -1747,6 +1805,14 @@
       return currentTime > "17:00";
     }
 
+    function collectionTimePassed(booking) {
+      const dateKey = booking.bookingDate || booking.createdDate;
+      if (booking.collectedAt || dateKey !== todayKey() || !booking.collectionTime) return false;
+      const now = new Date();
+      const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      return currentTime > booking.collectionTime;
+    }
+
     function isFriday(dateKey) {
       if (!dateKey) return false;
       return new Date(`${dateKey}T00:00:00`).getDay() === 5;
@@ -1958,11 +2024,25 @@
     function updateStats(bookings) {
       const dateKey = selectedStaffDate();
       const dated = bookingsForDate(bookings, dateKey);
+      const active = activeForDate(bookings, dateKey);
+      const expectedTotal = dated.reduce((total, booking) => total + Number(booking.totalCost || booking.items * 7), 0);
+      const paidTotal = dated
+        .filter((booking) => booking.paymentReceivedAt)
+        .reduce((total, booking) => total + Number(booking.totalCost || booking.items * 7), 0);
+      const unpaidActive = active.filter((booking) => !booking.paymentReceivedAt);
+      const tagsOut = active.flatMap((booking) => getTagNumbers(booking)).map(formatTagNumber).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
       document.getElementById("statActive").textContent = activeForDate(bookings, dateKey).length;
       document.getElementById("statArrived").textContent = dated.filter((booking) => booking.arrivedAt && !booking.collectedAt).length;
       document.getElementById("statPaid").textContent = dated.filter((booking) => booking.paymentReceivedAt && !booking.collectedAt).length;
       document.getElementById("statCollected").textContent = dated.filter((booking) => booking.collectedAt).length;
       document.getElementById("statCapacity").textContent = `${activeItemCountForDate(bookings, dateKey)}/${DAILY_ITEM_CAPACITY}`;
+      document.getElementById("statExpectedTakings").textContent = formatMoney(expectedTotal);
+      document.getElementById("statPaidTakings").textContent = formatMoney(paidTotal);
+      document.getElementById("summaryUncollected").textContent = active.reduce((total, booking) => total + Number(booking.items || 0), 0);
+      document.getElementById("summaryUnpaid").textContent = unpaidActive.length;
+      document.getElementById("summaryTagsOut").textContent = tagsOut.length ? tagsOut.join(", ") : "None";
+      document.getElementById("summaryUncollectedCard").classList.toggle("warning", active.length > 0);
+      document.getElementById("summaryUnpaidCard").classList.toggle("warning", unpaidActive.length > 0);
     }
 
     function normalisePhoneForWhatsApp(mobile) {
@@ -1989,9 +2069,16 @@
       const query = searchInput.value.trim().toLowerCase();
       const baseRows = dashboardMode === "today" ? activeForDate(bookingsCache, selectedStaffDate()) : bookingsCache;
       const filtered = baseRows.filter((booking) => {
-        const haystack = `${booking.reference} ${booking.name} ${booking.mobile} ${booking.email}`.toLowerCase();
+        const tagText = getTagNumbers(booking).map(formatTagNumber).join(" ");
+        const haystack = `${booking.reference} ${booking.name} ${booking.mobile} ${booking.email} ${tagText}`.toLowerCase();
         return haystack.includes(query);
-      }).sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+      }).sort((a, b) => {
+        if (dashboardMode === "today") {
+          return String(a.collectionTime || "17:00").localeCompare(String(b.collectionTime || "17:00"))
+            || String(a.createdAt || "").localeCompare(String(b.createdAt || ""));
+        }
+        return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
+      });
 
       updateStats(bookingsCache);
       renderBlockedDates();
@@ -2001,13 +2088,17 @@
       filtered.forEach((booking) => {
         const row = document.createElement("tr");
         const bookingTags = getTagNumbers(booking);
+        const flags = [
+          booking.arrivedAt && !booking.paymentReceivedAt && !booking.collectedAt ? "Payment not recorded" : "",
+          collectionTimePassed(booking) ? "Collection time passed" : ""
+        ].filter(Boolean);
         row.innerHTML = `
           <td><strong>${booking.reference}</strong><br><span>${formatDate(booking.bookingDate || booking.createdDate)}</span></td>
           <td><strong>${escapeHtml(booking.name)}</strong><br>${escapeHtml(booking.mobile)}${booking.email ? `<br>${escapeHtml(booking.email)}` : ""}</td>
           <td>${booking.items}<br><span>Expected ${formatMoney(booking.totalCost || booking.items * 7)}</span></td>
           <td><strong>${bookingTags.length ? bookingTags.map(formatTagNumber).join(", ") : "Unassigned"}</strong></td>
           <td>${formatTime(booking.collectionTime)}</td>
-          <td><span class="status ${statusClass(booking)}">${statusFor(booking)}</span></td>
+          <td><span class="status ${statusClass(booking)}">${statusFor(booking)}</span>${flags.map((flag) => `<span class="staff-flag">${flag}</span>`).join("")}</td>
           <td>${booking.notes ? escapeHtml(booking.notes) : "-"}</td>
           <td></td>
         `;
@@ -2139,8 +2230,8 @@
       const isStaff = view === "staff";
       bookingView.classList.toggle("active", !isStaff);
       staffView.classList.toggle("active", isStaff);
-      bookingNavButton.classList.toggle("active", !isStaff);
-      staffNavButton.classList.toggle("active", isStaff);
+      bookingNavButton?.classList.toggle("active", !isStaff);
+      staffNavButton?.classList.toggle("active", isStaff);
       if (updateUrl) {
         const url = isStaff ? `${window.location.pathname}#staff` : window.location.pathname;
         window.history.replaceState(null, "", url);
@@ -2358,8 +2449,8 @@
       button.addEventListener("click", () => setItemCount(button.dataset.itemCount));
     });
     bookingForm.addEventListener("submit", handleBookingSubmit);
-    bookingNavButton.addEventListener("click", () => setView("booking"));
-    staffNavButton.addEventListener("click", () => setView("staff"));
+    bookingNavButton?.addEventListener("click", () => setView("booking"));
+    staffNavButton?.addEventListener("click", () => setView("staff"));
     newBookingButton.addEventListener("click", resetBookingForm);
     exactItemsInput.addEventListener("input", () => {
       itemsInput.value = Math.max(5, Number(exactItemsInput.value) || 5);
