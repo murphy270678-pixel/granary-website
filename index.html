@@ -588,6 +588,22 @@
       color: var(--danger);
     }
 
+    .date-warning {
+      display: none;
+      border: 1px solid #e4b9b3;
+      border-radius: 8px;
+      padding: 11px 12px;
+      background: #fff3e8;
+      color: #72401c;
+      font-size: 14px;
+      line-height: 1.4;
+      font-weight: 800;
+    }
+
+    .date-warning.active {
+      display: block;
+    }
+
     .terms-details {
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -1122,6 +1138,9 @@
                 <label for="bookingDate">Booking date</label>
                 <input id="bookingDate" name="bookingDate" type="date" required>
               </div>
+              <div id="fridayWarning" class="date-warning" aria-live="polite">
+                Friday bookings must be collected by 5:00pm. The Granary is closed on Saturday, so items cannot be left overnight.
+              </div>
               <div class="field">
                 <label for="customerName">Name</label>
                 <input id="customerName" name="customerName" autocomplete="name" required>
@@ -1149,10 +1168,6 @@
               <div id="exactItemsField" class="field hidden">
                 <label for="exactItems">Exact number of items</label>
                 <input id="exactItems" type="number" min="5" max="30" value="5">
-              </div>
-              <div class="field">
-                <label for="collectionTime">Expected collection</label>
-                <input id="collectionTime" name="collectionTime" type="time" min="08:00" max="17:00" required>
               </div>
               <div class="price-summary">
                 <span id="priceBreakdown">£7 × 1 item</span>
@@ -1229,19 +1244,6 @@
           </div>
           <div id="syncStatus" class="sync-status" aria-live="polite">Last updated just now. Auto-refresh is on.</div>
 
-          <div class="blocked-panel">
-            <div>
-              <h2>Blocked dates</h2>
-              <p>Block dates when luggage storage is unavailable.</p>
-            </div>
-            <div class="blocked-controls">
-              <input id="blockDateInput" type="date" aria-label="Date to block">
-              <input id="blockReasonInput" type="text" placeholder="Reason, optional" aria-label="Blocked date reason">
-              <button class="secondary" type="button" id="blockDateButton">Block date</button>
-            </div>
-            <div id="blockedDateList" class="blocked-list"></div>
-          </div>
-
           <div class="table-wrap">
             <table>
               <thead>
@@ -1250,7 +1252,7 @@
                   <th>Customer</th>
                   <th>Items</th>
                   <th>Tags</th>
-                  <th>Collection time</th>
+                  <th>Collection</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -1269,6 +1271,19 @@
               <div class="module">Gift vouchers</div>
               <div class="module">Event bookings</div>
             </div>
+          </div>
+
+          <div class="blocked-panel">
+            <div>
+              <h2>Blocked dates</h2>
+              <p>Block dates when luggage storage is unavailable.</p>
+            </div>
+            <div class="blocked-controls">
+              <input id="blockDateInput" type="date" aria-label="Date to block">
+              <input id="blockReasonInput" type="text" placeholder="Reason, optional" aria-label="Blocked date reason">
+              <button class="secondary" type="button" id="blockDateButton">Block date</button>
+            </div>
+            <div id="blockedDateList" class="blocked-list"></div>
           </div>
         </div>
       </section>
@@ -1300,11 +1315,11 @@
     const paymentInstruction = document.getElementById("paymentInstruction");
     const newBookingButton = document.getElementById("newBookingButton");
     const bookingDateInput = document.getElementById("bookingDate");
+    const fridayWarning = document.getElementById("fridayWarning");
     const itemsInput = document.getElementById("items");
     const itemButtons = document.querySelectorAll("[data-item-count]");
     const exactItemsField = document.getElementById("exactItemsField");
     const exactItemsInput = document.getElementById("exactItems");
-    const collectionTimeInput = document.getElementById("collectionTime");
     const priceBreakdown = document.getElementById("priceBreakdown");
     const priceTotal = document.getElementById("priceTotal");
     const bookingRows = document.getElementById("bookingRows");
@@ -1397,7 +1412,7 @@
         mobile: row.mobile,
         email: row.email || "",
         items: row.items,
-        collectionTime: String(row.collection_time || "").slice(0, 5),
+        collectionTime: String(row.collection_time || "17:00").slice(0, 5),
         totalCost: row.total_cost,
         tagNumbers: Array.isArray(row.tag_numbers) ? row.tag_numbers.map(String) : [],
         notes: row.notes || "",
@@ -1417,7 +1432,7 @@
         mobile: booking.mobile,
         email: booking.email || null,
         items: booking.items,
-        collection_time: booking.collectionTime,
+        collection_time: booking.collectionTime || "17:00",
         total_cost: booking.totalCost,
         tag_numbers: booking.tagNumbers,
         notes: booking.notes || null
@@ -1575,6 +1590,16 @@
       return currentTime > "17:00";
     }
 
+    function isFriday(dateKey) {
+      if (!dateKey) return false;
+      return new Date(`${dateKey}T00:00:00`).getDay() === 5;
+    }
+
+    function updateFridayWarning() {
+      if (!fridayWarning) return;
+      fridayWarning.classList.toggle("active", isFriday(selectedBookingDate()));
+    }
+
     function isDateBlocked(dateKey) {
       return blockedDatesCache.some((blocked) => blocked.date === dateKey);
     }
@@ -1647,6 +1672,7 @@
 
     function updateBookingAvailability() {
       const dateKey = selectedBookingDate();
+      updateFridayWarning();
       const remaining = remainingItemCapacity(dateKey);
       const requested = selectedItemCount();
       const isClosed = bookingsClosedForDate(dateKey);
@@ -1673,7 +1699,6 @@
 
     function validateBookingForm() {
       const dateKey = selectedBookingDate();
-      collectionTimeInput.setCustomValidity("");
       itemsInput.setCustomValidity("");
       bookingDateInput.setCustomValidity("");
 
@@ -1683,10 +1708,6 @@
 
       if (bookingsClosedForDate(dateKey)) {
         bookingDateInput.setCustomValidity("Bookings for today are now closed.");
-      }
-
-      if (collectionTimeInput.value && collectionTimeInput.value > "17:00") {
-        collectionTimeInput.setCustomValidity("Items must be collected by 5:00pm.");
       }
 
       if (selectedItemCount() > remainingItemCapacity(dateKey)) {
@@ -1822,7 +1843,7 @@
           <td><strong>${escapeHtml(booking.name)}</strong><br>${escapeHtml(booking.mobile)}${booking.email ? `<br>${escapeHtml(booking.email)}` : ""}${booking.notes ? `<br><span>${escapeHtml(booking.notes)}</span>` : ""}</td>
           <td>${booking.items}<br><span>Expected ${formatMoney(booking.totalCost || booking.items * 7)}</span></td>
           <td><strong>${bookingTags.length ? bookingTags.map(formatTagNumber).join(", ") : "Unassigned"}</strong></td>
-          <td>${formatTime(booking.collectionTime)}</td>
+          <td>By 5:00pm</td>
           <td><span class="status ${statusClass(booking)}">${statusFor(booking)}</span></td>
           <td></td>
         `;
@@ -1997,7 +2018,7 @@
         booking.email,
         booking.items,
         booking.totalCost || booking.items * 7,
-        booking.collectionTime,
+        "By 5:00pm",
         getTagNumbers(booking).map(formatTagNumber).join(", "),
         statusFor(booking),
         booking.notes,
@@ -2049,7 +2070,7 @@
             mobile: form.get("mobile").trim(),
             email: form.get("email").trim(),
             items,
-            collectionTime: form.get("collectionTime"),
+            collectionTime: "17:00",
             totalCost: items * 7,
             tagNumbers,
             notes: form.get("notes").trim(),
@@ -2078,7 +2099,10 @@
         }
         await refreshData();
         confirmationRef.textContent = savedBooking.reference;
-        confirmationSummary.textContent = `Your booking reference is ${savedBooking.reference}. Staff will attach your luggage tags when you arrive. Number of items: ${savedBooking.items}. Booking date: ${formatDate(savedBooking.bookingDate)}. Expected collection time: ${formatTime(savedBooking.collectionTime)}. Payment due at drop-off: ${formatMoney(savedBooking.totalCost)}.`;
+        const fridayCollectionNote = isFriday(savedBooking.bookingDate)
+          ? " The Granary is closed on Saturday, so your items must be collected by 5:00pm on Friday."
+          : "";
+        confirmationSummary.textContent = `Your booking reference is ${savedBooking.reference}. Staff will attach your luggage tags when you arrive. Number of items: ${savedBooking.items}. Booking date: ${formatDate(savedBooking.bookingDate)}. Items must be collected by 5:00pm. Payment due at drop-off: ${formatMoney(savedBooking.totalCost)}.${fridayCollectionNote}`;
         confirmationTotal.textContent = formatMoney(savedBooking.totalCost);
         paymentInstruction.textContent = emailSent
           ? `A confirmation email has been sent to ${savedBooking.email}. Please show it when collecting your items. Payment is due at drop-off.`
@@ -2126,7 +2150,6 @@
       validateBookingForm();
       updateBookingAvailability();
     });
-    collectionTimeInput.addEventListener("input", validateBookingForm);
     staffBookingButton.addEventListener("click", () => setView("booking"));
     searchInput.addEventListener("input", renderRows);
     staffDateInput.addEventListener("change", renderRows);
