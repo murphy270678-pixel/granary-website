@@ -722,7 +722,7 @@
 
     .toolbar {
       display: grid;
-      grid-template-columns: minmax(220px, 1fr) 170px auto auto auto;
+      grid-template-columns: minmax(220px, 1fr) 170px auto auto auto auto;
       gap: 10px;
       align-items: center;
       padding: 12px;
@@ -734,6 +734,13 @@
 
     .toolbar input {
       min-height: 44px;
+    }
+
+    .sync-status {
+      margin: -8px 4px 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
     }
 
     .table-wrap {
@@ -1049,9 +1056,9 @@
                 <input id="mobile" name="mobile" autocomplete="tel" inputmode="tel" required>
               </div>
               <div class="field">
-                <label for="email">Email <span aria-hidden="true">(optional)</span></label>
-                <input id="email" name="email" autocomplete="email" inputmode="email" type="email">
-                <p class="helper-text">Optional — useful if you'd like a confirmation.</p>
+                <label for="email">Email</label>
+                <input id="email" name="email" autocomplete="email" inputmode="email" type="email" required>
+                <p class="helper-text">We'll send your confirmation here. Show it when collecting your items.</p>
               </div>
               <div class="field">
                 <label>How many items are you storing?</label>
@@ -1141,8 +1148,10 @@
             <input id="staffDate" type="date" aria-label="Dashboard date">
             <button class="secondary" type="button" id="showTodayButton">Today's active</button>
             <button class="ghost" type="button" id="showHistoryButton">History</button>
+            <button class="ghost" type="button" id="refreshStaffButton">Refresh</button>
             <button class="ghost" type="button" id="exportCsvButton">Export CSV</button>
           </div>
+          <div id="syncStatus" class="sync-status" aria-live="polite">Last updated just now. Auto-refresh is on.</div>
 
           <div class="blocked-panel">
             <div>
@@ -1196,10 +1205,12 @@
     const SUPABASE_URL = "https://gwyvgtyjvejhulxsvhca.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_Fs8UjApX4q8xYpmnSSedsA_tb3VMn90";
     const SUPABASE_ENABLED = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+    const EMAIL_CONFIRMATIONS_ENABLED = true;
     const WHATSAPP_ENABLED = false;
     const WHATSAPP_BUSINESS_NUMBER = "";
     const TAG_COUNT = 60;
     const DAILY_ITEM_CAPACITY = TAG_COUNT;
+    const STAFF_REFRESH_MS = 30000;
     const bookingView = document.getElementById("bookingView");
     const staffView = document.getElementById("staffView");
     const bookingForm = document.getElementById("bookingForm");
@@ -1224,6 +1235,7 @@
     const staffDateInput = document.getElementById("staffDate");
     const showTodayButton = document.getElementById("showTodayButton");
     const showHistoryButton = document.getElementById("showHistoryButton");
+    const refreshStaffButton = document.getElementById("refreshStaffButton");
     const exportCsvButton = document.getElementById("exportCsvButton");
     const printQrButton = document.getElementById("printQrButton");
     const staffBookingButton = document.getElementById("staffBookingButton");
@@ -1231,10 +1243,13 @@
     const blockReasonInput = document.getElementById("blockReasonInput");
     const blockDateButton = document.getElementById("blockDateButton");
     const blockedDateList = document.getElementById("blockedDateList");
+    const syncStatus = document.getElementById("syncStatus");
     let dashboardMode = "today";
     let bookingsCache = [];
     let blockedDatesCache = [];
     let dataMessage = "";
+    let staffRefreshTimer = null;
+    let staffRefreshInProgress = false;
 
     function todayKey() {
       const now = new Date();
@@ -1374,6 +1389,29 @@
         body: JSON.stringify(toDbBooking(booking))
       });
       return fromDbBooking(rows[0]);
+    }
+
+    async function sendBookingConfirmationEmail(booking) {
+      if (!EMAIL_CONFIRMATIONS_ENABLED || !SUPABASE_ENABLED || !booking.email) {
+        return { sent: false, reason: "Email confirmations are not available." };
+      }
+
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/dynamic-endpoint`, {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ bookingId: booking.id })
+      });
+
+      if (!response.ok) {
+        const details = await response.text();
+        throw new Error(details || "Email confirmation failed.");
+      }
+
+      return response.json();
     }
 
     async function saveBookingPatch(id, patch) {
@@ -1727,6 +1765,43 @@
       });
     }
 
+    function updateSyncStatus(message) {
+      if (!syncStatus) return;
+      syncStatus.textContent = message;
+    }
+
+    async function refreshStaffDashboard(manual = false) {
+      if (staffRefreshInProgress) return;
+      staffRefreshInProgress = true;
+      if (manual) updateSyncStatus("Refreshing bookings...");
+
+      try {
+        await refreshData();
+        renderRows();
+        updateBookingAvailability();
+        const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        updateSyncStatus(`Last updated ${time}. Auto-refresh is on.`);
+      } catch (error) {
+        console.error(error);
+        updateSyncStatus("Could not refresh bookings. Try again in a moment.");
+      } finally {
+        staffRefreshInProgress = false;
+      }
+    }
+
+    function startStaffAutoRefresh() {
+      if (staffRefreshTimer) return;
+      staffRefreshTimer = window.setInterval(() => {
+        if (staffView.classList.contains("active")) refreshStaffDashboard();
+      }, STAFF_REFRESH_MS);
+    }
+
+    function stopStaffAutoRefresh() {
+      if (!staffRefreshTimer) return;
+      window.clearInterval(staffRefreshTimer);
+      staffRefreshTimer = null;
+    }
+
     function renderBlockedDates() {
       blockedDateList.innerHTML = "";
       const upcoming = blockedDatesCache.filter((blocked) => blocked.date >= todayKey());
@@ -1806,8 +1881,10 @@
         window.history.replaceState(null, "", url);
       }
       if (isStaff) {
+        startStaffAutoRefresh();
         renderRows();
       } else {
+        stopStaffAutoRefresh();
         updateBookingAvailability();
       }
     }
@@ -1894,11 +1971,21 @@
         }
 
         if (!savedBooking) throw new Error("Could not create booking reference.");
+        submitButton.textContent = "Sending confirmation...";
+        let emailSent = false;
+        try {
+          await sendBookingConfirmationEmail(savedBooking);
+          emailSent = true;
+        } catch (emailError) {
+          console.error(emailError);
+        }
         await refreshData();
         confirmationRef.textContent = savedBooking.reference;
         confirmationSummary.textContent = `Your booking reference is ${savedBooking.reference}. Staff will attach your luggage tags when you arrive. Number of items: ${savedBooking.items}. Booking date: ${formatDate(savedBooking.bookingDate)}. Expected collection time: ${formatTime(savedBooking.collectionTime)}. Payment due at drop-off: ${formatMoney(savedBooking.totalCost)}.`;
         confirmationTotal.textContent = formatMoney(savedBooking.totalCost);
-        paymentInstruction.textContent = `Please pay ${formatMoney(savedBooking.totalCost)} at drop-off before your items are stored.`;
+        paymentInstruction.textContent = emailSent
+          ? `A confirmation email has been sent to ${savedBooking.email}. Please show it when collecting your items. Payment is due at drop-off.`
+          : "Your booking is saved, but the confirmation email could not be sent. Please screenshot this reference and show it when collecting your items.";
         bookingForm.style.display = "none";
         confirmation.classList.add("active");
       } catch (error) {
@@ -1946,6 +2033,7 @@
     staffBookingButton.addEventListener("click", () => setView("booking"));
     searchInput.addEventListener("input", renderRows);
     staffDateInput.addEventListener("change", renderRows);
+    refreshStaffButton.addEventListener("click", () => refreshStaffDashboard(true));
     exportCsvButton.addEventListener("click", downloadCsv);
     blockDateButton.addEventListener("click", handleBlockDate);
     window.addEventListener("hashchange", () => {
@@ -1953,6 +2041,9 @@
     });
     window.addEventListener("popstate", () => {
       setView(staffRouteIsActive() ? "staff" : "booking", false);
+    });
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && staffView.classList.contains("active")) refreshStaffDashboard();
     });
     showTodayButton.addEventListener("click", () => {
       dashboardMode = "today";
