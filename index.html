@@ -3,7 +3,40 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>The Granary Luggage Storage</title>
+  <title>Luggage Storage Portree | The Granary</title>
+  <meta name="description" content="Book luggage storage in Portree at The Granary. £7 per item, drop off from 8:00am, collect by 5:00pm, and pay in person at drop-off.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://granaryportree.uk/">
+  <meta property="og:title" content="Luggage Storage Portree | The Granary">
+  <meta property="og:description" content="Reserve luggage storage in the heart of Portree. £7 per item, payment at drop-off, collect by 5:00pm.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://granaryportree.uk/">
+  <meta property="og:image" content="https://granaryportree.uk/portree-harbour.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "The Granary Luggage Storage",
+    "url": "https://granaryportree.uk/",
+    "image": "https://granaryportree.uk/portree-harbour.jpg",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Portree",
+      "addressRegion": "Isle of Skye",
+      "addressCountry": "GB"
+    },
+    "areaServed": ["Portree", "Isle of Skye"],
+    "priceRange": "£7 per item",
+    "description": "Luggage storage in Portree at The Granary. Drop off from 8:00am, collect by 5:00pm, and pay in person at drop-off.",
+    "openingHoursSpecification": [{
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      "opens": "08:00",
+      "closes": "17:00"
+    }]
+  }
+  </script>
   <style>
     :root {
       --ink: #17201b;
@@ -333,6 +366,42 @@
       color: #3f4c44;
       line-height: 1.45;
       font-weight: 700;
+    }
+
+    .search-copy {
+      max-width: 740px;
+      margin-top: 18px;
+      color: #465249;
+      line-height: 1.55;
+      font-size: 15px;
+    }
+
+    .reassurance-list {
+      display: grid;
+      gap: 8px;
+      max-width: 740px;
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .reassurance-list li {
+      display: flex;
+      gap: 9px;
+      align-items: start;
+      color: #354239;
+      line-height: 1.45;
+      font-weight: 800;
+    }
+
+    .reassurance-list li::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      margin-top: 8px;
+      border-radius: 999px;
+      background: var(--brand);
+      flex: 0 0 auto;
     }
 
     .panel {
@@ -997,7 +1066,7 @@
             </div>
             <div class="eyebrow">The Granary Luggage Storage</div>
             <h1>Luggage storage in the heart of Portree.</h1>
-            <p class="lead">Reserve storage for your items, get a booking reference, then pay when you drop them off.</p>
+            <p class="lead">Reserve left luggage and bag storage in central Portree, get a booking reference by email, then pay when you drop your items off.</p>
             <div class="service-strip" aria-label="Luggage storage summary">
               <div>
                 <span>Price</span>
@@ -1028,13 +1097,19 @@
               </div>
               <div class="info-block">
                 <h2>At drop-off</h2>
-                <p>Drop-off is available from 8:00am. Give your name or reference at The Granary.</p>
+                <p>Drop-off is available from 8:00am. Give your name, reference or confirmation email at The Granary.</p>
               </div>
               <div class="info-block">
                 <h2>Collection</h2>
-                <p>Items must be collected the same day by 5:00pm. Show your reference or tag when collecting.</p>
+                <p>Items must be collected by 5:00pm on your booking date. Show your confirmation email or reference when collecting.</p>
               </div>
             </div>
+            <p class="search-copy">The Granary offers luggage storage in Portree for visitors exploring the town, heading for tours, waiting for transport, or spending time around the harbour before check-in.</p>
+            <ul class="reassurance-list" aria-label="Useful booking details">
+              <li>Central Portree location, close to the harbour and town centre.</li>
+              <li>£7 per item, with payment taken in person at drop-off.</li>
+              <li>Confirmation email sent after booking so you can show it at collection.</li>
+            </ul>
             <div class="notice">Please keep valuables, travel documents and medication with you.</div>
           </div>
 
@@ -1095,6 +1170,7 @@
                   <li>Storage is subject to available space when you arrive.</li>
                   <li>Keep valuables, money, travel documents and medication with you.</li>
                   <li>Payment is taken at drop-off before items are stored.</li>
+                  <li>Your contact details are used only to manage your luggage storage booking and contact you about it.</li>
                 </ul>
               </details>
               <label class="terms">
@@ -1208,6 +1284,8 @@
     const EMAIL_CONFIRMATIONS_ENABLED = true;
     const WHATSAPP_ENABLED = false;
     const WHATSAPP_BUSINESS_NUMBER = "";
+    const STAFF_ACCESS_CODE = "granary";
+    const STAFF_ACCESS_KEY = "granaryStaffAccess";
     const TAG_COUNT = 60;
     const DAILY_ITEM_CAPACITY = TAG_COUNT;
     const STAFF_REFRESH_MS = 30000;
@@ -1872,8 +1950,27 @@
       return new URLSearchParams(window.location.search).get("staff") === "1" || window.location.hash === "#staff";
     }
 
+    function staffAccessGranted() {
+      return sessionStorage.getItem(STAFF_ACCESS_KEY) === "yes";
+    }
+
+    function requestStaffAccess() {
+      if (staffAccessGranted()) return true;
+      const entered = prompt("Staff access code");
+      if (entered === STAFF_ACCESS_CODE) {
+        sessionStorage.setItem(STAFF_ACCESS_KEY, "yes");
+        return true;
+      }
+      window.history.replaceState(null, "", window.location.pathname);
+      return false;
+    }
+
     function setView(view, updateUrl = true) {
       const isStaff = view === "staff";
+      if (isStaff && !requestStaffAccess()) {
+        setView("booking", false);
+        return;
+      }
       bookingView.classList.toggle("active", !isStaff);
       staffView.classList.toggle("active", isStaff);
       if (updateUrl) {
