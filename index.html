@@ -722,7 +722,7 @@
 
     .toolbar {
       display: grid;
-      grid-template-columns: minmax(220px, 1fr) auto auto auto;
+      grid-template-columns: minmax(220px, 1fr) 170px auto auto auto;
       gap: 10px;
       align-items: center;
       padding: 12px;
@@ -819,6 +819,58 @@
       font-weight: 700;
     }
 
+    .blocked-panel {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.78);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .blocked-panel h2 {
+      margin: 0 0 4px;
+      font-size: 20px;
+    }
+
+    .blocked-panel p {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .blocked-controls {
+      display: grid;
+      grid-template-columns: 170px minmax(180px, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .blocked-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .blocked-date {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid #ead8cf;
+      border-radius: 8px;
+      background: #fff8ed;
+      color: #4a554d;
+      font-weight: 800;
+    }
+
+    .blocked-date span {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
     .module-strip {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -868,6 +920,10 @@
       }
 
       .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .blocked-controls {
         grid-template-columns: 1fr;
       }
     }
@@ -934,7 +990,7 @@
             </div>
             <div class="eyebrow">The Granary Luggage Storage</div>
             <h1>Luggage storage in the heart of Portree.</h1>
-            <p class="lead">Reserve same-day storage for your items, get a booking reference, then pay when you drop them off.</p>
+            <p class="lead">Reserve storage for your items, get a booking reference, then pay when you drop them off.</p>
             <div class="service-strip" aria-label="Luggage storage summary">
               <div>
                 <span>Price</span>
@@ -972,14 +1028,18 @@
                 <p>Items must be collected the same day by 5:00pm. Show your reference or tag when collecting.</p>
               </div>
             </div>
-            <div class="notice">Same-day bookings only. Please keep valuables, travel documents and medication with you.</div>
+            <div class="notice">Please keep valuables, travel documents and medication with you.</div>
           </div>
 
           <div class="panel booking-panel">
             <form id="bookingForm">
               <h2>Luggage storage</h2>
-              <p class="form-note">Same-day bookings only. Drop off from 8:00am and collect by 5:00pm.</p>
+              <p class="form-note">Drop off from 8:00am and collect by 5:00pm on your booking date.</p>
               <div id="bookingAvailability" class="availability" aria-live="polite"></div>
+              <div class="field">
+                <label for="bookingDate">Booking date</label>
+                <input id="bookingDate" name="bookingDate" type="date" required>
+              </div>
               <div class="field">
                 <label for="customerName">Name</label>
                 <input id="customerName" name="customerName" autocomplete="name" required>
@@ -1023,8 +1083,8 @@
               <details class="terms-details">
                 <summary>Storage terms</summary>
                 <ul>
-                  <li>Bookings are for same-day luggage storage only.</li>
-                  <li>Items must be collected by 5:00pm on the day of booking.</li>
+                  <li>Bookings are for luggage storage on the selected booking date only.</li>
+                  <li>Items must be collected by 5:00pm on the booking date.</li>
                   <li>Storage is subject to available space when you arrive.</li>
                   <li>Keep valuables, money, travel documents and medication with you.</li>
                   <li>Payment is taken at drop-off before items are stored.</li>
@@ -1060,7 +1120,7 @@
           <div class="dash-head">
             <div>
               <h1>Staff dashboard</h1>
-              <p class="lead">Today's active bookings, tags, arrivals, payments and collections.</p>
+              <p class="lead">Bookings, tags, arrivals, payments and collections for the selected date.</p>
             </div>
             <div class="actions">
               <button class="secondary" type="button" id="staffBookingButton">Booking</button>
@@ -1078,9 +1138,23 @@
 
           <div class="toolbar">
             <input id="searchInput" type="search" placeholder="Search by name or reference">
+            <input id="staffDate" type="date" aria-label="Dashboard date">
             <button class="secondary" type="button" id="showTodayButton">Today's active</button>
             <button class="ghost" type="button" id="showHistoryButton">History</button>
             <button class="ghost" type="button" id="exportCsvButton">Export CSV</button>
+          </div>
+
+          <div class="blocked-panel">
+            <div>
+              <h2>Blocked dates</h2>
+              <p>Block dates when luggage storage is unavailable.</p>
+            </div>
+            <div class="blocked-controls">
+              <input id="blockDateInput" type="date" aria-label="Date to block">
+              <input id="blockReasonInput" type="text" placeholder="Reason, optional" aria-label="Blocked date reason">
+              <button class="secondary" type="button" id="blockDateButton">Block date</button>
+            </div>
+            <div id="blockedDateList" class="blocked-list"></div>
           </div>
 
           <div class="table-wrap">
@@ -1118,6 +1192,10 @@
 
   <script>
     const STORAGE_KEY = "granaryHubBookings";
+    const BLOCKED_DATES_KEY = "granaryHubBlockedDates";
+    const SUPABASE_URL = "https://gwyvgtyjvejhulxsvhca.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_Fs8UjApX4q8xYpmnSSedsA_tb3VMn90";
+    const SUPABASE_ENABLED = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
     const WHATSAPP_ENABLED = false;
     const WHATSAPP_BUSINESS_NUMBER = "";
     const TAG_COUNT = 60;
@@ -1132,6 +1210,7 @@
     const confirmationTotal = document.getElementById("confirmationTotal");
     const paymentInstruction = document.getElementById("paymentInstruction");
     const newBookingButton = document.getElementById("newBookingButton");
+    const bookingDateInput = document.getElementById("bookingDate");
     const itemsInput = document.getElementById("items");
     const itemButtons = document.querySelectorAll("[data-item-count]");
     const exactItemsField = document.getElementById("exactItemsField");
@@ -1142,19 +1221,36 @@
     const bookingRows = document.getElementById("bookingRows");
     const emptyState = document.getElementById("emptyState");
     const searchInput = document.getElementById("searchInput");
+    const staffDateInput = document.getElementById("staffDate");
     const showTodayButton = document.getElementById("showTodayButton");
     const showHistoryButton = document.getElementById("showHistoryButton");
     const exportCsvButton = document.getElementById("exportCsvButton");
     const printQrButton = document.getElementById("printQrButton");
     const staffBookingButton = document.getElementById("staffBookingButton");
-    const staffDashboard = document.getElementById("staffDashboard");
+    const blockDateInput = document.getElementById("blockDateInput");
+    const blockReasonInput = document.getElementById("blockReasonInput");
+    const blockDateButton = document.getElementById("blockDateButton");
+    const blockedDateList = document.getElementById("blockedDateList");
     let dashboardMode = "today";
+    let bookingsCache = [];
+    let blockedDatesCache = [];
+    let dataMessage = "";
 
     function todayKey() {
-      return new Date().toISOString().slice(0, 10);
+      const now = new Date();
+      const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+      return local.toISOString().slice(0, 10);
     }
 
-    function loadBookings() {
+    function selectedBookingDate() {
+      return bookingDateInput.value || todayKey();
+    }
+
+    function selectedStaffDate() {
+      return staffDateInput.value || todayKey();
+    }
+
+    function loadLocalBookings() {
       try {
         return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
       } catch (error) {
@@ -1162,34 +1258,222 @@
       }
     }
 
-    function saveBookings(bookings) {
+    function saveLocalBookings(bookings) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
-      if (bookingAvailability) updateBookingAvailability();
     }
 
-    function todayActiveItemCount(bookings = loadBookings()) {
-      return bookings
-        .filter((booking) => !booking.collectedAt)
+    function loadLocalBlockedDates() {
+      try {
+        return JSON.parse(localStorage.getItem(BLOCKED_DATES_KEY)) || [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveLocalBlockedDates(dates) {
+      localStorage.setItem(BLOCKED_DATES_KEY, JSON.stringify(dates));
+    }
+
+    async function supabaseRequest(path, options = {}) {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+        ...options,
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
+          Prefer: "return=representation",
+          ...(options.headers || {})
+        }
+      });
+      if (!response.ok) {
+        const details = await response.text();
+        throw new Error(details || `Request failed: ${response.status}`);
+      }
+      if (response.status === 204) return null;
+      const text = await response.text();
+      return text ? JSON.parse(text) : null;
+    }
+
+    function fromDbBooking(row) {
+      return {
+        id: row.id,
+        reference: row.reference,
+        bookingDate: row.booking_date,
+        createdDate: row.booking_date,
+        name: row.name,
+        mobile: row.mobile,
+        email: row.email || "",
+        items: row.items,
+        collectionTime: String(row.collection_time || "").slice(0, 5),
+        totalCost: row.total_cost,
+        tagNumbers: Array.isArray(row.tag_numbers) ? row.tag_numbers.map(String) : [],
+        notes: row.notes || "",
+        createdAt: row.created_at,
+        arrivedAt: row.arrived_at || "",
+        paymentReceivedAt: row.payment_received_at || "",
+        collectedAt: row.collected_at || ""
+      };
+    }
+
+    function toDbBooking(booking) {
+      return {
+        id: booking.id,
+        reference: booking.reference,
+        booking_date: booking.bookingDate,
+        name: booking.name,
+        mobile: booking.mobile,
+        email: booking.email || null,
+        items: booking.items,
+        collection_time: booking.collectionTime,
+        total_cost: booking.totalCost,
+        tag_numbers: booking.tagNumbers,
+        notes: booking.notes || null
+      };
+    }
+
+    function fromDbBlockedDate(row) {
+      return {
+        date: row.date,
+        reason: row.reason || ""
+      };
+    }
+
+    async function refreshData() {
+      if (!SUPABASE_ENABLED) {
+        bookingsCache = migrateLegacyBookings(loadLocalBookings());
+        blockedDatesCache = loadLocalBlockedDates();
+        dataMessage = "";
+        return;
+      }
+
+      try {
+        const [bookings, blockedDates] = await Promise.all([
+          supabaseRequest("bookings?select=*&order=created_at.desc"),
+          supabaseRequest("blocked_dates?select=*&order=date.asc")
+        ]);
+        bookingsCache = (bookings || []).map(fromDbBooking);
+        blockedDatesCache = (blockedDates || []).map(fromDbBlockedDate);
+        dataMessage = "";
+      } catch (error) {
+        console.error(error);
+        bookingsCache = migrateLegacyBookings(loadLocalBookings());
+        blockedDatesCache = loadLocalBlockedDates();
+        dataMessage = "Could not reach the shared booking database. Showing this device only.";
+      }
+    }
+
+    async function createBooking(booking) {
+      if (!SUPABASE_ENABLED) {
+        bookingsCache.push(booking);
+        saveLocalBookings(bookingsCache);
+        return booking;
+      }
+
+      const rows = await supabaseRequest("bookings?select=*", {
+        method: "POST",
+        body: JSON.stringify(toDbBooking(booking))
+      });
+      return fromDbBooking(rows[0]);
+    }
+
+    async function saveBookingPatch(id, patch) {
+      if (!SUPABASE_ENABLED || dataMessage) {
+        bookingsCache = bookingsCache.map((booking) => booking.id === id ? { ...booking, ...patch } : booking);
+        saveLocalBookings(bookingsCache);
+        return;
+      }
+
+      const dbPatch = {};
+      if ("tagNumbers" in patch) dbPatch.tag_numbers = patch.tagNumbers;
+      if ("arrivedAt" in patch) dbPatch.arrived_at = patch.arrivedAt || null;
+      if ("paymentReceivedAt" in patch) dbPatch.payment_received_at = patch.paymentReceivedAt || null;
+      if ("collectedAt" in patch) dbPatch.collected_at = patch.collectedAt || null;
+      await supabaseRequest(`bookings?id=eq.${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        body: JSON.stringify(dbPatch)
+      });
+      await refreshData();
+    }
+
+    async function deleteBooking(id) {
+      if (!SUPABASE_ENABLED || dataMessage) {
+        bookingsCache = bookingsCache.filter((booking) => booking.id !== id);
+        saveLocalBookings(bookingsCache);
+        return;
+      }
+
+      await supabaseRequest(`bookings?id=eq.${encodeURIComponent(id)}`, { method: "DELETE" });
+      await refreshData();
+    }
+
+    async function addBlockedDate(date, reason) {
+      if (!SUPABASE_ENABLED || dataMessage) {
+        blockedDatesCache = [
+          ...blockedDatesCache.filter((blocked) => blocked.date !== date),
+          { date, reason }
+        ].sort((a, b) => a.date.localeCompare(b.date));
+        saveLocalBlockedDates(blockedDatesCache);
+        return;
+      }
+
+      await supabaseRequest("blocked_dates?on_conflict=date", {
+        method: "POST",
+        headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+        body: JSON.stringify({ date, reason: reason || null })
+      });
+      await refreshData();
+    }
+
+    async function removeBlockedDate(date) {
+      if (!SUPABASE_ENABLED || dataMessage) {
+        blockedDatesCache = blockedDatesCache.filter((blocked) => blocked.date !== date);
+        saveLocalBlockedDates(blockedDatesCache);
+        return;
+      }
+
+      await supabaseRequest(`blocked_dates?date=eq.${encodeURIComponent(date)}`, { method: "DELETE" });
+      await refreshData();
+    }
+
+    function bookingsForDate(bookings, dateKey) {
+      return bookings.filter((booking) => (booking.bookingDate || booking.createdDate) === dateKey);
+    }
+
+    function activeForDate(bookings, dateKey) {
+      return bookingsForDate(bookings, dateKey).filter((booking) => !booking.collectedAt);
+    }
+
+    function activeItemCountForDate(bookings, dateKey) {
+      return activeForDate(bookings, dateKey)
         .reduce((total, booking) => total + getTagNumbers(booking).length, 0);
     }
 
-    function remainingItemCapacity(bookings = loadBookings()) {
-      return availableTags(bookings).length;
+    function remainingItemCapacity(dateKey, bookings = bookingsCache) {
+      return availableTags(bookings, dateKey).length;
     }
 
-    function bookingsClosedNow() {
+    function bookingsClosedForDate(dateKey) {
+      if (dateKey !== todayKey()) return false;
       const now = new Date();
       const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
       return currentTime > "17:00";
     }
 
-    function makeReference(bookings) {
-      const todaysRefs = bookings
-        .filter((booking) => booking.createdDate === todayKey())
+    function isDateBlocked(dateKey) {
+      return blockedDatesCache.some((blocked) => blocked.date === dateKey);
+    }
+
+    function blockedReason(dateKey) {
+      const blocked = blockedDatesCache.find((entry) => entry.date === dateKey);
+      return blocked ? blocked.reason : "";
+    }
+
+    function makeReference(bookings, dateKey) {
+      const refs = bookingsForDate(bookings, dateKey)
         .map((booking) => /^G(\d{3})$/.exec(booking.reference || ""))
         .filter(Boolean)
         .map((match) => Number(match[1]));
-      const nextNumber = (todaysRefs.length ? Math.max(...todaysRefs) : 0) + 1;
+      const nextNumber = (refs.length ? Math.max(...refs) : 0) + 1;
       return `G${String(nextNumber).padStart(3, "0")}`;
     }
 
@@ -1202,6 +1486,16 @@
       if (!time) return "-";
       const [hours, minutes] = time.split(":");
       return `${hours}:${minutes}`;
+    }
+
+    function formatDate(dateKey) {
+      if (!dateKey) return "-";
+      return new Date(`${dateKey}T00:00:00`).toLocaleDateString([], {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+      });
     }
 
     function formatMoney(value) {
@@ -1225,12 +1519,8 @@
         button.classList.toggle("active", button.dataset.itemCount === value);
       });
       updatePriceTotal();
-      validateStorageTimes();
+      validateBookingForm();
     }
-
-    itemButtons.forEach((button) => {
-      button.addEventListener("click", () => setItemCount(button.dataset.itemCount));
-    });
 
     function updatePriceTotal() {
       const items = selectedItemCount();
@@ -1240,37 +1530,51 @@
     }
 
     function updateBookingAvailability() {
-      const remaining = remainingItemCapacity();
+      const dateKey = selectedBookingDate();
+      const remaining = remainingItemCapacity(dateKey);
       const requested = selectedItemCount();
-      const isClosed = bookingsClosedNow();
-      bookingAvailability.classList.toggle("closed", isClosed || remaining <= 0 || requested > remaining);
-      bookingForm.querySelector("button[type='submit']").disabled = isClosed || remaining <= 0 || requested > remaining;
+      const isClosed = bookingsClosedForDate(dateKey);
+      const isBlocked = isDateBlocked(dateKey);
+      const submitButton = bookingForm.querySelector("button[type='submit']");
+      const unavailable = Boolean(dataMessage) || isBlocked || isClosed || remaining <= 0 || requested > remaining;
+      bookingAvailability.classList.toggle("closed", unavailable);
+      submitButton.disabled = unavailable;
 
-      if (isClosed) {
+      if (dataMessage) {
+        bookingAvailability.textContent = dataMessage;
+      } else if (isBlocked) {
+        bookingAvailability.textContent = `Luggage storage is unavailable on ${formatDate(dateKey)}${blockedReason(dateKey) ? `: ${blockedReason(dateKey)}` : "."}`;
+      } else if (isClosed) {
         bookingAvailability.textContent = "Bookings for today are now closed. Items must be collected by 5:00pm.";
       } else if (remaining <= 0) {
-        bookingAvailability.textContent = "Storage is currently full for today.";
+        bookingAvailability.textContent = `Storage is currently full for ${formatDate(dateKey)}.`;
       } else if (requested > remaining) {
-        bookingAvailability.textContent = `Only ${remaining} item space${remaining === 1 ? "" : "s"} left today. Please reduce the number of items.`;
+        bookingAvailability.textContent = `Only ${remaining} item space${remaining === 1 ? "" : "s"} left for ${formatDate(dateKey)}. Please reduce the number of items.`;
       } else {
-        bookingAvailability.textContent = `${remaining} item space${remaining === 1 ? "" : "s"} currently available today.`;
+        bookingAvailability.textContent = `${remaining} item space${remaining === 1 ? "" : "s"} currently available for ${formatDate(dateKey)}.`;
       }
     }
 
-    function validateStorageTimes() {
+    function validateBookingForm() {
+      const dateKey = selectedBookingDate();
       collectionTimeInput.setCustomValidity("");
       itemsInput.setCustomValidity("");
+      bookingDateInput.setCustomValidity("");
 
-      if (bookingsClosedNow()) {
-        collectionTimeInput.setCustomValidity("Bookings for today are now closed.");
+      if (isDateBlocked(dateKey)) {
+        bookingDateInput.setCustomValidity("Luggage storage is unavailable on this date.");
+      }
+
+      if (bookingsClosedForDate(dateKey)) {
+        bookingDateInput.setCustomValidity("Bookings for today are now closed.");
       }
 
       if (collectionTimeInput.value && collectionTimeInput.value > "17:00") {
         collectionTimeInput.setCustomValidity("Items must be collected by 5:00pm.");
       }
 
-      if (selectedItemCount() > remainingItemCapacity()) {
-        itemsInput.setCustomValidity("There is not enough luggage storage space remaining today.");
+      if (selectedItemCount() > remainingItemCapacity(dateKey)) {
+        itemsInput.setCustomValidity("There is not enough luggage storage space remaining for this date.");
       }
     }
 
@@ -1285,11 +1589,6 @@
       return statusFor(booking).toLowerCase();
     }
 
-    function activeToday(bookings) {
-      const key = todayKey();
-      return bookings.filter((booking) => booking.createdDate === key && !booking.collectedAt);
-    }
-
     function formatTagNumber(tag) {
       return String(tag).padStart(3, "0");
     }
@@ -1300,25 +1599,25 @@
       return [];
     }
 
-    function usedTagNumbers(bookings, currentId = "") {
+    function usedTagNumbers(bookings, dateKey, currentId = "") {
       return new Set(
-        bookings
-          .filter((booking) => !booking.collectedAt && booking.id !== currentId)
+        activeForDate(bookings, dateKey)
+          .filter((booking) => booking.id !== currentId)
           .flatMap((booking) => getTagNumbers(booking))
           .map(String)
       );
     }
 
-    function availableTags(bookings = loadBookings(), currentId = "") {
-      const used = usedTagNumbers(bookings, currentId);
+    function availableTags(bookings = bookingsCache, dateKey = selectedBookingDate(), currentId = "") {
+      const used = usedTagNumbers(bookings, dateKey, currentId);
       return Array.from({ length: TAG_COUNT }, (_, index) => String(index + 1)).filter((tag) => !used.has(tag));
     }
 
-    function assignNextTags(itemCount, bookings = loadBookings()) {
-      return availableTags(bookings).slice(0, itemCount);
+    function assignNextTags(itemCount, bookings = bookingsCache, dateKey = selectedBookingDate()) {
+      return availableTags(bookings, dateKey).slice(0, itemCount);
     }
 
-    function editTagsForBooking(booking) {
+    async function editTagsForBooking(booking) {
       const currentTags = getTagNumbers(booking).map(formatTagNumber).join(", ");
       const entered = prompt("Edit tags for this booking. Use commas between tag numbers.", currentTags);
       if (entered === null) return;
@@ -1332,39 +1631,39 @@
         alert(`This booking needs ${booking.items} tag${Number(booking.items) === 1 ? "" : "s"}.`);
         return;
       }
-      const used = usedTagNumbers(loadBookings(), booking.id);
+      const used = usedTagNumbers(bookingsCache, booking.bookingDate || booking.createdDate, booking.id);
       const duplicate = uniqueTags.find((tag) => used.has(tag));
       if (duplicate) {
         alert(`Tag ${formatTagNumber(duplicate)} is already assigned to another active booking.`);
         return;
       }
-      updateBooking(booking.id, { tagNumbers: uniqueTags });
+      await updateBooking(booking.id, { tagNumbers: uniqueTags });
     }
 
     function migrateLegacyBookings(bookings) {
       return bookings.map((booking) => {
-        if (Array.isArray(booking.tagNumbers)) return booking;
+        const dateKey = booking.bookingDate || booking.createdDate || todayKey();
+        if (Array.isArray(booking.tagNumbers)) {
+          return { ...booking, bookingDate: dateKey, createdDate: dateKey };
+        }
         const { tagNumber, ...rest } = booking;
         return {
           ...rest,
+          bookingDate: dateKey,
+          createdDate: dateKey,
           tagNumbers: tagNumber ? [String(tagNumber)] : []
         };
       });
     }
 
-    function ensureLegacyBookingsMigrated() {
-      const bookings = loadBookings();
-      const migrated = migrateLegacyBookings(bookings);
-      if (JSON.stringify(bookings) !== JSON.stringify(migrated)) saveBookings(migrated);
-    }
-
     function updateStats(bookings) {
-      const todays = bookings.filter((booking) => booking.createdDate === todayKey());
-      document.getElementById("statActive").textContent = activeToday(bookings).length;
-      document.getElementById("statArrived").textContent = todays.filter((booking) => booking.arrivedAt && !booking.collectedAt).length;
-      document.getElementById("statPaid").textContent = todays.filter((booking) => booking.paymentReceivedAt && !booking.collectedAt).length;
-      document.getElementById("statCollected").textContent = todays.filter((booking) => booking.collectedAt).length;
-      document.getElementById("statCapacity").textContent = `${todayActiveItemCount(bookings)}/${DAILY_ITEM_CAPACITY}`;
+      const dateKey = selectedStaffDate();
+      const dated = bookingsForDate(bookings, dateKey);
+      document.getElementById("statActive").textContent = activeForDate(bookings, dateKey).length;
+      document.getElementById("statArrived").textContent = dated.filter((booking) => booking.arrivedAt && !booking.collectedAt).length;
+      document.getElementById("statPaid").textContent = dated.filter((booking) => booking.paymentReceivedAt && !booking.collectedAt).length;
+      document.getElementById("statCollected").textContent = dated.filter((booking) => booking.collectedAt).length;
+      document.getElementById("statCapacity").textContent = `${activeItemCountForDate(bookings, dateKey)}/${DAILY_ITEM_CAPACITY}`;
     }
 
     function normalisePhoneForWhatsApp(mobile) {
@@ -1387,15 +1686,15 @@
     }
 
     function renderRows() {
-      const bookings = loadBookings();
       const query = searchInput.value.trim().toLowerCase();
-      const baseRows = dashboardMode === "today" ? activeToday(bookings) : bookings;
+      const baseRows = dashboardMode === "today" ? activeForDate(bookingsCache, selectedStaffDate()) : bookingsCache;
       const filtered = baseRows.filter((booking) => {
         const haystack = `${booking.reference} ${booking.name} ${booking.mobile} ${booking.email}`.toLowerCase();
         return haystack.includes(query);
-      }).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      }).sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
 
-      updateStats(bookings);
+      updateStats(bookingsCache);
+      renderBlockedDates();
       bookingRows.innerHTML = "";
       emptyState.style.display = filtered.length ? "none" : "block";
 
@@ -1403,7 +1702,7 @@
         const row = document.createElement("tr");
         const bookingTags = getTagNumbers(booking);
         row.innerHTML = `
-          <td><strong>${booking.reference}</strong><br><span>${new Date(booking.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span></td>
+          <td><strong>${booking.reference}</strong><br><span>${formatDate(booking.bookingDate || booking.createdDate)}</span></td>
           <td><strong>${escapeHtml(booking.name)}</strong><br>${escapeHtml(booking.mobile)}${booking.email ? `<br>${escapeHtml(booking.email)}` : ""}${booking.notes ? `<br><span>${escapeHtml(booking.notes)}</span>` : ""}</td>
           <td>${booking.items}<br><span>Expected ${formatMoney(booking.totalCost || booking.items * 7)}</span></td>
           <td><strong>${bookingTags.length ? bookingTags.map(formatTagNumber).join(", ") : "Unassigned"}</strong></td>
@@ -1428,6 +1727,23 @@
       });
     }
 
+    function renderBlockedDates() {
+      blockedDateList.innerHTML = "";
+      const upcoming = blockedDatesCache.filter((blocked) => blocked.date >= todayKey());
+      if (!upcoming.length) {
+        blockedDateList.innerHTML = '<div class="empty">No blocked dates.</div>';
+        return;
+      }
+
+      upcoming.forEach((blocked) => {
+        const row = document.createElement("div");
+        row.className = "blocked-date";
+        row.innerHTML = `<div>${formatDate(blocked.date)}${blocked.reason ? `<br><span>${escapeHtml(blocked.reason)}</span>` : ""}</div>`;
+        row.appendChild(actionButton("Remove", () => handleRemoveBlockedDate(blocked.date), false, "danger"));
+        blockedDateList.appendChild(row);
+      });
+    }
+
     function escapeHtml(value) {
       return String(value || "").replace(/[&<>"']/g, (char) => ({
         "&": "&amp;",
@@ -1448,16 +1764,33 @@
       return button;
     }
 
-    function updateBooking(id, patch) {
-      const bookings = loadBookings().map((booking) => booking.id === id ? { ...booking, ...patch } : booking);
-      saveBookings(bookings);
+    async function updateBooking(id, patch) {
+      await saveBookingPatch(id, patch);
+      await refreshData();
       renderRows();
+      updateBookingAvailability();
     }
 
-    function removeBooking(id) {
+    async function removeBooking(id) {
       if (!confirm("Remove this booking?")) return;
-      saveBookings(loadBookings().filter((booking) => booking.id !== id));
+      await deleteBooking(id);
       renderRows();
+      updateBookingAvailability();
+    }
+
+    async function handleBlockDate() {
+      const date = blockDateInput.value;
+      if (!date) return;
+      await addBlockedDate(date, blockReasonInput.value.trim());
+      blockReasonInput.value = "";
+      renderRows();
+      updateBookingAvailability();
+    }
+
+    async function handleRemoveBlockedDate(date) {
+      await removeBlockedDate(date);
+      renderRows();
+      updateBookingAvailability();
     }
 
     function staffRouteIsActive() {
@@ -1480,10 +1813,11 @@
     }
 
     function downloadCsv() {
-      const rows = loadBookings().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-      const headers = ["Reference", "Name", "Mobile", "Email", "Items", "Total", "Collection", "Tags", "Status", "Customer notes", "Created", "Arrived", "Paid", "Collected"];
+      const rows = bookingsCache.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+      const headers = ["Reference", "Booking date", "Name", "Mobile", "Email", "Items", "Total", "Collection", "Tags", "Status", "Customer notes", "Created", "Arrived", "Paid", "Collected"];
       const csvRows = [headers, ...rows.map((booking) => [
         booking.reference,
+        booking.bookingDate || booking.createdDate,
         booking.name,
         booking.mobile,
         booking.email,
@@ -1510,68 +1844,119 @@
       URL.revokeObjectURL(url);
     }
 
-    bookingForm.addEventListener("submit", (event) => {
+    async function handleBookingSubmit(event) {
       event.preventDefault();
-      validateStorageTimes();
+      await refreshData();
+      validateBookingForm();
       if (!bookingForm.reportValidity()) return;
       const form = new FormData(bookingForm);
-      const now = new Date();
-      const bookings = loadBookings();
+      const submitButton = bookingForm.querySelector("button[type='submit']");
+      const bookingDate = form.get("bookingDate");
       const items = Number(form.get("items"));
-      const tagNumbers = assignNextTags(items, bookings);
-      if (tagNumbers.length < items) {
-        itemsInput.setCustomValidity("There are not enough luggage tags available for that number of items.");
-        bookingForm.reportValidity();
-        return;
-      }
-      const booking = {
-        id: makeId(),
-        reference: makeReference(bookings),
-        name: form.get("customerName").trim(),
-        mobile: form.get("mobile").trim(),
-        email: form.get("email").trim(),
-        items,
-        collectionTime: form.get("collectionTime"),
-        totalCost: items * 7,
-        tagNumbers,
-        notes: form.get("notes").trim(),
-        createdAt: now.toISOString(),
-        createdDate: todayKey(),
-        arrivedAt: "",
-        paymentReceivedAt: "",
-        collectedAt: ""
-      };
-      bookings.push(booking);
-      saveBookings(bookings);
-      confirmationRef.textContent = booking.reference;
-      confirmationSummary.textContent = `Your booking reference is ${booking.reference}. Staff will attach your luggage tags when you arrive. Number of items: ${booking.items}. Expected collection time: ${formatTime(booking.collectionTime)}. Payment due at drop-off: ${formatMoney(booking.totalCost)}.`;
-      confirmationTotal.textContent = formatMoney(booking.totalCost);
-      paymentInstruction.textContent = `Please pay ${formatMoney(booking.totalCost)} at drop-off before your items are stored.`;
-      bookingForm.style.display = "none";
-      confirmation.classList.add("active");
-    });
+      submitButton.disabled = true;
+      submitButton.textContent = "Submitting...";
 
-    newBookingButton.addEventListener("click", () => {
+      try {
+        let savedBooking = null;
+        for (let attempt = 0; attempt < 3; attempt += 1) {
+          if (attempt > 0) await refreshData();
+          const tagNumbers = assignNextTags(items, bookingsCache, bookingDate);
+          if (tagNumbers.length < items) {
+            itemsInput.setCustomValidity("There are not enough luggage tags available for that number of items.");
+            bookingForm.reportValidity();
+            return;
+          }
+          const booking = {
+            id: makeId(),
+            reference: makeReference(bookingsCache, bookingDate),
+            bookingDate,
+            createdDate: bookingDate,
+            name: form.get("customerName").trim(),
+            mobile: form.get("mobile").trim(),
+            email: form.get("email").trim(),
+            items,
+            collectionTime: form.get("collectionTime"),
+            totalCost: items * 7,
+            tagNumbers,
+            notes: form.get("notes").trim(),
+            createdAt: new Date().toISOString(),
+            arrivedAt: "",
+            paymentReceivedAt: "",
+            collectedAt: ""
+          };
+
+          try {
+            savedBooking = await createBooking(booking);
+            break;
+          } catch (error) {
+            if (!String(error.message || "").includes("duplicate")) throw error;
+          }
+        }
+
+        if (!savedBooking) throw new Error("Could not create booking reference.");
+        await refreshData();
+        confirmationRef.textContent = savedBooking.reference;
+        confirmationSummary.textContent = `Your booking reference is ${savedBooking.reference}. Staff will attach your luggage tags when you arrive. Number of items: ${savedBooking.items}. Booking date: ${formatDate(savedBooking.bookingDate)}. Expected collection time: ${formatTime(savedBooking.collectionTime)}. Payment due at drop-off: ${formatMoney(savedBooking.totalCost)}.`;
+        confirmationTotal.textContent = formatMoney(savedBooking.totalCost);
+        paymentInstruction.textContent = `Please pay ${formatMoney(savedBooking.totalCost)} at drop-off before your items are stored.`;
+        bookingForm.style.display = "none";
+        confirmation.classList.add("active");
+      } catch (error) {
+        console.error(error);
+        alert("Sorry, the booking could not be saved. Please try again or speak to staff.");
+      } finally {
+        submitButton.textContent = "Submit booking";
+        updateBookingAvailability();
+      }
+    }
+
+    function resetBookingForm() {
       bookingForm.reset();
+      bookingDateInput.value = todayKey();
       setItemCount("1");
       updatePriceTotal();
       confirmation.classList.remove("active");
       bookingForm.style.display = "grid";
-    });
+    }
 
+    function setInitialDates() {
+      const today = todayKey();
+      bookingDateInput.value = today;
+      bookingDateInput.min = today;
+      staffDateInput.value = today;
+      blockDateInput.value = today;
+      blockDateInput.min = today;
+    }
+
+    itemButtons.forEach((button) => {
+      button.addEventListener("click", () => setItemCount(button.dataset.itemCount));
+    });
+    bookingForm.addEventListener("submit", handleBookingSubmit);
+    newBookingButton.addEventListener("click", resetBookingForm);
     exactItemsInput.addEventListener("input", () => {
       itemsInput.value = Math.max(5, Number(exactItemsInput.value) || 5);
       updatePriceTotal();
-      validateStorageTimes();
+      validateBookingForm();
     });
-    collectionTimeInput.addEventListener("input", validateStorageTimes);
-
+    bookingDateInput.addEventListener("change", () => {
+      validateBookingForm();
+      updateBookingAvailability();
+    });
+    collectionTimeInput.addEventListener("input", validateBookingForm);
     staffBookingButton.addEventListener("click", () => setView("booking"));
-
     searchInput.addEventListener("input", renderRows);
+    staffDateInput.addEventListener("change", renderRows);
     exportCsvButton.addEventListener("click", downloadCsv);
+    blockDateButton.addEventListener("click", handleBlockDate);
+    window.addEventListener("hashchange", () => {
+      setView(staffRouteIsActive() ? "staff" : "booking", false);
+    });
+    window.addEventListener("popstate", () => {
+      setView(staffRouteIsActive() ? "staff" : "booking", false);
+    });
     showTodayButton.addEventListener("click", () => {
       dashboardMode = "today";
+      staffDateInput.value = todayKey();
       showTodayButton.className = "secondary";
       showHistoryButton.className = "ghost";
       renderRows();
@@ -1602,7 +1987,7 @@
         </head>
         <body>
           <h1>Book luggage storage</h1>
-          <p>Scan to book same-day luggage storage, then pay when you drop off your items.</p>
+          <p>Scan to book luggage storage, then pay when you drop off your items.</p>
           <div class="box">
             <img alt="Booking QR code" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(bookingUrl)}">
           </div>
@@ -1614,9 +1999,15 @@
       printWindow.focus();
     });
 
-    ensureLegacyBookingsMigrated();
-    updatePriceTotal();
-    setView(staffRouteIsActive() ? "staff" : "booking", false);
+    async function initialise() {
+      setInitialDates();
+      await refreshData();
+      updatePriceTotal();
+      renderBlockedDates();
+      setView(staffRouteIsActive() ? "staff" : "booking", false);
+    }
+
+    initialise();
   </script>
 </body>
 </html>
