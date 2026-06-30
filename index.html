@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Luggage Storage Portree | The Granary</title>
-  <meta name="description" content="Book luggage storage in Portree at The Granary. £7 per item, drop off from 8:00am, collect by 5:00pm, and pay in person at drop-off.">
+  <title>Luggage Storage in Portree | The Granary</title>
+  <meta name="description" content="Same-day luggage storage at The Granary in Portree, Isle of Skye. £7 per item. Book online and pay at drop-off.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://granaryportree.uk/">
-  <meta property="og:title" content="Luggage Storage Portree | The Granary">
-  <meta property="og:description" content="Reserve luggage storage in the heart of Portree. £7 per item, payment at drop-off, collect by 5:00pm.">
+  <meta property="og:title" content="Luggage Storage in Portree | The Granary">
+  <meta property="og:description" content="Same-day luggage storage at The Granary in Portree, Isle of Skye. £7 per item. Book online and pay at drop-off.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://granaryportree.uk/">
   <meta property="og:image" content="https://granaryportree.uk/portree-harbour.jpg">
@@ -265,7 +265,7 @@
 
     .service-strip {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 1px;
       margin-top: 24px;
       max-width: 740px;
@@ -871,6 +871,35 @@
       font-weight: 800;
     }
 
+    .staff-version {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .site-footer {
+      max-width: 1180px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 18px 32px;
+      color: #4a554d;
+      position: relative;
+    }
+
+    .site-footer strong {
+      display: block;
+      color: var(--ink);
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    .site-footer p {
+      margin: 0;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
     .table-wrap {
       overflow: auto;
       border: 1px solid var(--line);
@@ -1132,6 +1161,11 @@
       .service-strip strong {
         font-size: 18px;
       }
+
+      .skye-scene {
+        height: 116px;
+        margin-bottom: 18px;
+      }
     }
   </style>
 </head>
@@ -1146,6 +1180,10 @@
             <div class="brand-subtitle">Luggage Storage</div>
           </div>
         </div>
+        <nav class="nav" aria-label="Main navigation">
+          <button type="button" id="bookingNavButton" class="active">Booking</button>
+          <button type="button" id="staffNavButton">Staff</button>
+        </nav>
       </div>
     </header>
 
@@ -1158,61 +1196,35 @@
             </div>
             <div class="eyebrow">The Granary Luggage Storage</div>
             <h1>Luggage storage in the heart of Portree.</h1>
-            <p class="lead">Reserve left luggage and bag storage in central Portree, get a booking reference by email, then pay when you drop your items off.</p>
+            <p class="lead">Store your luggage safely while you explore Portree. Book in under a minute and pay when you arrive.</p>
             <div class="service-strip" aria-label="Luggage storage summary">
               <div>
                 <span>Price</span>
-                <strong>£7 per item</strong>
+                <strong>🧳 £7 per item</strong>
               </div>
               <div>
-                <span>Drop-off</span>
-                <strong>From 8:00am</strong>
+                <span>Storage</span>
+                <strong>🔒 Locked staff-only storage</strong>
+              </div>
+              <div>
+                <span>Security</span>
+                <strong>📹 CCTV coverage</strong>
               </div>
               <div>
                 <span>Collection</span>
-                <strong>By 5:00pm</strong>
+                <strong>⏰ Same-day collection before closing</strong>
               </div>
             </div>
+            <p class="search-copy">Perfect before check-in, after check-out or while exploring the Isle of Skye.</p>
             <div class="steps" aria-label="Booking steps">
-              <div class="step">1. Enter your details</div>
-              <div class="step">2. Get a reference</div>
-              <div class="step">3. Pay at drop-off</div>
+              <div class="step">Book your luggage storage</div>
+              <div class="step">Pay at drop-off</div>
             </div>
-            <div class="info-grid" aria-label="Luggage storage details">
-              <div class="info-block">
-                <h2>What this booking does</h2>
-                <p>It reserves space for your items and gives staff your details before you arrive.</p>
-              </div>
-              <div class="info-block">
-                <h2>Payment</h2>
-                <p>Storage costs £7 per item. Staff confirm the total and take payment when you drop off your items.</p>
-              </div>
-              <div class="info-block">
-                <h2>At drop-off</h2>
-                <p>Drop-off is available from 8:00am. Give your name, reference or confirmation email at The Granary.</p>
-              </div>
-              <div class="info-block">
-                <h2>Collection</h2>
-                <p>Items must be collected by 5:00pm on your booking date. Show your confirmation email or reference when collecting.</p>
-              </div>
-            </div>
-            <p class="search-copy">The Granary offers luggage storage in Portree for visitors exploring the town, heading for tours, waiting for transport, or spending time around the harbour before check-in.</p>
-            <ul class="reassurance-list" aria-label="Useful booking details">
-              <li>Central Portree location, close to the harbour and town centre.</li>
-              <li>£7 per item, with payment taken in person at drop-off.</li>
-              <li>Confirmation email sent after booking so you can show it at collection.</li>
-            </ul>
             <div class="cafe-prompt" aria-label="Cafe at The Granary">
               <h2>While you're here</h2>
-              <p>Dropping off your luggage? Stay for a coffee, cold drink or something to eat before heading back into Portree.</p>
-              <ul class="cafe-list">
-                <li>Fresh coffee</li>
-                <li>Cold drinks</li>
-                <li>Cakes and bakes</li>
-                <li>Light bites</li>
-              </ul>
+              <p>While you're here, why not enjoy coffee, breakfast, lunch or cake at The Granary?</p>
             </div>
-            <div class="notice">Please keep valuables, travel documents and medication with you.</div>
+            <div class="notice">Please let us know if your luggage contains fragile or high-value items.</div>
           </div>
 
           <div class="panel booking-panel">
@@ -1238,8 +1250,8 @@
               </div>
               <div class="field">
                 <label for="email">Email</label>
-                <input id="email" name="email" autocomplete="email" inputmode="email" type="email" required>
-                <p class="helper-text">We'll send your confirmation here. Show it when collecting your items.</p>
+                <input id="email" name="email" autocomplete="email" inputmode="email" type="email">
+                <p class="helper-text">Optional — useful if you'd like a confirmation.</p>
               </div>
               <div class="field">
                 <label>How many items are you storing?</label>
@@ -1256,6 +1268,10 @@
                 <label for="exactItems">Exact number of items</label>
                 <input id="exactItems" type="number" min="5" max="30" value="5">
               </div>
+              <div class="field">
+                <label for="collectionTime">Expected collection time</label>
+                <input id="collectionTime" name="collectionTime" type="time" min="08:00" max="17:00" required>
+              </div>
               <div class="price-summary">
                 <span id="priceBreakdown">£7 × 1 item</span>
                 <strong id="priceTotal">£7</strong>
@@ -1269,8 +1285,7 @@
                 <ul>
                   <li>Bookings are for luggage storage on the selected booking date only.</li>
                   <li>Items must be collected by 5:00pm on the booking date.</li>
-                  <li>Storage is subject to available space when you arrive.</li>
-                  <li>Keep valuables, money, travel documents and medication with you.</li>
+                  <li>Please let us know if your luggage contains fragile or high-value items.</li>
                   <li>Payment is taken at drop-off before items are stored.</li>
                   <li>Your contact details are used only to manage your luggage storage booking and contact you about it.</li>
                 </ul>
@@ -1279,6 +1294,7 @@
                 <input id="terms" name="terms" type="checkbox" required>
                 <span>I accept The Granary luggage storage terms and understand payment is due at drop-off.</span>
               </label>
+              <p class="helper-text">Booking takes less than 60 seconds.</p>
               <button class="primary" type="submit">Submit booking</button>
             </form>
 
@@ -1377,8 +1393,9 @@
                   <th>Customer</th>
                   <th>Items</th>
                   <th>Tags</th>
-                  <th>Collection</th>
+                  <th>Collection time</th>
                   <th>Status</th>
+                  <th>Staff notes</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -1410,9 +1427,15 @@
             </div>
             <div id="blockedDateList" class="blocked-list"></div>
           </div>
+          <div class="staff-version">Granary Luggage Storage v0.5</div>
         </div>
       </section>
     </main>
+    <footer class="site-footer">
+      <strong>The Granary</strong>
+      <p>Portree, Isle of Skye</p>
+      <p>Café • Coffee • Food • Luggage storage</p>
+    </footer>
   </div>
 
   <script>
@@ -1424,8 +1447,6 @@
     const EMAIL_CONFIRMATIONS_ENABLED = true;
     const WHATSAPP_ENABLED = false;
     const WHATSAPP_BUSINESS_NUMBER = "";
-    const STAFF_ACCESS_CODE = "granary";
-    const STAFF_ACCESS_KEY = "granaryStaffAccess";
     const TAG_COUNT = 60;
     const DAILY_ITEM_CAPACITY = TAG_COUNT;
     const STAFF_REFRESH_MS = 30000;
@@ -1439,12 +1460,15 @@
     const confirmationTotal = document.getElementById("confirmationTotal");
     const paymentInstruction = document.getElementById("paymentInstruction");
     const newBookingButton = document.getElementById("newBookingButton");
+    const bookingNavButton = document.getElementById("bookingNavButton");
+    const staffNavButton = document.getElementById("staffNavButton");
     const bookingDateInput = document.getElementById("bookingDate");
     const fridayWarning = document.getElementById("fridayWarning");
     const itemsInput = document.getElementById("items");
     const itemButtons = document.querySelectorAll("[data-item-count]");
     const exactItemsField = document.getElementById("exactItemsField");
     const exactItemsInput = document.getElementById("exactItems");
+    const collectionTimeInput = document.getElementById("collectionTime");
     const priceBreakdown = document.getElementById("priceBreakdown");
     const priceTotal = document.getElementById("priceTotal");
     const bookingRows = document.getElementById("bookingRows");
@@ -1541,7 +1565,7 @@
         mobile: row.mobile,
         email: row.email || "",
         items: row.items,
-        collectionTime: String(row.collection_time || "17:00").slice(0, 5),
+        collectionTime: String(row.collection_time || "").slice(0, 5),
         totalCost: row.total_cost,
         tagNumbers: Array.isArray(row.tag_numbers) ? row.tag_numbers.map(String) : [],
         notes: row.notes || "",
@@ -1561,7 +1585,7 @@
         mobile: booking.mobile,
         email: booking.email || null,
         items: booking.items,
-        collection_time: booking.collectionTime || "17:00",
+        collection_time: booking.collectionTime,
         total_cost: booking.totalCost,
         tag_numbers: booking.tagNumbers,
         notes: booking.notes || null
@@ -1633,7 +1657,11 @@
         throw new Error(details || "Email confirmation failed.");
       }
 
-      return response.json();
+      const result = await response.json();
+      if (!result.sent) {
+        throw new Error(result.error || "Email confirmation failed.");
+      }
+      return result;
     }
 
     async function saveBookingPatch(id, patch) {
@@ -1822,12 +1850,13 @@
       } else if (requested > remaining) {
         bookingAvailability.textContent = `Only ${remaining} item space${remaining === 1 ? "" : "s"} left for ${formatDate(dateKey)}. Please reduce the number of items.`;
       } else {
-        bookingAvailability.textContent = `${remaining} item space${remaining === 1 ? "" : "s"} currently available for ${formatDate(dateKey)}.`;
+        bookingAvailability.textContent = "";
       }
     }
 
     function validateBookingForm() {
       const dateKey = selectedBookingDate();
+      collectionTimeInput.setCustomValidity("");
       itemsInput.setCustomValidity("");
       bookingDateInput.setCustomValidity("");
 
@@ -1837,6 +1866,10 @@
 
       if (bookingsClosedForDate(dateKey)) {
         bookingDateInput.setCustomValidity("Bookings for today are now closed.");
+      }
+
+      if (collectionTimeInput.value && collectionTimeInput.value > "17:00") {
+        collectionTimeInput.setCustomValidity("Items must be collected by 5:00pm.");
       }
 
       if (selectedItemCount() > remainingItemCapacity(dateKey)) {
@@ -1970,11 +2003,12 @@
         const bookingTags = getTagNumbers(booking);
         row.innerHTML = `
           <td><strong>${booking.reference}</strong><br><span>${formatDate(booking.bookingDate || booking.createdDate)}</span></td>
-          <td><strong>${escapeHtml(booking.name)}</strong><br>${escapeHtml(booking.mobile)}${booking.email ? `<br>${escapeHtml(booking.email)}` : ""}${booking.notes ? `<br><span>${escapeHtml(booking.notes)}</span>` : ""}</td>
+          <td><strong>${escapeHtml(booking.name)}</strong><br>${escapeHtml(booking.mobile)}${booking.email ? `<br>${escapeHtml(booking.email)}` : ""}</td>
           <td>${booking.items}<br><span>Expected ${formatMoney(booking.totalCost || booking.items * 7)}</span></td>
           <td><strong>${bookingTags.length ? bookingTags.map(formatTagNumber).join(", ") : "Unassigned"}</strong></td>
-          <td>By 5:00pm</td>
+          <td>${formatTime(booking.collectionTime)}</td>
           <td><span class="status ${statusClass(booking)}">${statusFor(booking)}</span></td>
+          <td>${booking.notes ? escapeHtml(booking.notes) : "-"}</td>
           <td></td>
         `;
 
@@ -1989,7 +2023,7 @@
         if (!WHATSAPP_ENABLED) whatsAppButton.title = "WhatsApp contact not live yet";
         actions.appendChild(whatsAppButton);
         actions.appendChild(actionButton("Remove", () => removeBooking(booking.id), false, "danger"));
-        row.children[6].appendChild(actions);
+        row.children[7].appendChild(actions);
         bookingRows.appendChild(row);
       });
     }
@@ -2101,29 +2135,12 @@
       return new URLSearchParams(window.location.search).get("staff") === "1" || window.location.hash === "#staff";
     }
 
-    function staffAccessGranted() {
-      return sessionStorage.getItem(STAFF_ACCESS_KEY) === "yes";
-    }
-
-    function requestStaffAccess() {
-      if (staffAccessGranted()) return true;
-      const entered = prompt("Staff access code");
-      if (entered === STAFF_ACCESS_CODE) {
-        sessionStorage.setItem(STAFF_ACCESS_KEY, "yes");
-        return true;
-      }
-      window.history.replaceState(null, "", window.location.pathname);
-      return false;
-    }
-
     function setView(view, updateUrl = true) {
       const isStaff = view === "staff";
-      if (isStaff && !requestStaffAccess()) {
-        setView("booking", false);
-        return;
-      }
       bookingView.classList.toggle("active", !isStaff);
       staffView.classList.toggle("active", isStaff);
+      bookingNavButton.classList.toggle("active", !isStaff);
+      staffNavButton.classList.toggle("active", isStaff);
       if (updateUrl) {
         const url = isStaff ? `${window.location.pathname}#staff` : window.location.pathname;
         window.history.replaceState(null, "", url);
@@ -2148,7 +2165,7 @@
         booking.email,
         booking.items,
         booking.totalCost || booking.items * 7,
-        "By 5:00pm",
+        booking.collectionTime,
         getTagNumbers(booking).map(formatTagNumber).join(", "),
         statusFor(booking),
         booking.notes,
@@ -2188,6 +2205,8 @@
           const tagNumbers = assignNextTags(items, bookingsCache, bookingDate);
           if (tagNumbers.length < items) {
             itemsInput.setCustomValidity("There are not enough luggage tags available for that number of items.");
+            bookingAvailability.textContent = "Storage is currently full for that number of items. Please reduce the number of items or speak to staff.";
+            bookingAvailability.classList.add("closed");
             bookingForm.reportValidity();
             return;
           }
@@ -2200,7 +2219,7 @@
             mobile: form.get("mobile").trim(),
             email: form.get("email").trim(),
             items,
-            collectionTime: "17:00",
+            collectionTime: form.get("collectionTime"),
             totalCost: items * 7,
             tagNumbers,
             notes: form.get("notes").trim(),
@@ -2232,7 +2251,7 @@
         const fridayCollectionNote = isFriday(savedBooking.bookingDate)
           ? " The Granary is closed on Saturday, so your items must be collected by 5:00pm on Friday."
           : "";
-        confirmationSummary.textContent = `Your booking reference is ${savedBooking.reference}. Staff will attach your luggage tags when you arrive. Number of items: ${savedBooking.items}. Booking date: ${formatDate(savedBooking.bookingDate)}. Items must be collected by 5:00pm. Payment due at drop-off: ${formatMoney(savedBooking.totalCost)}.${fridayCollectionNote}`;
+        confirmationSummary.textContent = `Your booking reference is ${savedBooking.reference}. Staff will attach your luggage tags when you arrive. Number of items: ${savedBooking.items}. Booking date: ${formatDate(savedBooking.bookingDate)}. Expected collection time: ${formatTime(savedBooking.collectionTime)}. Payment due at drop-off: ${formatMoney(savedBooking.totalCost)}.${fridayCollectionNote}`;
         confirmationTotal.textContent = formatMoney(savedBooking.totalCost);
         paymentInstruction.textContent = emailSent
           ? `A confirmation email has been sent to ${savedBooking.email}. Please show it when collecting your items. Payment is due at drop-off.`
@@ -2243,6 +2262,7 @@
         console.error(error);
         alert("Sorry, the booking could not be saved. Please try again or speak to staff.");
       } finally {
+        submitButton.disabled = false;
         submitButton.textContent = "Submit booking";
         updateBookingAvailability();
       }
@@ -2326,6 +2346,7 @@
       const today = todayKey();
       bookingDateInput.value = today;
       bookingDateInput.min = today;
+      collectionTimeInput.value = "17:00";
       staffDateInput.value = today;
       staffEntryDate.value = today;
       staffEntryDate.min = today;
@@ -2337,6 +2358,8 @@
       button.addEventListener("click", () => setItemCount(button.dataset.itemCount));
     });
     bookingForm.addEventListener("submit", handleBookingSubmit);
+    bookingNavButton.addEventListener("click", () => setView("booking"));
+    staffNavButton.addEventListener("click", () => setView("staff"));
     newBookingButton.addEventListener("click", resetBookingForm);
     exactItemsInput.addEventListener("input", () => {
       itemsInput.value = Math.max(5, Number(exactItemsInput.value) || 5);
@@ -2347,6 +2370,7 @@
       validateBookingForm();
       updateBookingAvailability();
     });
+    collectionTimeInput.addEventListener("input", validateBookingForm);
     staffBookingButton.addEventListener("click", () => setView("booking"));
     searchInput.addEventListener("input", renderRows);
     staffDateInput.addEventListener("change", () => {
