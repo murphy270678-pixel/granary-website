@@ -404,6 +404,49 @@
       flex: 0 0 auto;
     }
 
+    .cafe-prompt {
+      max-width: 740px;
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid rgba(183, 111, 60, .32);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(240, 221, 198, .62), rgba(255,255,255,.78)),
+        #fffaf2;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .cafe-prompt h2 {
+      margin: 0 0 8px;
+      font-size: 21px;
+    }
+
+    .cafe-prompt p {
+      margin: 0;
+      color: #4a554d;
+      line-height: 1.5;
+      font-weight: 700;
+    }
+
+    .cafe-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .cafe-list li {
+      border: 1px solid rgba(183, 111, 60, .28);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: rgba(255,255,255,.72);
+      color: #5b402b;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
     .panel {
       background: var(--panel);
       border: 1px solid var(--line);
@@ -963,6 +1006,35 @@
       font-weight: 700;
     }
 
+    .staff-entry-panel {
+      display: none;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid rgba(47, 107, 79, .18);
+      border-radius: 8px;
+      background: rgba(255,255,255,.78);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .staff-entry-panel.active {
+      display: grid;
+    }
+
+    .staff-entry-panel h2 {
+      margin: 0 0 4px;
+      font-size: 20px;
+    }
+
+    .staff-entry-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .staff-entry-wide {
+      grid-column: 1 / -1;
+    }
+
     .module-strip {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1016,6 +1088,10 @@
       }
 
       .blocked-controls {
+        grid-template-columns: 1fr;
+      }
+
+      .staff-entry-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -1126,6 +1202,16 @@
               <li>£7 per item, with payment taken in person at drop-off.</li>
               <li>Confirmation email sent after booking so you can show it at collection.</li>
             </ul>
+            <div class="cafe-prompt" aria-label="Cafe at The Granary">
+              <h2>While you're here</h2>
+              <p>Dropping off your luggage? Stay for a coffee, cold drink or something to eat before heading back into Portree.</p>
+              <ul class="cafe-list">
+                <li>Fresh coffee</li>
+                <li>Cold drinks</li>
+                <li>Cakes and bakes</li>
+                <li>Light bites</li>
+              </ul>
+            </div>
             <div class="notice">Please keep valuables, travel documents and medication with you.</div>
           </div>
 
@@ -1146,8 +1232,9 @@
                 <input id="customerName" name="customerName" autocomplete="name" required>
               </div>
               <div class="field">
-                <label for="mobile">Mobile number</label>
+                <label for="mobile">Mobile / WhatsApp number</label>
                 <input id="mobile" name="mobile" autocomplete="tel" inputmode="tel" required>
+                <p class="helper-text">Include your country code if outside the UK, for example +1, +33 or +49.</p>
               </div>
               <div class="field">
                 <label for="email">Email</label>
@@ -1240,9 +1327,47 @@
             <button class="secondary" type="button" id="showTodayButton">Today's active</button>
             <button class="ghost" type="button" id="showHistoryButton">History</button>
             <button class="ghost" type="button" id="refreshStaffButton">Refresh</button>
+            <button class="ghost" type="button" id="toggleStaffEntryButton">New staff booking</button>
             <button class="ghost" type="button" id="exportCsvButton">Export CSV</button>
           </div>
           <div id="syncStatus" class="sync-status" aria-live="polite">Last updated just now. Auto-refresh is on.</div>
+
+          <form id="staffEntryForm" class="staff-entry-panel">
+            <div>
+              <h2>New staff booking</h2>
+              <p class="helper-text">Use this when someone cannot use the QR code or needs booked in at the counter.</p>
+            </div>
+            <div class="staff-entry-grid">
+              <div class="field">
+                <label for="staffEntryDate">Booking date</label>
+                <input id="staffEntryDate" name="bookingDate" type="date" required>
+              </div>
+              <div class="field">
+                <label for="staffEntryName">Name</label>
+                <input id="staffEntryName" name="customerName" required>
+              </div>
+              <div class="field">
+                <label for="staffEntryItems">Items</label>
+                <input id="staffEntryItems" name="items" type="number" min="1" max="30" value="1" required>
+              </div>
+              <div class="field">
+                <label for="staffEntryMobile">Mobile</label>
+                <input id="staffEntryMobile" name="mobile" autocomplete="tel" inputmode="tel">
+              </div>
+              <div class="field">
+                <label for="staffEntryEmail">Email</label>
+                <input id="staffEntryEmail" name="email" autocomplete="email" inputmode="email" type="email">
+              </div>
+              <div class="field staff-entry-wide">
+                <label for="staffEntryNotes">Notes</label>
+                <textarea id="staffEntryNotes" name="notes" placeholder="Walk-in booking, customer details, large items..."></textarea>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="primary" type="submit">Create booking</button>
+              <button class="ghost" type="button" id="cancelStaffEntryButton">Cancel</button>
+            </div>
+          </form>
 
           <div class="table-wrap">
             <table>
@@ -1329,6 +1454,10 @@
     const showTodayButton = document.getElementById("showTodayButton");
     const showHistoryButton = document.getElementById("showHistoryButton");
     const refreshStaffButton = document.getElementById("refreshStaffButton");
+    const toggleStaffEntryButton = document.getElementById("toggleStaffEntryButton");
+    const staffEntryForm = document.getElementById("staffEntryForm");
+    const staffEntryDate = document.getElementById("staffEntryDate");
+    const cancelStaffEntryButton = document.getElementById("cancelStaffEntryButton");
     const exportCsvButton = document.getElementById("exportCsvButton");
     const printQrButton = document.getElementById("printQrButton");
     const staffBookingButton = document.getElementById("staffBookingButton");
@@ -1806,8 +1935,9 @@
     function normalisePhoneForWhatsApp(mobile) {
       let number = String(mobile || "").replace(/[\s()\-]/g, "");
       if (number.startsWith("07")) number = `44${number.slice(1)}`;
-      if (number.startsWith("+44")) number = number.slice(1);
-      if (!number.startsWith("44") || !/^\d{11,15}$/.test(number)) return "";
+      if (number.startsWith("+")) number = number.slice(1);
+      if (number.startsWith("00")) number = number.slice(2);
+      if (!/^\d{8,15}$/.test(number)) return "";
       return number;
     }
 
@@ -2118,6 +2248,71 @@
       }
     }
 
+    async function handleStaffEntrySubmit(event) {
+      event.preventDefault();
+      await refreshData();
+      const form = new FormData(staffEntryForm);
+      const bookingDate = form.get("bookingDate");
+      const items = Math.max(1, Number(form.get("items")) || 1);
+      const submitButton = staffEntryForm.querySelector("button[type='submit']");
+
+      if (isDateBlocked(bookingDate)) {
+        alert("Luggage storage is blocked for this date.");
+        return;
+      }
+
+      const tagNumbers = assignNextTags(items, bookingsCache, bookingDate);
+      if (tagNumbers.length < items) {
+        alert("There are not enough luggage tags available for that number of items.");
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.textContent = "Creating...";
+
+      try {
+        const booking = {
+          id: makeId(),
+          reference: makeReference(bookingsCache, bookingDate),
+          bookingDate,
+          createdDate: bookingDate,
+          name: form.get("customerName").trim(),
+          mobile: form.get("mobile").trim(),
+          email: form.get("email").trim(),
+          items,
+          collectionTime: "17:00",
+          totalCost: items * 7,
+          tagNumbers,
+          notes: form.get("notes").trim() || "Staff entry",
+          createdAt: new Date().toISOString(),
+          arrivedAt: new Date().toISOString(),
+          paymentReceivedAt: "",
+          collectedAt: ""
+        };
+
+        const savedBooking = await createBooking(booking);
+        if (savedBooking.email) {
+          try {
+            await sendBookingConfirmationEmail(savedBooking);
+          } catch (error) {
+            console.error(error);
+          }
+        }
+        await refreshData();
+        staffEntryForm.reset();
+        staffEntryDate.value = selectedStaffDate();
+        staffEntryForm.classList.remove("active");
+        renderRows();
+        updateBookingAvailability();
+      } catch (error) {
+        console.error(error);
+        alert("Sorry, the staff booking could not be created.");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Create booking";
+      }
+    }
+
     function resetBookingForm() {
       bookingForm.reset();
       bookingDateInput.value = todayKey();
@@ -2132,6 +2327,8 @@
       bookingDateInput.value = today;
       bookingDateInput.min = today;
       staffDateInput.value = today;
+      staffEntryDate.value = today;
+      staffEntryDate.min = today;
       blockDateInput.value = today;
       blockDateInput.min = today;
     }
@@ -2152,8 +2349,19 @@
     });
     staffBookingButton.addEventListener("click", () => setView("booking"));
     searchInput.addEventListener("input", renderRows);
-    staffDateInput.addEventListener("change", renderRows);
+    staffDateInput.addEventListener("change", () => {
+      staffEntryDate.value = selectedStaffDate();
+      renderRows();
+    });
     refreshStaffButton.addEventListener("click", () => refreshStaffDashboard(true));
+    toggleStaffEntryButton.addEventListener("click", () => {
+      staffEntryDate.value = selectedStaffDate();
+      staffEntryForm.classList.toggle("active");
+    });
+    cancelStaffEntryButton.addEventListener("click", () => {
+      staffEntryForm.classList.remove("active");
+    });
+    staffEntryForm.addEventListener("submit", handleStaffEntrySubmit);
     exportCsvButton.addEventListener("click", downloadCsv);
     blockDateButton.addEventListener("click", handleBlockDate);
     window.addEventListener("hashchange", () => {
