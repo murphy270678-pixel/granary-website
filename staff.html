@@ -1276,6 +1276,23 @@
     </header>
 
     <main>
+      <section id="staffLogin" class="panel staff-login">
+        <h1>Staff access</h1>
+        <p>Enter the staff PIN to view luggage storage bookings.</p>
+        <form id="staffLoginForm">
+          <div class="field">
+            <label for="staffPin">Staff PIN</label>
+            <input id="staffPin" name="staffPin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="current-password" required>
+          </div>
+          <label class="terms">
+            <input id="rememberStaffDevice" name="rememberStaffDevice" type="checkbox">
+            <span>Remember this device for 30 days</span>
+          </label>
+          <button class="primary" type="submit">Unlock dashboard</button>
+          <p id="staffLoginError" class="helper-text" aria-live="polite"></p>
+        </form>
+      </section>
+
       <section id="staffView" class="view">
         <div id="staffDashboard" class="dashboard">
           <div class="dash-head">
@@ -1286,6 +1303,7 @@
             <div class="actions">
               <button class="secondary" type="button" id="staffBookingButton">Booking</button>
               <button class="primary" type="button" id="printQrButton">Print booking QR</button>
+              <button class="ghost" type="button" id="staffLogoutButton">Logout</button>
             </div>
           </div>
 
@@ -1416,8 +1434,17 @@ const STORAGE_KEY = "granaryHubBookings";
     const TAG_COUNT = 60;
     const DAILY_ITEM_CAPACITY = TAG_COUNT;
     const STAFF_REFRESH_MS = 30000;
+    const STAFF_AUTH_ENDPOINT = `${SUPABASE_URL}/functions/v1/staff-auth`;
+    const STAFF_AUTH_STORAGE_KEY = "granaryStaffAuthToken";
+    const STAFF_AUTH_SESSION_KEY = "granaryStaffSessionToken";
     const bookingView = document.getElementById("bookingView");
     const staffView = document.getElementById("staffView");
+    const staffLogin = document.getElementById("staffLogin");
+    const staffLoginForm = document.getElementById("staffLoginForm");
+    const staffPinInput = document.getElementById("staffPin");
+    const rememberStaffDevice = document.getElementById("rememberStaffDevice");
+    const staffLoginError = document.getElementById("staffLoginError");
+    const staffLogoutButton = document.getElementById("staffLogoutButton");
     const bookingForm = document.getElementById("bookingForm");
     const bookingAvailability = document.getElementById("bookingAvailability");
     const confirmation = document.getElementById("confirmation");
@@ -2137,6 +2164,72 @@ const STORAGE_KEY = "granaryHubBookings";
       return document.body.dataset.page === "staff";
     }
 
+    function storedStaffToken() {
+      return localStorage.getItem(STAFF_AUTH_STORAGE_KEY) || sessionStorage.getItem(STAFF_AUTH_SESSION_KEY) || "";
+    }
+
+    function storeStaffToken(token, remember) {
+      sessionStorage.removeItem(STAFF_AUTH_SESSION_KEY);
+      localStorage.removeItem(STAFF_AUTH_STORAGE_KEY);
+      if (remember) {
+        localStorage.setItem(STAFF_AUTH_STORAGE_KEY, token);
+      } else {
+        sessionStorage.setItem(STAFF_AUTH_SESSION_KEY, token);
+      }
+    }
+
+    function clearStaffAccess() {
+      sessionStorage.removeItem(STAFF_AUTH_SESSION_KEY);
+      localStorage.removeItem(STAFF_AUTH_STORAGE_KEY);
+      stopStaffAutoRefresh();
+      showStaffLogin();
+    }
+
+    async function staffAuthRequest(body) {
+      const response = await fetch(STAFF_AUTH_ENDPOINT, {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.ok) {
+        throw new Error(result.error || "Staff access failed.");
+      }
+      return result;
+    }
+
+    async function staffAccessGranted() {
+      const token = storedStaffToken();
+      if (!token) return false;
+      try {
+        await staffAuthRequest({ token });
+        return true;
+      } catch (error) {
+        sessionStorage.removeItem(STAFF_AUTH_SESSION_KEY);
+        localStorage.removeItem(STAFF_AUTH_STORAGE_KEY);
+        return false;
+      }
+    }
+
+    function showStaffLogin(message = "") {
+      staffLogin?.classList.remove("hidden");
+      staffView?.classList.remove("active");
+      stopStaffAutoRefresh();
+      if (staffLoginError) staffLoginError.textContent = message;
+      staffPinInput?.focus();
+    }
+
+    async function unlockStaffDashboard() {
+      staffLogin?.classList.add("hidden");
+      await refreshData();
+      renderBlockedDates();
+      setView("staff", false);
+    }
+
     function setView(view, updateUrl = true) {
       const isStaff = view === "staff";
       bookingView?.classList.toggle("active", !isStaff);
@@ -2378,6 +2471,28 @@ const STORAGE_KEY = "granaryHubBookings";
       if (staffEntryDate) staffEntryDate.value = selectedStaffDate();
       renderRows();
     });
+    staffLoginForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const submitButton = staffLoginForm.querySelector("button[type='submit']");
+      submitButton.disabled = true;
+      submitButton.textContent = "Checking...";
+      try {
+        const result = await staffAuthRequest({
+          pin: staffPinInput.value,
+          remember: Boolean(rememberStaffDevice?.checked)
+        });
+        storeStaffToken(result.token, Boolean(rememberStaffDevice?.checked));
+        staffPinInput.value = "";
+        await unlockStaffDashboard();
+      } catch (error) {
+        staffPinInput.value = "";
+        showStaffLogin("Incorrect PIN.");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Unlock dashboard";
+      }
+    });
+    staffLogoutButton?.addEventListener("click", clearStaffAccess);
     refreshStaffButton?.addEventListener("click", () => refreshStaffDashboard(true));
     toggleStaffEntryButton?.addEventListener("click", () => {
       if (staffEntryDate) staffEntryDate.value = selectedStaffDate();
@@ -2414,14 +2529,17 @@ const STORAGE_KEY = "granaryHubBookings";
     });
     async function initialise() {
       setInitialDates();
-      await refreshData();
       if (bookingForm) {
+        await refreshData();
         updatePriceTotal();
         setView("booking", false);
       }
       if (staffView) {
-        renderBlockedDates();
-        setView("staff", false);
+        if (await staffAccessGranted()) {
+          await unlockStaffDashboard();
+        } else {
+          showStaffLogin();
+        }
       }
     }
 
