@@ -418,6 +418,10 @@
             <label for="manualItems">Items</label>
             <input id="manualItems" type="number" min="1" value="1" required>
           </div>
+          <div>
+            <label for="manualTags">Tag numbers</label>
+            <input id="manualTags" placeholder="001, 002" required>
+          </div>
           <div style="grid-column: 1 / -1;">
             <label for="manualNotes">Notes</label>
             <textarea id="manualNotes" placeholder="Optional"></textarea>
@@ -864,9 +868,29 @@
     $("manualBookingForm").addEventListener("submit", async (event) => {
       event.preventDefault();
       const items = Math.max(1, Number($("manualItems").value || 1));
-      const tags = getNextTags(items);
+      const tags = $("manualTags").value
+        .split(",")
+        .map((tag) => tag.trim().replace(/^0*(\d+)$/, (_, n) => String(n).padStart(3, "0")))
+        .filter(Boolean);
+      if (!tags.length) {
+        setNotice("Please enter the luggage tag number before creating the booking.", true);
+        $("manualTags").focus();
+        return;
+      }
       if (tags.length !== items) {
-        setNotice("There are not enough available tags for this booking.", true);
+        setNotice(`Please enter ${items} tag number${items === 1 ? "" : "s"} for ${items} item${items === 1 ? "" : "s"}.`, true);
+        $("manualTags").focus();
+        return;
+      }
+      if (new Set(tags).size !== tags.length) {
+        setNotice("Each tag number must be different.", true);
+        $("manualTags").focus();
+        return;
+      }
+      const unavailableTags = tags.filter((tag) => usedTags().has(tag));
+      if (unavailableTags.length) {
+        setNotice(`Tag ${unavailableTags.join(", ")} is already in use on an active booking.`, true);
+        $("manualTags").focus();
         return;
       }
       const booking = {
