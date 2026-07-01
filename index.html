@@ -1512,10 +1512,6 @@
                 <label for="exactItems">Exact number of items</label>
                 <input id="exactItems" type="number" min="5" max="30" value="5">
               </div>
-              <div class="field">
-                <label for="collectionTime">Expected collection time</label>
-                <input id="collectionTime" name="collectionTime" type="time" min="08:00" max="17:00" required>
-              </div>
               <div class="price-summary">
                 <span id="priceBreakdown">£7 × 1 item</span>
                 <strong id="priceTotal">£7</strong>
@@ -2094,7 +2090,7 @@ const STORAGE_KEY = "granaryHubBookings";
 
     function validateBookingForm() {
       const dateKey = selectedBookingDate();
-      collectionTimeInput.setCustomValidity("");
+      collectionTimeInput?.setCustomValidity("");
       itemsInput.setCustomValidity("");
       bookingDateInput.setCustomValidity("");
 
@@ -2106,7 +2102,7 @@ const STORAGE_KEY = "granaryHubBookings";
         bookingDateInput.setCustomValidity("Bookings for today are now closed.");
       }
 
-      if (collectionTimeInput.value && collectionTimeInput.value > "17:00") {
+      if (collectionTimeInput?.value && collectionTimeInput.value > "17:00") {
         collectionTimeInput.setCustomValidity("Items must be collected by 5:00pm.");
       }
 
@@ -2477,7 +2473,7 @@ const STORAGE_KEY = "granaryHubBookings";
             mobile: form.get("mobile").trim(),
             email: form.get("email").trim(),
             items,
-            collectionTime: form.get("collectionTime"),
+            collectionTime: "17:00",
             totalCost: items * 7,
             tagNumbers,
             notes: form.get("notes").trim(),
@@ -2509,7 +2505,7 @@ const STORAGE_KEY = "granaryHubBookings";
         const fridayCollectionNote = isFriday(savedBooking.bookingDate)
           ? " The Granary is closed on Saturday, so your items must be collected by 5:00pm on Friday."
           : "";
-        confirmationSummary.textContent = `Your booking reference is ${savedBooking.reference}. Staff will attach your luggage tags when you arrive. Number of items: ${savedBooking.items}. Booking date: ${formatDate(savedBooking.bookingDate)}. Expected collection time: ${formatTime(savedBooking.collectionTime)}. Payment due at drop-off: ${formatMoney(savedBooking.totalCost)}.${fridayCollectionNote}`;
+        confirmationSummary.textContent = `Your booking reference is ${savedBooking.reference}. Staff will attach your luggage tags when you arrive. Number of items: ${savedBooking.items}. Booking date: ${formatDate(savedBooking.bookingDate)}. Payment due at drop-off: ${formatMoney(savedBooking.totalCost)}.${fridayCollectionNote}`;
         confirmationTotal.textContent = formatMoney(savedBooking.totalCost);
         paymentInstruction.textContent = emailSent
           ? `A confirmation email has been sent to ${savedBooking.email}. Please show it when collecting your items. Payment is due at drop-off.`
