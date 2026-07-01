@@ -3,1992 +3,597 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Staff Dashboard | The Granary Luggage Storage</title>
   <meta name="robots" content="noindex,nofollow">
-<style>
+  <title>Staff Dashboard | The Granary</title>
+  <style>
     :root {
+      --green: #163528;
+      --green-2: #235a42;
+      --cream: #f7f2e8;
+      --paper: #fffdf8;
+      --line: #ded6c7;
+      --muted: #63716b;
       --ink: #17201b;
-      --muted: #62716d;
-      --paper: #f7f3e9;
-      --panel: #ffffff;
-      --line: #d9d4c5;
-      --brand: #2f665a;
-      --brand-dark: #1f4b43;
-      --accent: #b76f3c;
-      --accent-soft: #f0ddc6;
-      --sea: #dce9e7;
-      --sky: #edf3f1;
-      --heather: #75607c;
-      --danger: #9a372f;
-      --ok: #287a56;
-      --shadow: 0 20px 60px rgba(31, 39, 34, .13);
-      --shadow-soft: 0 10px 30px rgba(31, 39, 34, .08);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --red: #9f2f2f;
+      --amber: #8a5d13;
+      --blue: #245b7a;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
+      background: var(--cream);
       color: var(--ink);
-      background:
-        radial-gradient(circle at 18% 10%, rgba(255, 255, 255, .9), transparent 230px),
-        linear-gradient(165deg, rgba(220, 233, 231, .95), transparent 420px),
-        linear-gradient(120deg, rgba(117, 96, 124, .12), transparent 360px),
-        linear-gradient(180deg, rgba(255, 255, 255, .38), transparent 260px),
-        var(--paper);
-      min-height: 100vh;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: .28;
-      background-image:
-        linear-gradient(rgba(31, 75, 67, .035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(31, 75, 67, .035) 1px, transparent 1px);
-      background-size: 38px 38px;
-      mask-image: linear-gradient(180deg, #000, transparent 62%);
-    }
-
-    button, input, textarea, select {
-      font: inherit;
-    }
-
-    .shell {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      line-height: 1.45;
     }
 
     header {
-      border-bottom: 1px solid rgba(222, 216, 199, .9);
-      background: rgba(250, 248, 241, .9);
-      backdrop-filter: blur(16px);
-      position: sticky;
-      top: 0;
-      z-index: 5;
+      background: var(--green);
+      color: #fff;
+      padding: 20px;
     }
 
-    .topbar {
-      max-width: 1180px;
+    .wrap {
+      width: min(1180px, calc(100% - 28px));
       margin: 0 auto;
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
-      min-width: 0;
+      justify-content: space-between;
+      gap: 16px;
     }
 
-    .mark {
-      width: 46px;
-      height: 46px;
-      border-radius: 8px;
-      background:
-        linear-gradient(135deg, rgba(255,255,255,.16), transparent 48%),
-        var(--brand);
-      color: #fff;
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-      letter-spacing: .04em;
-      flex: 0 0 auto;
-      box-shadow: 0 10px 24px rgba(47, 107, 79, .22);
-    }
-
-    .brand-title {
-      font-size: 18px;
-      line-height: 1.1;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .brand-subtitle {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 2px;
-    }
-
-    .nav {
-      display: flex;
-      gap: 8px;
-      padding: 4px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: rgba(255, 255, 255, .62);
-    }
-
-    .nav button {
-      border: 0;
-      background: transparent;
-      color: var(--muted);
-      min-height: 42px;
-      padding: 0 14px;
-      border-radius: 7px;
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .nav button.active {
-      background: linear-gradient(180deg, var(--brand), var(--brand-dark));
-      color: #fff;
-      box-shadow: 0 6px 16px rgba(47, 107, 79, .18);
-    }
-
-    main {
-      width: 100%;
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 34px 18px 52px;
-      flex: 1;
-      position: relative;
-    }
-
-    .view { display: none; }
-    .view.active { display: block; }
-
-    .booking-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 410px;
-      gap: 38px;
-      align-items: start;
-    }
-
-    .hero-copy {
-      padding: 18px 0 4px;
-    }
-
-    .skye-scene {
-      position: relative;
-      max-width: 740px;
-      height: 178px;
-      margin-bottom: 26px;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid rgba(217, 212, 197, .92);
-      background: var(--sea);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .skye-scene img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center 58%;
-      display: block;
-    }
-
-    .skye-scene::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, rgba(23, 32, 27, .32), transparent 58%);
-    }
-
-    .skye-scene::after {
-      content: none;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 30px;
-      padding: 0 10px;
-      border: 1px solid rgba(47, 107, 79, .22);
-      border-radius: 999px;
-      background: rgba(255,253,248,.78);
-      color: var(--brand-dark);
-      font-size: 13px;
-      font-weight: 900;
-      margin-bottom: 18px;
-      box-shadow: var(--shadow-soft);
-    }
-
-    h1 {
+    .brand h1 {
       margin: 0;
-      font-size: clamp(38px, 6vw, 68px);
-      line-height: .96;
-      letter-spacing: 0;
-      max-width: 760px;
-      color: #15231f;
-    }
-
-    .lead {
-      margin: 18px 0 0;
-      color: #3f4c44;
-      font-size: 18px;
-      line-height: 1.55;
-      max-width: 650px;
-    }
-
-    .service-strip {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 1px;
-      margin-top: 24px;
-      max-width: 740px;
-      overflow: hidden;
-      border: 1px solid rgba(217, 212, 197, .92);
-      border-radius: 8px;
-      background: var(--line);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .service-strip div {
-      background: rgba(255,253,248,.82);
-      padding: 14px;
-    }
-
-    .service-strip span {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 900;
-      text-transform: uppercase;
+      font-size: clamp(1.25rem, 3vw, 1.8rem);
       letter-spacing: .06em;
+      text-transform: uppercase;
     }
 
-    .service-strip strong {
-      display: block;
-      margin-top: 5px;
-      font-size: 20px;
-      line-height: 1.1;
+    .brand p {
+      margin: 3px 0 0;
+      color: #d9e6dc;
+      font-weight: 600;
     }
 
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 26px;
-      max-width: 740px;
-    }
-
-    .step {
-      position: relative;
-      border: 1px solid rgba(222, 216, 199, .9);
-      border-radius: 8px;
-      padding: 14px;
-      background: rgba(255,255,255,.68);
-      color: #3f4c44;
-      font-weight: 700;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .step::before {
-      content: "";
-      display: block;
-      width: 36px;
-      height: 4px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--accent), var(--heather));
-      margin-bottom: 12px;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 24px;
-      max-width: 740px;
-    }
-
-    .info-block {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(255,253,248,.8);
-      padding: 16px;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .info-block h2 {
-      margin: 0 0 8px;
-      font-size: 16px;
-      line-height: 1.2;
-    }
-
-    .info-block p {
-      margin: 0;
-      color: #4a554d;
-      line-height: 1.45;
-      font-size: 14px;
-    }
-
-    .notice {
-      margin-top: 12px;
-      max-width: 740px;
-      border: 1px solid rgba(47, 107, 79, .18);
-      border-left: 5px solid var(--brand);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, .76);
-      padding: 13px 14px;
-      color: #3f4c44;
-      line-height: 1.45;
-      font-weight: 700;
-    }
-
-    .search-copy {
-      max-width: 740px;
-      margin-top: 18px;
-      color: #465249;
-      line-height: 1.55;
-      font-size: 15px;
-    }
-
-    .reassurance-list {
-      display: grid;
-      gap: 8px;
-      max-width: 740px;
-      margin: 18px 0 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .reassurance-list li {
-      display: flex;
-      gap: 9px;
-      align-items: start;
-      color: #354239;
-      line-height: 1.45;
-      font-weight: 800;
-    }
-
-    .reassurance-list li::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      margin-top: 8px;
-      border-radius: 999px;
-      background: var(--brand);
-      flex: 0 0 auto;
-    }
-
-    .cafe-prompt {
-      max-width: 740px;
-      margin-top: 18px;
-      padding: 18px;
-      border: 1px solid rgba(183, 111, 60, .32);
-      border-radius: 8px;
-      background:
-        linear-gradient(135deg, rgba(240, 221, 198, .62), rgba(255,255,255,.78)),
-        #fffaf2;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .cafe-prompt h2 {
-      margin: 0 0 8px;
-      font-size: 21px;
-    }
-
-    .cafe-prompt p {
-      margin: 0;
-      color: #4a554d;
-      line-height: 1.5;
-      font-weight: 700;
-    }
-
-    .cafe-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 14px;
-      padding: 0;
-      list-style: none;
-    }
-
-    .cafe-list li {
-      border: 1px solid rgba(183, 111, 60, .28);
-      border-radius: 999px;
-      padding: 7px 10px;
-      background: rgba(255,255,255,.72);
-      color: #5b402b;
-      font-size: 13px;
-      font-weight: 900;
-    }
-
-    .local-info {
-      max-width: 1180px;
-      margin: 24px auto 0;
-      display: grid;
-      grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
-      gap: 18px;
-    }
-
-    .find-us, .faq-section {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(255,255,255,.78);
-      box-shadow: var(--shadow-soft);
-      padding: 18px;
-    }
-
-    .find-us h2, .faq-section h2 {
-      margin: 0 0 10px;
-      color: var(--brand-dark);
-      font-size: 22px;
-    }
-
-    .find-us p, .faq-section p {
-      margin: 0;
-      color: #4a554d;
-      line-height: 1.5;
-      font-weight: 700;
-    }
-
-    .find-us .secondary {
-      margin-top: 14px;
-    }
-
-    .faq-grid {
-      display: grid;
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    .faq-item {
-      border-top: 1px solid #ebe5d8;
-      padding-top: 12px;
-    }
-
-    .faq-item h3 {
-      margin: 0 0 5px;
-      font-size: 16px;
-      color: var(--ink);
-    }
-
-    .faq-item p + p {
-      margin-top: 8px;
-    }
-
-    .faq-item ul {
-      margin: 8px 0 10px;
-      padding-left: 20px;
-      color: #4a554d;
-      font-weight: 700;
-      line-height: 1.45;
-    }
+    main { padding: 24px 0 42px; }
 
     .panel {
-      background: var(--panel);
+      background: var(--paper);
       border: 1px solid var(--line);
       border-radius: 8px;
-      box-shadow: var(--shadow);
+      padding: 18px;
+      box-shadow: 0 12px 28px rgba(22, 53, 40, .08);
     }
 
-    .booking-panel {
-      padding: 20px;
-      position: sticky;
-      top: 96px;
-      border-color: rgba(47, 107, 79, .18);
+    .login {
+      max-width: 420px;
+      margin: 36px auto;
     }
 
-    .booking-panel h2 {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .booking-panel h2::after {
-      content: "£7/item";
-      min-height: 28px;
-      display: inline-flex;
-      align-items: center;
-      padding: 0 9px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: #6d441f;
-      font-size: 12px;
-      font-weight: 900;
-    }
-
-    .panel h2 {
-      margin: 0 0 16px;
-      font-size: 22px;
-      line-height: 1.15;
-    }
-
-    form {
-      display: grid;
-      gap: 14px;
-    }
-
-    .field {
-      display: grid;
-      gap: 7px;
-    }
-
-    .form-note {
-      margin: -6px 0 2px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 1.35;
+    .login h2,
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 1.25rem;
     }
 
     label {
-      font-weight: 800;
-      font-size: 14px;
-      color: #2d3830;
-    }
-
-    input, textarea, select {
-      width: 100%;
-      border: 1px solid #d7cfbd;
-      background: #fffdf8;
-      color: var(--ink);
-      border-radius: 7px;
-      min-height: 50px;
-      padding: 12px 13px;
-      outline: none;
-      transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 82px;
-    }
-
-    input:focus, textarea:focus, select:focus {
-      border-color: var(--brand);
-      box-shadow: 0 0 0 3px rgba(47, 107, 79, .16);
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .helper-text {
-      margin: -2px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .item-options {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .item-option {
-      min-height: 54px;
-      border: 1px solid #d7cfbd;
-      border-radius: 8px;
-      background: #fffdf8;
-      color: var(--ink);
-      cursor: pointer;
-      font-weight: 900;
-      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease, background .14s ease;
-    }
-
-    .item-option.active {
-      background: var(--brand);
-      border-color: var(--brand);
-      color: #fff;
-      box-shadow: 0 10px 24px rgba(47, 107, 79, .2);
-    }
-
-    .item-option:hover {
-      transform: translateY(-1px);
-      border-color: var(--brand);
-    }
-
-    .terms {
-      display: grid;
-      grid-template-columns: 22px 1fr;
-      gap: 10px;
-      align-items: start;
-      color: #455148;
-      font-size: 14px;
-      line-height: 1.45;
-      padding: 10px 0;
-    }
-
-    .terms input {
-      width: 20px;
-      height: 20px;
-      min-height: auto;
-      margin-top: 1px;
-    }
-
-    .price-summary {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 14px;
-      border: 1px solid rgba(47, 107, 79, .22);
-      border-radius: 8px;
-      background:
-        linear-gradient(135deg, rgba(47, 107, 79, .12), rgba(199, 122, 53, .12)),
-        #fff;
-      color: #284537;
-      font-weight: 800;
-    }
-
-    .price-summary strong {
-      font-size: 22px;
-      color: var(--brand-dark);
-      white-space: nowrap;
-    }
-
-    .availability {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 11px 12px;
-      background: #fff8ed;
-      color: #4a554d;
-      font-size: 14px;
-      line-height: 1.4;
+      display: block;
+      margin: 12px 0 6px;
       font-weight: 700;
     }
 
-    .availability:empty {
-      display: none;
-    }
-
-    .availability.closed {
-      background: #f9e8e5;
-      border-color: #e4b9b3;
-      color: var(--danger);
-    }
-
-    .date-warning {
-      display: none;
-      border: 1px solid #e4b9b3;
-      border-radius: 8px;
-      padding: 11px 12px;
-      background: #fff3e8;
-      color: #72401c;
-      font-size: 14px;
-      line-height: 1.4;
-      font-weight: 800;
-    }
-
-    .date-warning.active {
-      display: block;
-    }
-
-    .terms-details {
+    input,
+    textarea,
+    select {
+      width: 100%;
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 7px;
       padding: 11px 12px;
+      font: inherit;
       background: #fff;
-      color: #4a554d;
-      font-size: 14px;
-      line-height: 1.45;
+      color: var(--ink);
     }
 
-    .terms-details summary {
-      cursor: pointer;
-      color: var(--brand);
-      font-weight: 900;
-    }
+    textarea { min-height: 74px; resize: vertical; }
 
-    .terms-details h3 {
-      margin: 12px 0 2px;
-      color: var(--brand-dark);
-      font-size: 14px;
-      letter-spacing: .04em;
-    }
-
-    .terms-details p {
-      margin: 0;
+    .check-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin: 14px 0;
       color: var(--muted);
-      font-weight: 800;
+      font-weight: 600;
     }
 
-    .terms-details ul {
-      margin: 10px 0 0;
-      padding-left: 19px;
+    .check-row input {
+      width: auto;
+      transform: scale(1.15);
     }
 
-    .terms-details li + li {
-      margin-top: 6px;
-    }
-
-    .primary, .secondary, .ghost, .danger {
+    button,
+    .button {
       border: 0;
       border-radius: 7px;
-      min-height: 46px;
-      padding: 0 16px;
-      cursor: pointer;
+      background: var(--green);
+      color: #fff;
+      padding: 10px 13px;
+      font: inherit;
       font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      text-decoration: none;
-      white-space: nowrap;
-      transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+      gap: 7px;
+      min-height: 42px;
     }
 
-    .primary {
-      background: linear-gradient(180deg, var(--brand), var(--brand-dark));
-      color: #fff;
-      box-shadow: 0 10px 24px rgba(47, 107, 79, .2);
+    button:hover,
+    .button:hover { background: var(--green-2); }
+
+    button.secondary {
+      background: #ebe4d5;
+      color: var(--green);
     }
 
-    .primary:hover { background: var(--brand-dark); }
-    .primary:hover, .secondary:hover, .ghost:hover { transform: translateY(-1px); }
+    button.secondary:hover { background: #ded4c1; }
 
-    .secondary {
-      background: #fff8ed;
-      color: var(--ink);
-      border: 1px solid var(--line);
+    button.danger { background: var(--red); }
+    button.blue { background: var(--blue); }
+    button.amber { background: var(--amber); }
+    button[disabled] {
+      cursor: not-allowed;
+      opacity: .5;
     }
 
-    .ghost {
-      background: rgba(255,255,255,.66);
-      color: var(--brand);
-      border: 1px solid rgba(47, 107, 79, .35);
-    }
-
-    .danger {
-      background: #f9e8e5;
-      color: var(--danger);
-      border: 1px solid #e4b9b3;
-    }
-
-    .confirmation {
-      display: none;
-      padding: 20px;
-      border-radius: 8px;
-      border: 1px solid rgba(40, 122, 86, .24);
-      background:
-        linear-gradient(135deg, rgba(40, 122, 86, .12), rgba(255,255,255,.72)),
-        #eff8f2;
-    }
-
-    .confirmation.active {
-      display: block;
-    }
-
-    .confirmation-actions {
-      display: grid;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .payment-note {
-      margin: 10px 0 0;
-      color: #3f4c44;
-      font-size: 14px;
-      line-height: 1.45;
-      font-weight: 700;
-    }
-
-    .amount-due {
+    .toolbar {
       display: flex;
+      flex-wrap: wrap;
+      align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin: 12px 0;
-      padding: 12px;
-      border-radius: 8px;
-      background: #fff;
-      border: 1px solid #cfe2d5;
-      color: #284537;
-      font-weight: 900;
+      margin-bottom: 16px;
     }
 
-    .amount-due strong {
-      font-size: 24px;
-      color: var(--brand-dark);
-      white-space: nowrap;
-    }
-
-    .ref {
-      display: inline-flex;
-      margin: 12px 0;
-      padding: 10px 13px;
-      border-radius: 7px;
-      background: #fff;
-      border: 1px solid #cfe2d5;
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: .04em;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .dashboard {
-      display: grid;
-      gap: 18px;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .staff-login {
-      max-width: 420px;
-      margin: 32px auto;
-      padding: 22px;
-      border-color: rgba(47, 107, 79, .18);
-    }
-
-    .staff-login h1 {
-      font-size: 32px;
-      margin-bottom: 10px;
-    }
-
-    .staff-login p {
-      color: var(--muted);
-      line-height: 1.45;
-      margin: 0 0 16px;
-      font-weight: 700;
-    }
-
-    .dash-head {
+    .toolbar-actions {
       display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      align-items: end;
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(255,255,255,.72);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .dash-head h1 {
-      font-size: clamp(30px, 4vw, 44px);
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
     }
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(140px, 1fr));
       gap: 12px;
+      margin-bottom: 16px;
     }
 
     .stat {
-      padding: 16px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,253,248,.9));
+      background: #fff;
       border: 1px solid var(--line);
       border-radius: 8px;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .stat strong {
-      display: block;
-      font-size: 28px;
-      line-height: 1;
+      padding: 14px;
     }
 
     .stat span {
       display: block;
-      margin-top: 8px;
       color: var(--muted);
-      font-weight: 700;
-      font-size: 13px;
-    }
-
-    .staff-summary {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .summary-card {
-      min-height: 86px;
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(255,255,255,.78);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .summary-card span {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: .04em;
+      font-size: .85rem;
+      font-weight: 800;
       text-transform: uppercase;
-      margin-bottom: 8px;
+      letter-spacing: .04em;
     }
 
-    .summary-card strong {
+    .stat strong {
       display: block;
-      color: var(--brand-dark);
-      font-size: 18px;
-      line-height: 1.25;
-    }
-
-    .summary-card.warning strong {
-      color: var(--danger);
-    }
-
-    .toolbar {
-      display: grid;
-      grid-template-columns: minmax(220px, 1fr) 170px auto auto auto auto;
-      gap: 10px;
-      align-items: center;
-      padding: 12px;
-      background: rgba(255,255,255,.78);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .toolbar input {
-      min-height: 44px;
-    }
-
-    .sync-status {
-      margin: -8px 4px 0;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    .staff-version {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 800;
-      text-align: right;
-    }
-
-    .site-footer {
-      max-width: 1180px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 0 18px 32px;
-      color: #4a554d;
-      position: relative;
-    }
-
-    .site-footer strong {
-      display: block;
-      color: var(--ink);
-      font-size: 16px;
-      margin-bottom: 4px;
-    }
-
-    .site-footer p {
-      margin: 0;
-      line-height: 1.45;
-      font-weight: 700;
+      margin-top: 4px;
+      font-size: 1.35rem;
     }
 
     .table-wrap {
-      overflow: auto;
+      overflow-x: auto;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #fff;
-      box-shadow: var(--shadow-soft);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 920px;
+      min-width: 980px;
     }
 
-    th, td {
+    th,
+    td {
       padding: 12px;
-      border-bottom: 1px solid #ebe5d8;
+      border-bottom: 1px solid var(--line);
       text-align: left;
       vertical-align: top;
-      font-size: 14px;
+      font-size: .95rem;
     }
 
     th {
-      color: #4a554d;
-      background: #f7f1e8;
-      font-size: 12px;
+      background: #efe8d9;
+      color: var(--green);
+      font-size: .78rem;
       text-transform: uppercase;
-      letter-spacing: .04em;
-      position: sticky;
-      top: 0;
+      letter-spacing: .05em;
     }
 
     tr:last-child td { border-bottom: 0; }
 
-    .status {
-      display: inline-flex;
-      min-height: 26px;
-      align-items: center;
-      border-radius: 999px;
-      padding: 0 9px;
-      font-size: 12px;
+    .ref {
       font-weight: 900;
-      background: #eee6d8;
-      color: #594d3d;
+      font-size: 1.08rem;
+      letter-spacing: .04em;
+    }
+
+    .muted { color: var(--muted); }
+
+    .status {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: .78rem;
+      font-weight: 900;
+      background: #efe8d9;
+      color: var(--green);
       white-space: nowrap;
     }
 
-    .status.arrived { background: #e7f1ff; color: #24548a; }
-    .status.paid { background: #f3ecff; color: #5e3f88; }
-    .status.collected { background: #e9f5ed; color: #287a56; }
-
-    .staff-flag {
-      display: block;
-      margin-top: 6px;
-      color: var(--danger);
-      font-size: 12px;
-      font-weight: 900;
-      line-height: 1.25;
-    }
+    .status.arrived { background: #e7f1ea; color: #1d623f; }
+    .status.paid { background: #eef3f6; color: #245b7a; }
+    .status.collected { background: #eee; color: #555; }
 
     .actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 7px;
+      gap: 6px;
       min-width: 250px;
     }
 
-    .actions button, .tag-select {
-      min-height: 36px;
-      border-radius: 7px;
-      padding: 0 10px;
-      font-size: 13px;
+    .actions button {
+      min-height: 34px;
+      padding: 7px 9px;
+      font-size: .85rem;
     }
 
-    .tag-select {
-      width: 92px;
-      border: 1px solid #cfc7b5;
-    }
-
-    .whatsapp-button[disabled] {
-      cursor: not-allowed;
-      opacity: .5;
-      transform: none;
-    }
-
-    .empty {
-      padding: 26px;
-      text-align: center;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .blocked-panel {
-      display: grid;
-      gap: 12px;
-      padding: 16px;
+    .notice {
       border: 1px solid var(--line);
+      background: #fff7db;
+      color: #59400f;
       border-radius: 8px;
-      background: rgba(255,255,255,.78);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .blocked-panel h2 {
-      margin: 0 0 4px;
-      font-size: 20px;
-    }
-
-    .blocked-panel p {
-      margin: 0;
-      color: var(--muted);
+      padding: 11px 13px;
+      margin: 12px 0;
       font-weight: 700;
-      line-height: 1.4;
     }
 
-    .blocked-controls {
+    .error {
+      display: none;
+      border: 1px solid #e0aaaa;
+      background: #fff0f0;
+      color: var(--red);
+      border-radius: 8px;
+      padding: 11px 13px;
+      margin-top: 12px;
+      font-weight: 700;
+    }
+
+    .grid-2 {
       display: grid;
-      grid-template-columns: 170px minmax(180px, 1fr) auto;
-      gap: 10px;
-      align-items: center;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
     }
 
     .blocked-list {
       display: grid;
       gap: 8px;
+      margin-top: 12px;
     }
 
-    .blocked-date {
+    .blocked-row {
       display: flex;
-      align-items: center;
       justify-content: space-between;
       gap: 12px;
+      align-items: center;
       padding: 10px 12px;
-      border: 1px solid #ead8cf;
+      background: #fff;
+      border: 1px solid var(--line);
       border-radius: 8px;
-      background: #fff8ed;
-      color: #4a554d;
-      font-weight: 800;
     }
 
-    .blocked-date span {
+    footer {
       color: var(--muted);
-      font-weight: 700;
+      padding: 18px 0 30px;
+      font-size: .9rem;
     }
 
-    .staff-entry-panel {
-      display: none;
-      gap: 12px;
-      padding: 16px;
-      border: 1px solid rgba(47, 107, 79, .18);
-      border-radius: 8px;
-      background: rgba(255,255,255,.78);
-      box-shadow: var(--shadow-soft);
-    }
+    .hidden { display: none !important; }
 
-    .staff-entry-panel.active {
-      display: grid;
-    }
-
-    .staff-entry-panel h2 {
-      margin: 0 0 4px;
-      font-size: 20px;
-    }
-
-    .staff-entry-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .staff-entry-wide {
-      grid-column: 1 / -1;
-    }
-
-    .module-strip {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    .module {
-      padding: 15px;
-      border: 1px dashed #c8bda8;
-      border-radius: 8px;
-      color: #59645c;
-      background: rgba(255,255,255,.68);
-      font-weight: 800;
-      box-shadow: var(--shadow-soft);
-    }
-
-    @media (max-width: 860px) {
-      .topbar {
-        align-items: stretch;
+    @media (max-width: 760px) {
+      .brand {
+        align-items: flex-start;
         flex-direction: column;
       }
 
-      .nav {
-        width: 100%;
-      }
+      .stats,
+      .grid-2 { grid-template-columns: 1fr; }
 
-      .nav button {
-        flex: 1;
-      }
-
-      .booking-layout {
-        grid-template-columns: 1fr;
-      }
-
-      .booking-panel {
-        position: static;
-      }
-
-      .steps, .stats, .staff-summary, .module-strip, .info-grid, .service-strip, .local-info {
-        grid-template-columns: 1fr;
-      }
-
-      .dash-head {
-        align-items: stretch;
-        flex-direction: column;
-      }
-
-      .toolbar {
-        grid-template-columns: 1fr;
-      }
-
-      .blocked-controls {
-        grid-template-columns: 1fr;
-      }
-
-      .staff-entry-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 520px) {
-      main {
-        padding: 18px 12px 32px;
-      }
-
-      .topbar {
-        padding: 12px;
-      }
-
-      .brand-title {
-        font-size: 16px;
-      }
-
-      .brand-subtitle {
-        font-size: 12px;
-      }
-
-      .row {
-        grid-template-columns: 1fr;
-      }
-
-      .booking-panel {
-        padding: 14px;
-      }
-
-      h1 {
-        font-size: 36px;
-      }
-
-      .lead {
-        font-size: 16px;
-      }
-
-      .service-strip strong {
-        font-size: 18px;
-      }
-
-      .skye-scene {
-        height: 116px;
-        margin-bottom: 18px;
-      }
+      .toolbar { align-items: stretch; }
+      .toolbar-actions { width: 100%; }
+      .toolbar-actions > * { flex: 1 1 150px; }
     }
   </style>
 </head>
-<body data-page="staff">
-  <div class="shell">
-    <header>
-      <div class="topbar">
-        <div class="brand" aria-label="The Granary Luggage Storage">
-          <div class="mark">G</div>
-          <div>
-            <div class="brand-title">THE GRANARY</div>
-            <div class="brand-subtitle">Staff Dashboard</div>
-          </div>
+<body>
+  <header>
+    <div class="wrap brand">
+      <div>
+        <h1>The Granary</h1>
+        <p>Luggage Storage Staff</p>
+      </div>
+      <button id="staffLogoutButton" class="secondary hidden" type="button">Logout</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="staffLogin" class="panel login">
+      <h2>Staff access</h2>
+      <p class="muted">Enter the staff PIN to view bookings.</p>
+      <form id="staffLoginForm">
+        <label for="staffPin">PIN</label>
+        <input id="staffPin" name="staffPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="current-password" required>
+        <label class="check-row">
+          <input id="rememberStaffDevice" type="checkbox">
+          Remember this device for 30 days
+        </label>
+        <button type="submit">Open dashboard</button>
+        <div id="staffLoginError" class="error"></div>
+      </form>
+    </section>
+
+    <section id="staffDashboard" class="hidden">
+      <div class="toolbar">
+        <div>
+          <h2 class="section-title">Today's bookings</h2>
+          <div id="todayLabel" class="muted"></div>
+        </div>
+        <div class="toolbar-actions">
+          <input id="bookingSearch" type="search" placeholder="Search name, reference, mobile">
+          <button id="refreshButton" type="button" class="secondary">Refresh</button>
+          <button id="exportCsvButton" type="button">Export CSV</button>
         </div>
       </div>
-    </header>
 
-    <main>
-      <section id="staffLogin" class="panel staff-login">
-        <h1>Staff access</h1>
-        <p>Enter the staff PIN to view luggage storage bookings.</p>
-        <form id="staffLoginForm">
-          <div class="field">
-            <label for="staffPin">Staff PIN</label>
-            <input id="staffPin" name="staffPin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="current-password" required>
+      <div id="staffNotice" class="notice hidden"></div>
+
+      <div class="stats">
+        <div class="stat"><span>Active bookings</span><strong id="activeBookings">0</strong></div>
+        <div class="stat"><span>Items in store</span><strong id="itemsInStore">0</strong></div>
+        <div class="stat"><span>Paid today</span><strong id="paidToday">0</strong></div>
+        <div class="stat"><span>Available tags</span><strong id="availableTags">0</strong></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Tags</th>
+              <th>Collection time</th>
+              <th>Status</th>
+              <th>Staff notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="bookingsBody"></tbody>
+        </table>
+      </div>
+
+      <section class="panel" style="margin-top: 18px;">
+        <h2 class="section-title">Manual booking</h2>
+        <p class="muted">Use this if someone cannot access the public booking page.</p>
+        <form id="manualBookingForm" class="grid-2">
+          <div>
+            <label for="manualName">Name</label>
+            <input id="manualName" required>
           </div>
-          <label class="terms">
-            <input id="rememberStaffDevice" name="rememberStaffDevice" type="checkbox">
-            <span>Remember this device for 30 days</span>
-          </label>
-          <button class="primary" type="submit">Unlock dashboard</button>
-          <p id="staffLoginError" class="helper-text" aria-live="polite"></p>
+          <div>
+            <label for="manualMobile">Mobile</label>
+            <input id="manualMobile" required>
+          </div>
+          <div>
+            <label for="manualEmail">Email</label>
+            <input id="manualEmail" type="email" required>
+          </div>
+          <div>
+            <label for="manualItems">Items</label>
+            <input id="manualItems" type="number" min="1" value="1" required>
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <label for="manualNotes">Notes</label>
+            <textarea id="manualNotes" placeholder="Optional"></textarea>
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <button type="submit">Create booking</button>
+          </div>
         </form>
       </section>
 
-      <section id="staffView" class="view">
-        <div id="staffDashboard" class="dashboard">
-          <div class="dash-head">
-            <div>
-              <h1>Staff dashboard</h1>
-              <p class="lead">Bookings, tags, arrivals, payments and collections for the selected date.</p>
-            </div>
-            <div class="actions">
-              <button class="secondary" type="button" id="staffBookingButton">Booking</button>
-              <button class="primary" type="button" id="printQrButton">Print booking QR</button>
-              <button class="ghost" type="button" id="staffLogoutButton">Logout</button>
-            </div>
+      <section class="panel" style="margin-top: 18px;">
+        <h2 class="section-title">Blocked dates</h2>
+        <p class="muted">Block dates when luggage storage should not be available.</p>
+        <form id="blockedDateForm" class="grid-2">
+          <div>
+            <label for="blockedDate">Date</label>
+            <input id="blockedDate" type="date" required>
           </div>
-
-          <div class="stats" aria-label="Dashboard stats">
-            <div class="stat"><strong id="statActive">0</strong><span>Active today</span></div>
-            <div class="stat"><strong id="statArrived">0</strong><span>Arrived</span></div>
-            <div class="stat"><strong id="statPaid">0</strong><span>Paid</span></div>
-            <div class="stat"><strong id="statCollected">0</strong><span>Collected</span></div>
-            <div class="stat"><strong id="statCapacity">0/60</strong><span>Item capacity</span></div>
-            <div class="stat"><strong id="statExpectedTakings">£0</strong><span>Expected today</span></div>
-            <div class="stat"><strong id="statPaidTakings">£0</strong><span>Paid so far</span></div>
+          <div>
+            <label for="blockedReason">Reason</label>
+            <input id="blockedReason" placeholder="Closed / fully booked">
           </div>
-
-          <div class="staff-summary" aria-label="End of day checklist">
-            <div class="summary-card" id="summaryUncollectedCard">
-              <span>Uncollected items</span>
-              <strong id="summaryUncollected">0</strong>
-            </div>
-            <div class="summary-card" id="summaryUnpaidCard">
-              <span>Unpaid bookings</span>
-              <strong id="summaryUnpaid">0</strong>
-            </div>
-            <div class="summary-card">
-              <span>Tags still out</span>
-              <strong id="summaryTagsOut">None</strong>
-            </div>
+          <div style="grid-column: 1 / -1;">
+            <button type="submit">Block date</button>
           </div>
-
-          <div class="toolbar">
-            <input id="searchInput" type="search" placeholder="Search name, reference or tag">
-            <input id="staffDate" type="date" aria-label="Dashboard date">
-            <button class="secondary" type="button" id="showTodayButton">Today's active</button>
-            <button class="ghost" type="button" id="showHistoryButton">History</button>
-            <button class="ghost" type="button" id="refreshStaffButton">Refresh</button>
-            <button class="ghost" type="button" id="toggleStaffEntryButton">New staff booking</button>
-            <button class="ghost" type="button" id="exportCsvButton">Export CSV</button>
-          </div>
-          <div id="syncStatus" class="sync-status" aria-live="polite">Last updated just now. Auto-refresh is on.</div>
-
-          <form id="staffEntryForm" class="staff-entry-panel">
-            <div>
-              <h2>New staff booking</h2>
-              <p class="helper-text">Use this when someone cannot use the QR code or needs booked in at the counter.</p>
-            </div>
-            <div class="staff-entry-grid">
-              <div class="field">
-                <label for="staffEntryDate">Booking date</label>
-                <input id="staffEntryDate" name="bookingDate" type="date" required>
-              </div>
-              <div class="field">
-                <label for="staffEntryName">Name</label>
-                <input id="staffEntryName" name="customerName" required>
-              </div>
-              <div class="field">
-                <label for="staffEntryItems">Items</label>
-                <input id="staffEntryItems" name="items" type="number" min="1" max="30" value="1" required>
-              </div>
-              <div class="field">
-                <label for="staffEntryMobile">Mobile</label>
-                <input id="staffEntryMobile" name="mobile" autocomplete="tel" inputmode="tel">
-              </div>
-              <div class="field">
-                <label for="staffEntryEmail">Email</label>
-                <input id="staffEntryEmail" name="email" autocomplete="email" inputmode="email" type="email" required>
-                <p class="helper-text">Required because the confirmation email is used for collection.</p>
-              </div>
-              <div class="field staff-entry-wide">
-                <label for="staffEntryNotes">Notes</label>
-                <textarea id="staffEntryNotes" name="notes" placeholder="Walk-in booking, customer details, large items..."></textarea>
-              </div>
-            </div>
-            <div class="actions">
-              <button class="primary" type="submit">Create booking</button>
-              <button class="ghost" type="button" id="cancelStaffEntryButton">Cancel</button>
-            </div>
-          </form>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Reference</th>
-                  <th>Customer</th>
-                  <th>Items</th>
-                  <th>Tags</th>
-                  <th>Collection time</th>
-                  <th>Status</th>
-                  <th>Staff notes</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="bookingRows"></tbody>
-            </table>
-            <div id="emptyState" class="empty">No bookings to show.</div>
-          </div>
-
-          <div class="blocked-panel">
-            <div>
-              <h2>Blocked dates</h2>
-              <p>Block dates when luggage storage is unavailable.</p>
-            </div>
-            <div class="blocked-controls">
-              <input id="blockDateInput" type="date" aria-label="Date to block">
-              <input id="blockReasonInput" type="text" placeholder="Reason, optional" aria-label="Blocked date reason">
-              <button class="secondary" type="button" id="blockDateButton">Block date</button>
-            </div>
-            <div id="blockedDateList" class="blocked-list"></div>
-          </div>
-          <div class="staff-version">Granary Luggage Storage v0.5</div>
-        </div>
+        </form>
+        <div id="blockedDatesList" class="blocked-list"></div>
       </section>
-    </main>
-    <footer class="site-footer">
-      <strong>The Granary</strong>
-      <p>Staff dashboard</p>
-    </footer>
-  </div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    Granary Luggage Storage v0.5
+  </footer>
 
   <script>
-const STORAGE_KEY = "granaryHubBookings";
-    const BLOCKED_DATES_KEY = "granaryHubBlockedDates";
     const SUPABASE_URL = "https://gwyvgtyjvejhulxsvhca.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_Fs8UjApX4q8xYpmnSSedsA_tb3VMn90";
-    const SUPABASE_ENABLED = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
-    const EMAIL_CONFIRMATIONS_ENABLED = true;
+    const STAFF_AUTH_ENDPOINT = `${SUPABASE_URL}/functions/v1/staff-auth`;
+    const EMAIL_ENDPOINT = `${SUPABASE_URL}/functions/v1/dynamic-endpoint`;
+    const STAFF_SESSION_KEY = "granaryStaffSession";
+    const STAFF_REMEMBER_KEY = "granaryStaffRemembered";
     const WHATSAPP_ENABLED = false;
     const WHATSAPP_BUSINESS_NUMBER = "";
-    const TAG_COUNT = 60;
-    const DAILY_ITEM_CAPACITY = TAG_COUNT;
-    const STAFF_REFRESH_MS = 30000;
-    const STAFF_AUTH_ENDPOINT = `${SUPABASE_URL}/functions/v1/staff-auth`;
-    const STAFF_AUTH_STORAGE_KEY = "granaryStaffAuthToken";
-    const STAFF_AUTH_SESSION_KEY = "granaryStaffSessionToken";
-    const bookingView = document.getElementById("bookingView");
-    const staffView = document.getElementById("staffView");
-    const staffLogin = document.getElementById("staffLogin");
-    const staffLoginForm = document.getElementById("staffLoginForm");
-    const staffPinInput = document.getElementById("staffPin");
-    const rememberStaffDevice = document.getElementById("rememberStaffDevice");
-    const staffLoginError = document.getElementById("staffLoginError");
-    const staffLogoutButton = document.getElementById("staffLogoutButton");
-    const bookingForm = document.getElementById("bookingForm");
-    const bookingAvailability = document.getElementById("bookingAvailability");
-    const confirmation = document.getElementById("confirmation");
-    const confirmationRef = document.getElementById("confirmationRef");
-    const confirmationSummary = document.getElementById("confirmationSummary");
-    const confirmationTotal = document.getElementById("confirmationTotal");
-    const paymentInstruction = document.getElementById("paymentInstruction");
-    const newBookingButton = document.getElementById("newBookingButton");
-    const bookingNavButton = document.getElementById("bookingNavButton");
-    const staffNavButton = document.getElementById("staffNavButton");
-    const bookingDateInput = document.getElementById("bookingDate");
-    const fridayWarning = document.getElementById("fridayWarning");
-    const itemsInput = document.getElementById("items");
-    const itemButtons = document.querySelectorAll("[data-item-count]");
-    const exactItemsField = document.getElementById("exactItemsField");
-    const exactItemsInput = document.getElementById("exactItems");
-    const collectionTimeInput = document.getElementById("collectionTime");
-    const priceBreakdown = document.getElementById("priceBreakdown");
-    const priceTotal = document.getElementById("priceTotal");
-    const bookingRows = document.getElementById("bookingRows");
-    const emptyState = document.getElementById("emptyState");
-    const searchInput = document.getElementById("searchInput");
-    const staffDateInput = document.getElementById("staffDate");
-    const showTodayButton = document.getElementById("showTodayButton");
-    const showHistoryButton = document.getElementById("showHistoryButton");
-    const refreshStaffButton = document.getElementById("refreshStaffButton");
-    const toggleStaffEntryButton = document.getElementById("toggleStaffEntryButton");
-    const staffEntryForm = document.getElementById("staffEntryForm");
-    const staffEntryDate = document.getElementById("staffEntryDate");
-    const cancelStaffEntryButton = document.getElementById("cancelStaffEntryButton");
-    const exportCsvButton = document.getElementById("exportCsvButton");
-    const printQrButton = document.getElementById("printQrButton");
-    const staffBookingButton = document.getElementById("staffBookingButton");
-    const blockDateInput = document.getElementById("blockDateInput");
-    const blockReasonInput = document.getElementById("blockReasonInput");
-    const blockDateButton = document.getElementById("blockDateButton");
-    const blockedDateList = document.getElementById("blockedDateList");
-    const syncStatus = document.getElementById("syncStatus");
-    let dashboardMode = "today";
-    let bookingsCache = [];
-    let blockedDatesCache = [];
-    let dataMessage = "";
-    let staffRefreshTimer = null;
-    let staffRefreshInProgress = false;
+    const TOTAL_TAGS = 80;
+    const PRICE_PER_ITEM = 7;
+
+    const state = {
+      bookings: [],
+      blockedDates: [],
+      authed: false,
+    };
+
+    const $ = (id) => document.getElementById(id);
 
     function todayKey() {
-      const now = new Date();
-      const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-      return local.toISOString().slice(0, 10);
+      return new Date().toLocaleDateString("en-CA", { timeZone: "Europe/London" });
     }
 
-    function selectedBookingDate() {
-      return bookingDateInput?.value || todayKey();
+    function formatTime(value) {
+      return String(value || "").slice(0, 5) || "17:00";
     }
 
-    function selectedStaffDate() {
-      return staffDateInput?.value || todayKey();
-    }
-
-    function loadLocalBookings() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      } catch (error) {
-        return [];
-      }
-    }
-
-    function saveLocalBookings(bookings) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
-    }
-
-    function loadLocalBlockedDates() {
-      try {
-        return JSON.parse(localStorage.getItem(BLOCKED_DATES_KEY)) || [];
-      } catch (error) {
-        return [];
-      }
-    }
-
-    function saveLocalBlockedDates(dates) {
-      localStorage.setItem(BLOCKED_DATES_KEY, JSON.stringify(dates));
-    }
-
-    async function supabaseRequest(path, options = {}) {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-        ...options,
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          "Content-Type": "application/json",
-          Prefer: "return=representation",
-          ...(options.headers || {})
-        }
-      });
-      if (!response.ok) {
-        const details = await response.text();
-        throw new Error(details || `Request failed: ${response.status}`);
-      }
-      if (response.status === 204) return null;
-      const text = await response.text();
-      return text ? JSON.parse(text) : null;
-    }
-
-    function fromDbBooking(row) {
-      return {
-        id: row.id,
-        reference: row.reference,
-        bookingDate: row.booking_date,
-        createdDate: row.booking_date,
-        name: row.name,
-        mobile: row.mobile,
-        email: row.email || "",
-        items: row.items,
-        collectionTime: String(row.collection_time || "").slice(0, 5),
-        totalCost: row.total_cost,
-        tagNumbers: Array.isArray(row.tag_numbers) ? row.tag_numbers.map(String) : [],
-        notes: row.notes || "",
-        createdAt: row.created_at,
-        arrivedAt: row.arrived_at || "",
-        paymentReceivedAt: row.payment_received_at || "",
-        collectedAt: row.collected_at || ""
-      };
-    }
-
-    function toDbBooking(booking) {
-      return {
-        id: booking.id,
-        reference: booking.reference,
-        booking_date: booking.bookingDate,
-        name: booking.name,
-        mobile: booking.mobile,
-        email: booking.email || null,
-        items: booking.items,
-        collection_time: booking.collectionTime,
-        total_cost: booking.totalCost,
-        tag_numbers: booking.tagNumbers,
-        notes: booking.notes || null
-      };
-    }
-
-    function fromDbBlockedDate(row) {
-      return {
-        date: row.date,
-        reason: row.reason || ""
-      };
-    }
-
-    async function refreshData() {
-      if (!SUPABASE_ENABLED) {
-        bookingsCache = migrateLegacyBookings(loadLocalBookings());
-        blockedDatesCache = loadLocalBlockedDates();
-        dataMessage = "";
-        return;
-      }
-
-      try {
-        const [bookings, blockedDates] = await Promise.all([
-          supabaseRequest("bookings?select=*&order=created_at.desc"),
-          supabaseRequest("blocked_dates?select=*&order=date.asc")
-        ]);
-        bookingsCache = (bookings || []).map(fromDbBooking);
-        blockedDatesCache = (blockedDates || []).map(fromDbBlockedDate);
-        dataMessage = "";
-      } catch (error) {
-        console.error(error);
-        bookingsCache = migrateLegacyBookings(loadLocalBookings());
-        blockedDatesCache = loadLocalBlockedDates();
-        dataMessage = "Could not reach the shared booking database. Showing this device only.";
-      }
-    }
-
-    async function createBooking(booking) {
-      if (!SUPABASE_ENABLED) {
-        bookingsCache.push(booking);
-        saveLocalBookings(bookingsCache);
-        return booking;
-      }
-
-      const rows = await supabaseRequest("bookings?select=*", {
-        method: "POST",
-        body: JSON.stringify(toDbBooking(booking))
-      });
-      return fromDbBooking(rows[0]);
-    }
-
-    async function sendBookingConfirmationEmail(booking) {
-      if (!EMAIL_CONFIRMATIONS_ENABLED || !SUPABASE_ENABLED || !booking.email) {
-        return { sent: false, reason: "Email confirmations are not available." };
-      }
-
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/dynamic-endpoint`, {
-        method: "POST",
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ bookingId: booking.id })
-      });
-
-      if (!response.ok) {
-        const details = await response.text();
-        throw new Error(details || "Email confirmation failed.");
-      }
-
-      const result = await response.json();
-      if (!result.sent) {
-        throw new Error(result.error || "Email confirmation failed.");
-      }
-      return result;
-    }
-
-    async function saveBookingPatch(id, patch) {
-      if (!SUPABASE_ENABLED || dataMessage) {
-        bookingsCache = bookingsCache.map((booking) => booking.id === id ? { ...booking, ...patch } : booking);
-        saveLocalBookings(bookingsCache);
-        return;
-      }
-
-      const dbPatch = {};
-      if ("tagNumbers" in patch) dbPatch.tag_numbers = patch.tagNumbers;
-      if ("arrivedAt" in patch) dbPatch.arrived_at = patch.arrivedAt || null;
-      if ("paymentReceivedAt" in patch) dbPatch.payment_received_at = patch.paymentReceivedAt || null;
-      if ("collectedAt" in patch) dbPatch.collected_at = patch.collectedAt || null;
-      await supabaseRequest(`bookings?id=eq.${encodeURIComponent(id)}`, {
-        method: "PATCH",
-        body: JSON.stringify(dbPatch)
-      });
-      await refreshData();
-    }
-
-    async function deleteBooking(id) {
-      if (!SUPABASE_ENABLED || dataMessage) {
-        bookingsCache = bookingsCache.filter((booking) => booking.id !== id);
-        saveLocalBookings(bookingsCache);
-        return;
-      }
-
-      await supabaseRequest(`bookings?id=eq.${encodeURIComponent(id)}`, { method: "DELETE" });
-      await refreshData();
-    }
-
-    async function addBlockedDate(date, reason) {
-      if (!SUPABASE_ENABLED || dataMessage) {
-        blockedDatesCache = [
-          ...blockedDatesCache.filter((blocked) => blocked.date !== date),
-          { date, reason }
-        ].sort((a, b) => a.date.localeCompare(b.date));
-        saveLocalBlockedDates(blockedDatesCache);
-        return;
-      }
-
-      await supabaseRequest("blocked_dates?on_conflict=date", {
-        method: "POST",
-        headers: { Prefer: "resolution=merge-duplicates,return=representation" },
-        body: JSON.stringify({ date, reason: reason || null })
-      });
-      await refreshData();
-    }
-
-    async function removeBlockedDate(date) {
-      if (!SUPABASE_ENABLED || dataMessage) {
-        blockedDatesCache = blockedDatesCache.filter((blocked) => blocked.date !== date);
-        saveLocalBlockedDates(blockedDatesCache);
-        return;
-      }
-
-      await supabaseRequest(`blocked_dates?date=eq.${encodeURIComponent(date)}`, { method: "DELETE" });
-      await refreshData();
-    }
-
-    function bookingsForDate(bookings, dateKey) {
-      return bookings.filter((booking) => (booking.bookingDate || booking.createdDate) === dateKey);
-    }
-
-    function activeForDate(bookings, dateKey) {
-      return bookingsForDate(bookings, dateKey).filter((booking) => !booking.collectedAt);
-    }
-
-    function activeItemCountForDate(bookings, dateKey) {
-      return activeForDate(bookings, dateKey)
-        .reduce((total, booking) => total + getTagNumbers(booking).length, 0);
-    }
-
-    function remainingItemCapacity(dateKey, bookings = bookingsCache) {
-      return availableTags(bookings, dateKey).length;
-    }
-
-    function bookingsClosedForDate(dateKey) {
-      if (dateKey !== todayKey()) return false;
-      const now = new Date();
-      const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-      return currentTime > "17:00";
-    }
-
-    function collectionTimePassed(booking) {
-      const dateKey = booking.bookingDate || booking.createdDate;
-      if (booking.collectedAt || dateKey !== todayKey() || !booking.collectionTime) return false;
-      const now = new Date();
-      const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-      return currentTime > booking.collectionTime;
-    }
-
-    function isFriday(dateKey) {
-      if (!dateKey) return false;
-      return new Date(`${dateKey}T00:00:00`).getDay() === 5;
-    }
-
-    function updateFridayWarning() {
-      if (!fridayWarning) return;
-      fridayWarning.classList.toggle("active", isFriday(selectedBookingDate()));
-    }
-
-    function isDateBlocked(dateKey) {
-      return blockedDatesCache.some((blocked) => blocked.date === dateKey);
-    }
-
-    function blockedReason(dateKey) {
-      const blocked = blockedDatesCache.find((entry) => entry.date === dateKey);
-      return blocked ? blocked.reason : "";
-    }
-
-    function makeReference(bookings, dateKey) {
-      const refs = bookingsForDate(bookings, dateKey)
-        .map((booking) => /^G(\d{3})$/.exec(booking.reference || ""))
-        .filter(Boolean)
-        .map((match) => Number(match[1]));
-      const nextNumber = (refs.length ? Math.max(...refs) : 0) + 1;
-      return `G${String(nextNumber).padStart(3, "0")}`;
-    }
-
-    function makeId() {
-      if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
-      return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    }
-
-    function formatTime(time) {
-      if (!time) return "-";
-      const [hours, minutes] = time.split(":");
-      return `${hours}:${minutes}`;
-    }
-
-    function formatDate(dateKey) {
-      if (!dateKey) return "-";
-      return new Date(`${dateKey}T00:00:00`).toLocaleDateString([], {
+    function formatDate(value) {
+      if (!value) return "";
+      return new Date(`${value}T00:00:00`).toLocaleDateString("en-GB", {
         weekday: "short",
         day: "numeric",
         month: "short",
-        year: "numeric"
       });
     }
 
-    function formatMoney(value) {
-      return `£${value}`;
+    function money(value) {
+      return `£${Number(value || 0)}`;
     }
 
-    function selectedItemCount() {
-      return Math.max(1, Number(itemsInput.value) || 1);
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;",
+      }[char]));
     }
 
-    function setItemCount(value) {
-      const isExact = value === "5+";
-      exactItemsField.classList.toggle("hidden", !isExact);
-      if (isExact) {
-        exactItemsInput.value = Math.max(5, Number(exactItemsInput.value) || 5);
-        itemsInput.value = exactItemsInput.value;
-      } else {
-        itemsInput.value = value;
-      }
-      itemButtons.forEach((button) => {
-        button.classList.toggle("active", button.dataset.itemCount === value);
+    function supabaseHeaders(extra = {}) {
+      return {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json",
+        ...extra,
+      };
+    }
+
+    async function supabaseFetch(path, options = {}) {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+        ...options,
+        headers: supabaseHeaders(options.headers || {}),
       });
-      updatePriceTotal();
-      validateBookingForm();
-    }
-
-    function updatePriceTotal() {
-      if (!priceBreakdown || !priceTotal) return;
-      const items = selectedItemCount();
-      priceBreakdown.textContent = `£7 × ${items} item${items === 1 ? "" : "s"}`;
-      priceTotal.textContent = formatMoney(items * 7);
-      updateBookingAvailability();
-    }
-
-    function updateBookingAvailability() {
-      if (!bookingForm || !bookingAvailability) return;
-      const dateKey = selectedBookingDate();
-      updateFridayWarning();
-      const remaining = remainingItemCapacity(dateKey);
-      const requested = selectedItemCount();
-      const isClosed = bookingsClosedForDate(dateKey);
-      const isBlocked = isDateBlocked(dateKey);
-      const submitButton = bookingForm.querySelector("button[type='submit']");
-      const unavailable = Boolean(dataMessage) || isBlocked || isClosed || remaining <= 0 || requested > remaining;
-      bookingAvailability.classList.toggle("closed", unavailable);
-      submitButton.disabled = unavailable;
-
-      if (dataMessage) {
-        bookingAvailability.textContent = dataMessage;
-      } else if (isBlocked) {
-        bookingAvailability.textContent = `Luggage storage is unavailable on ${formatDate(dateKey)}${blockedReason(dateKey) ? `: ${blockedReason(dateKey)}` : "."}`;
-      } else if (isClosed) {
-        bookingAvailability.textContent = "Bookings for today are now closed. Items must be collected by 5:00pm.";
-      } else if (remaining <= 0) {
-        bookingAvailability.textContent = `Storage is currently full for ${formatDate(dateKey)}.`;
-      } else if (requested > remaining) {
-        bookingAvailability.textContent = `Only ${remaining} item space${remaining === 1 ? "" : "s"} left for ${formatDate(dateKey)}. Please reduce the number of items.`;
-      } else {
-        bookingAvailability.textContent = "";
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || "Supabase request failed.");
       }
+      if (response.status === 204) return null;
+      return response.json();
     }
 
-    function validateBookingForm() {
-      const dateKey = selectedBookingDate();
-      collectionTimeInput.setCustomValidity("");
-      itemsInput.setCustomValidity("");
-      bookingDateInput.setCustomValidity("");
-
-      if (isDateBlocked(dateKey)) {
-        bookingDateInput.setCustomValidity("Luggage storage is unavailable on this date.");
-      }
-
-      if (bookingsClosedForDate(dateKey)) {
-        bookingDateInput.setCustomValidity("Bookings for today are now closed.");
-      }
-
-      if (collectionTimeInput.value && collectionTimeInput.value > "17:00") {
-        collectionTimeInput.setCustomValidity("Items must be collected by 5:00pm.");
-      }
-
-      if (selectedItemCount() > remainingItemCapacity(dateKey)) {
-        itemsInput.setCustomValidity("There is not enough luggage storage space remaining for this date.");
-      }
-    }
-
-    function statusFor(booking) {
-      if (booking.collectedAt) return "Collected";
-      if (booking.paymentReceivedAt) return "Paid";
-      if (booking.arrivedAt) return "Arrived";
-      return "Booked";
-    }
-
-    function statusClass(booking) {
-      return statusFor(booking).toLowerCase();
-    }
-
-    function formatTagNumber(tag) {
-      return String(tag).padStart(3, "0");
-    }
-
-    function getTagNumbers(booking) {
-      if (Array.isArray(booking.tagNumbers)) return booking.tagNumbers.map(String).filter(Boolean);
-      if (booking.tagNumber) return [String(booking.tagNumber)];
-      return [];
-    }
-
-    function usedTagNumbers(bookings, dateKey, currentId = "") {
-      return new Set(
-        activeForDate(bookings, dateKey)
-          .filter((booking) => booking.id !== currentId)
-          .flatMap((booking) => getTagNumbers(booking))
-          .map(String)
-      );
-    }
-
-    function availableTags(bookings = bookingsCache, dateKey = selectedBookingDate(), currentId = "") {
-      const used = usedTagNumbers(bookings, dateKey, currentId);
-      return Array.from({ length: TAG_COUNT }, (_, index) => String(index + 1)).filter((tag) => !used.has(tag));
-    }
-
-    function assignNextTags(itemCount, bookings = bookingsCache, dateKey = selectedBookingDate()) {
-      return availableTags(bookings, dateKey).slice(0, itemCount);
-    }
-
-    async function editTagsForBooking(booking) {
-      const currentTags = getTagNumbers(booking).map(formatTagNumber).join(", ");
-      const entered = prompt("Edit tags for this booking. Use commas between tag numbers.", currentTags);
-      if (entered === null) return;
-      const tagNumbers = entered
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean)
-        .map((tag) => String(Number(tag)));
-      const uniqueTags = [...new Set(tagNumbers)].filter((tag) => Number(tag) >= 1 && Number(tag) <= TAG_COUNT);
-      if (uniqueTags.length !== Number(booking.items)) {
-        alert(`This booking needs ${booking.items} tag${Number(booking.items) === 1 ? "" : "s"}.`);
-        return;
-      }
-      const used = usedTagNumbers(bookingsCache, booking.bookingDate || booking.createdDate, booking.id);
-      const duplicate = uniqueTags.find((tag) => used.has(tag));
-      if (duplicate) {
-        alert(`Tag ${formatTagNumber(duplicate)} is already assigned to another active booking.`);
-        return;
-      }
-      await updateBooking(booking.id, { tagNumbers: uniqueTags });
-    }
-
-    function migrateLegacyBookings(bookings) {
-      return bookings.map((booking) => {
-        const dateKey = booking.bookingDate || booking.createdDate || todayKey();
-        if (Array.isArray(booking.tagNumbers)) {
-          return { ...booking, bookingDate: dateKey, createdDate: dateKey };
-        }
-        const { tagNumber, ...rest } = booking;
-        return {
-          ...rest,
-          bookingDate: dateKey,
-          createdDate: dateKey,
-          tagNumbers: tagNumber ? [String(tagNumber)] : []
-        };
+    async function staffAuth(payload) {
+      const response = await fetch(STAFF_AUTH_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error || "Could not open staff dashboard.");
+      }
+      return data;
     }
 
-    function updateStats(bookings) {
-      const dateKey = selectedStaffDate();
-      const dated = bookingsForDate(bookings, dateKey);
-      const active = activeForDate(bookings, dateKey);
-      const expectedTotal = dated.reduce((total, booking) => total + Number(booking.totalCost || booking.items * 7), 0);
-      const paidTotal = dated
-        .filter((booking) => booking.paymentReceivedAt)
-        .reduce((total, booking) => total + Number(booking.totalCost || booking.items * 7), 0);
-      const unpaidActive = active.filter((booking) => !booking.paymentReceivedAt);
-      const tagsOut = active.flatMap((booking) => getTagNumbers(booking)).map(formatTagNumber).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-      document.getElementById("statActive").textContent = activeForDate(bookings, dateKey).length;
-      document.getElementById("statArrived").textContent = dated.filter((booking) => booking.arrivedAt && !booking.collectedAt).length;
-      document.getElementById("statPaid").textContent = dated.filter((booking) => booking.paymentReceivedAt && !booking.collectedAt).length;
-      document.getElementById("statCollected").textContent = dated.filter((booking) => booking.collectedAt).length;
-      document.getElementById("statCapacity").textContent = `${activeItemCountForDate(bookings, dateKey)}/${DAILY_ITEM_CAPACITY}`;
-      document.getElementById("statExpectedTakings").textContent = formatMoney(expectedTotal);
-      document.getElementById("statPaidTakings").textContent = formatMoney(paidTotal);
-      document.getElementById("summaryUncollected").textContent = active.reduce((total, booking) => total + Number(booking.items || 0), 0);
-      document.getElementById("summaryUnpaid").textContent = unpaidActive.length;
-      document.getElementById("summaryTagsOut").textContent = tagsOut.length ? tagsOut.join(", ") : "None";
-      document.getElementById("summaryUncollectedCard").classList.toggle("warning", active.length > 0);
-      document.getElementById("summaryUnpaidCard").classList.toggle("warning", unpaidActive.length > 0);
+    function setNotice(message, isError = false) {
+      const el = $("staffNotice");
+      el.textContent = message;
+      el.classList.remove("hidden");
+      el.style.background = isError ? "#fff0f0" : "#fff7db";
+      el.style.color = isError ? "#9f2f2f" : "#59400f";
+      clearTimeout(setNotice.timer);
+      setNotice.timer = setTimeout(() => el.classList.add("hidden"), 4500);
+    }
+
+    function openDashboard() {
+      state.authed = true;
+      $("staffLogin").classList.add("hidden");
+      $("staffDashboard").classList.remove("hidden");
+      $("staffLogoutButton").classList.remove("hidden");
+      loadStaffData();
+    }
+
+    function closeDashboard() {
+      state.authed = false;
+      localStorage.removeItem(STAFF_REMEMBER_KEY);
+      sessionStorage.removeItem(STAFF_SESSION_KEY);
+      $("staffDashboard").classList.add("hidden");
+      $("staffLogoutButton").classList.add("hidden");
+      $("staffLogin").classList.remove("hidden");
+      $("staffPin").value = "";
+      $("staffPin").focus();
+    }
+
+    async function tryRememberedLogin() {
+      const token = localStorage.getItem(STAFF_REMEMBER_KEY) || sessionStorage.getItem(STAFF_SESSION_KEY);
+      if (!token) return;
+      try {
+        await staffAuth({ token });
+        openDashboard();
+      } catch {
+        localStorage.removeItem(STAFF_REMEMBER_KEY);
+        sessionStorage.removeItem(STAFF_SESSION_KEY);
+      }
+    }
+
+    function bookingStatus(booking) {
+      if (booking.collected_at) return ["Collected", "collected"];
+      if (booking.payment_received_at) return ["Paid", "paid"];
+      if (booking.arrived_at) return ["Arrived", "arrived"];
+      return ["Booked", ""];
     }
 
     function normalisePhoneForWhatsApp(mobile) {
-      let number = String(mobile || "").replace(/[\s()\-]/g, "");
-      if (number.startsWith("07")) number = `44${number.slice(1)}`;
-      if (number.startsWith("+")) number = number.slice(1);
-      if (number.startsWith("00")) number = number.slice(2);
-      if (!/^\d{8,15}$/.test(number)) return "";
-      return number;
+      const raw = String(mobile || "").replace(/[\s()\-]/g, "");
+      if (/^07\d{9}$/.test(raw)) return `44${raw.slice(1)}`;
+      if (/^\+44\d{10}$/.test(raw)) return raw.slice(1);
+      if (/^44\d{10}$/.test(raw)) return raw;
+      if (/^\d{8,15}$/.test(raw)) return raw;
+      return "";
     }
 
     function buildWhatsAppMessage(booking) {
@@ -1996,554 +601,317 @@ const STORAGE_KEY = "granaryHubBookings";
     }
 
     function openWhatsAppForBooking(booking) {
-      const customerNumber = normalisePhoneForWhatsApp(booking.mobile);
-      if (!WHATSAPP_ENABLED || !customerNumber) return;
-      const encodedMessage = encodeURIComponent(buildWhatsAppMessage(booking));
-      window.open(`https://wa.me/${customerNumber}?text=${encodedMessage}`, "_blank", "noopener");
+      if (!WHATSAPP_ENABLED) return;
+      const number = normalisePhoneForWhatsApp(booking.mobile);
+      if (!number) return;
+      const message = encodeURIComponent(buildWhatsAppMessage(booking));
+      window.open(`https://wa.me/${number}?text=${message}`, "_blank", "noopener");
     }
 
-    function renderRows() {
-      const query = searchInput.value.trim().toLowerCase();
-      const baseRows = dashboardMode === "today" ? activeForDate(bookingsCache, selectedStaffDate()) : bookingsCache;
-      const filtered = baseRows.filter((booking) => {
-        const tagText = getTagNumbers(booking).map(formatTagNumber).join(" ");
-        const haystack = `${booking.reference} ${booking.name} ${booking.mobile} ${booking.email} ${tagText}`.toLowerCase();
-        return haystack.includes(query);
-      }).sort((a, b) => {
-        if (dashboardMode === "today") {
-          return String(a.collectionTime || "17:00").localeCompare(String(b.collectionTime || "17:00"))
-            || String(a.createdAt || "").localeCompare(String(b.createdAt || ""));
-        }
-        return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
-      });
-
-      updateStats(bookingsCache);
-      renderBlockedDates();
-      bookingRows.innerHTML = "";
-      emptyState.style.display = filtered.length ? "none" : "block";
-
-      filtered.forEach((booking) => {
-        const row = document.createElement("tr");
-        const bookingTags = getTagNumbers(booking);
-        const flags = [
-          booking.arrivedAt && !booking.paymentReceivedAt && !booking.collectedAt ? "Payment not recorded" : "",
-          collectionTimePassed(booking) ? "Collection time passed" : ""
-        ].filter(Boolean);
-        row.innerHTML = `
-          <td><strong>${booking.reference}</strong><br><span>${formatDate(booking.bookingDate || booking.createdDate)}</span></td>
-          <td><strong>${escapeHtml(booking.name)}</strong><br>${escapeHtml(booking.mobile)}${booking.email ? `<br>${escapeHtml(booking.email)}` : ""}</td>
-          <td>${booking.items}<br><span>Expected ${formatMoney(booking.totalCost || booking.items * 7)}</span></td>
-          <td><strong>${bookingTags.length ? bookingTags.map(formatTagNumber).join(", ") : "Unassigned"}</strong></td>
-          <td>${formatTime(booking.collectionTime)}</td>
-          <td><span class="status ${statusClass(booking)}">${statusFor(booking)}</span>${flags.map((flag) => `<span class="staff-flag">${flag}</span>`).join("")}</td>
-          <td>${booking.notes ? escapeHtml(booking.notes) : "-"}</td>
-          <td></td>
-        `;
-
-        const actions = document.createElement("div");
-        actions.className = "actions";
-        actions.appendChild(actionButton("Arrived", () => updateBooking(booking.id, { arrivedAt: new Date().toISOString() }), Boolean(booking.arrivedAt || booking.collectedAt)));
-        actions.appendChild(actionButton("Paid", () => updateBooking(booking.id, { paymentReceivedAt: new Date().toISOString(), arrivedAt: booking.arrivedAt || new Date().toISOString() }), Boolean(booking.paymentReceivedAt || booking.collectedAt)));
-        actions.appendChild(actionButton("Collected", () => updateBooking(booking.id, { collectedAt: new Date().toISOString() }), Boolean(booking.collectedAt)));
-        actions.appendChild(actionButton("Edit tags", () => editTagsForBooking(booking), Boolean(booking.collectedAt), "ghost"));
-        const whatsAppButton = actionButton("WhatsApp", () => openWhatsAppForBooking(booking), !WHATSAPP_ENABLED || !normalisePhoneForWhatsApp(booking.mobile), "ghost");
-        whatsAppButton.classList.add("whatsapp-button");
-        if (!WHATSAPP_ENABLED) whatsAppButton.title = "WhatsApp contact not live yet";
-        actions.appendChild(whatsAppButton);
-        actions.appendChild(actionButton("Remove", () => removeBooking(booking.id), false, "danger"));
-        row.children[7].appendChild(actions);
-        bookingRows.appendChild(row);
-      });
+    function usedTags() {
+      const used = new Set();
+      state.bookings
+        .filter((booking) => !booking.collected_at)
+        .forEach((booking) => (booking.tag_numbers || []).forEach((tag) => used.add(String(tag).padStart(3, "0"))));
+      return used;
     }
 
-    function updateSyncStatus(message) {
-      if (!syncStatus) return;
-      syncStatus.textContent = message;
-    }
-
-    async function refreshStaffDashboard(manual = false) {
-      if (staffRefreshInProgress) return;
-      staffRefreshInProgress = true;
-      if (manual) updateSyncStatus("Refreshing bookings...");
-
-      try {
-        await refreshData();
-        renderRows();
-        updateBookingAvailability();
-        const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        updateSyncStatus(`Last updated ${time}. Auto-refresh is on.`);
-      } catch (error) {
-        console.error(error);
-        updateSyncStatus("Could not refresh bookings. Try again in a moment.");
-      } finally {
-        staffRefreshInProgress = false;
+    function getNextTags(count) {
+      const used = usedTags();
+      const tags = [];
+      for (let tag = 1; tag <= TOTAL_TAGS && tags.length < count; tag += 1) {
+        const formatted = String(tag).padStart(3, "0");
+        if (!used.has(formatted)) tags.push(formatted);
       }
+      return tags.length === count ? tags : [];
     }
 
-    function startStaffAutoRefresh() {
-      if (staffRefreshTimer) return;
-      staffRefreshTimer = window.setInterval(() => {
-        if (staffView.classList.contains("active")) refreshStaffDashboard();
-      }, STAFF_REFRESH_MS);
+    function getNextReference() {
+      const today = todayKey();
+      const numbers = state.bookings
+        .filter((booking) => booking.booking_date === today)
+        .map((booking) => Number(String(booking.reference || "").replace(/^G/i, "")))
+        .filter(Number.isFinite);
+      const next = numbers.length ? Math.max(...numbers) + 1 : 1;
+      return `G${String(next).padStart(3, "0")}`;
     }
 
-    function stopStaffAutoRefresh() {
-      if (!staffRefreshTimer) return;
-      window.clearInterval(staffRefreshTimer);
-      staffRefreshTimer = null;
-    }
-
-    function renderBlockedDates() {
-      if (!blockedDateList) return;
-      blockedDateList.innerHTML = "";
-      const upcoming = blockedDatesCache.filter((blocked) => blocked.date >= todayKey());
-      if (!upcoming.length) {
-        blockedDateList.innerHTML = '<div class="empty">No blocked dates.</div>';
-        return;
-      }
-
-      upcoming.forEach((blocked) => {
-        const row = document.createElement("div");
-        row.className = "blocked-date";
-        row.innerHTML = `<div>${formatDate(blocked.date)}${blocked.reason ? `<br><span>${escapeHtml(blocked.reason)}</span>` : ""}</div>`;
-        row.appendChild(actionButton("Remove", () => handleRemoveBlockedDate(blocked.date), false, "danger"));
-        blockedDateList.appendChild(row);
-      });
-    }
-
-    function escapeHtml(value) {
-      return String(value || "").replace(/[&<>"']/g, (char) => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;"
-      }[char]));
-    }
-
-    function actionButton(label, onClick, disabled, kind = "secondary") {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = kind;
-      button.textContent = label;
-      button.disabled = disabled;
-      button.addEventListener("click", onClick);
-      return button;
-    }
-
-    async function updateBooking(id, patch) {
-      await saveBookingPatch(id, patch);
-      await refreshData();
-      renderRows();
-      updateBookingAvailability();
-    }
-
-    async function removeBooking(id) {
-      if (!confirm("Remove this booking?")) return;
-      await deleteBooking(id);
-      renderRows();
-      updateBookingAvailability();
-    }
-
-    async function handleBlockDate() {
-      const date = blockDateInput.value;
-      if (!date) return;
-      await addBlockedDate(date, blockReasonInput.value.trim());
-      blockReasonInput.value = "";
-      renderRows();
-      updateBookingAvailability();
-    }
-
-    async function handleRemoveBlockedDate(date) {
-      await removeBlockedDate(date);
-      renderRows();
-      updateBookingAvailability();
-    }
-
-    function staffRouteIsActive() {
-      return document.body.dataset.page === "staff";
-    }
-
-    function storedStaffToken() {
-      return localStorage.getItem(STAFF_AUTH_STORAGE_KEY) || sessionStorage.getItem(STAFF_AUTH_SESSION_KEY) || "";
-    }
-
-    function storeStaffToken(token, remember) {
-      sessionStorage.removeItem(STAFF_AUTH_SESSION_KEY);
-      localStorage.removeItem(STAFF_AUTH_STORAGE_KEY);
-      if (remember) {
-        localStorage.setItem(STAFF_AUTH_STORAGE_KEY, token);
-      } else {
-        sessionStorage.setItem(STAFF_AUTH_SESSION_KEY, token);
-      }
-    }
-
-    function clearStaffAccess() {
-      sessionStorage.removeItem(STAFF_AUTH_SESSION_KEY);
-      localStorage.removeItem(STAFF_AUTH_STORAGE_KEY);
-      stopStaffAutoRefresh();
-      showStaffLogin();
-    }
-
-    async function staffAuthRequest(body) {
-      const response = await fetch(STAFF_AUTH_ENDPOINT, {
-        method: "POST",
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result.ok) {
-        throw new Error(result.error || "Staff access failed.");
-      }
-      return result;
-    }
-
-    async function staffAccessGranted() {
-      const token = storedStaffToken();
-      if (!token) return false;
-      try {
-        await staffAuthRequest({ token });
-        return true;
-      } catch (error) {
-        sessionStorage.removeItem(STAFF_AUTH_SESSION_KEY);
-        localStorage.removeItem(STAFF_AUTH_STORAGE_KEY);
-        return false;
-      }
-    }
-
-    function showStaffLogin(message = "") {
-      staffLogin?.classList.remove("hidden");
-      staffView?.classList.remove("active");
-      stopStaffAutoRefresh();
-      if (staffLoginError) staffLoginError.textContent = message;
-      staffPinInput?.focus();
-    }
-
-    async function unlockStaffDashboard() {
-      staffLogin?.classList.add("hidden");
-      await refreshData();
-      renderBlockedDates();
-      setView("staff", false);
-    }
-
-    function setView(view, updateUrl = true) {
-      const isStaff = view === "staff";
-      bookingView?.classList.toggle("active", !isStaff);
-      staffView?.classList.toggle("active", isStaff);
-      if (isStaff) {
-        startStaffAutoRefresh();
-        renderRows();
-      } else {
-        stopStaffAutoRefresh();
-        updateBookingAvailability();
-      }
-    }
-
-    function downloadCsv() {
-      const rows = bookingsCache.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
-      const headers = ["Reference", "Booking date", "Name", "Mobile", "Email", "Items", "Total", "Collection", "Tags", "Status", "Customer notes", "Created", "Arrived", "Paid", "Collected"];
-      const csvRows = [headers, ...rows.map((booking) => [
+    function filteredBookings() {
+      const q = $("bookingSearch").value.trim().toLowerCase();
+      const todays = state.bookings.filter((booking) => booking.booking_date === todayKey());
+      if (!q) return todays;
+      return todays.filter((booking) => [
         booking.reference,
-        booking.bookingDate || booking.createdDate,
         booking.name,
         booking.mobile,
         booking.email,
-        booking.items,
-        booking.totalCost || booking.items * 7,
-        booking.collectionTime,
-        getTagNumbers(booking).map(formatTagNumber).join(", "),
-        statusFor(booking),
-        booking.notes,
-        booking.createdAt,
-        booking.arrivedAt,
-        booking.paymentReceivedAt,
-        booking.collectedAt
-      ])];
-      const csv = csvRows.map((row) => row.map((value) => `"${String(value || "").replace(/"/g, '""')}"`).join(",")).join("\n");
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+        (booking.tag_numbers || []).join(", "),
+      ].join(" ").toLowerCase().includes(q));
+    }
+
+    function renderStats() {
+      const active = state.bookings.filter((booking) => booking.booking_date === todayKey() && !booking.collected_at);
+      const paid = state.bookings.filter((booking) => booking.booking_date === todayKey() && booking.payment_received_at);
+      const activeItems = active.reduce((sum, booking) => sum + Number(booking.items || 0), 0);
+      $("activeBookings").textContent = String(active.length);
+      $("itemsInStore").textContent = String(activeItems);
+      $("paidToday").textContent = money(paid.reduce((sum, booking) => sum + Number(booking.total_cost || 0), 0));
+      $("availableTags").textContent = String(Math.max(0, TOTAL_TAGS - usedTags().size));
+    }
+
+    function renderBookings() {
+      const rows = filteredBookings();
+      const body = $("bookingsBody");
+      if (!rows.length) {
+        body.innerHTML = `<tr><td colspan="8" class="muted">No bookings found.</td></tr>`;
+        renderStats();
+        return;
+      }
+
+      body.innerHTML = rows.map((booking) => {
+        const [statusLabel, statusClass] = bookingStatus(booking);
+        const tags = (booking.tag_numbers || []).map((tag) => String(tag).padStart(3, "0")).join(", ") || "Unassigned";
+        const whatsappNumber = normalisePhoneForWhatsApp(booking.mobile);
+        const whatsappLive = WHATSAPP_ENABLED && whatsappNumber;
+        return `
+          <tr>
+            <td><div class="ref">${escapeHtml(booking.reference)}</div><div class="muted">${escapeHtml(formatDate(booking.booking_date))}</div></td>
+            <td>
+              <strong>${escapeHtml(booking.name)}</strong><br>
+              <span class="muted">${escapeHtml(booking.mobile)}</span><br>
+              <span class="muted">${escapeHtml(booking.email || "")}</span>
+            </td>
+            <td><strong>${Number(booking.items || 0)}</strong><br><span class="muted">${money(booking.total_cost || Number(booking.items || 0) * PRICE_PER_ITEM)}</span></td>
+            <td>${escapeHtml(tags)}</td>
+            <td>${escapeHtml(formatTime(booking.collection_time))}</td>
+            <td><span class="status ${statusClass}">${statusLabel}</span></td>
+            <td>${escapeHtml(booking.notes || "")}</td>
+            <td>
+              <div class="actions">
+                <button type="button" class="blue" onclick="markBooking('${booking.id}', 'arrived_at')" ${booking.arrived_at ? "disabled" : ""}>Arrived</button>
+                <button type="button" class="amber" onclick="markBooking('${booking.id}', 'payment_received_at')" ${booking.payment_received_at ? "disabled" : ""}>Paid</button>
+                <button type="button" onclick="markBooking('${booking.id}', 'collected_at')" ${booking.collected_at ? "disabled" : ""}>Collected</button>
+                <button type="button" class="secondary" onclick="editTags('${booking.id}')">Edit tags</button>
+                <button type="button" class="secondary" onclick="openWhatsAppForBookingById('${booking.id}')" ${whatsappLive ? "" : "disabled"} title="${whatsappLive ? "Open WhatsApp" : "WhatsApp contact not live yet"}">WhatsApp</button>
+                <button type="button" class="danger" onclick="removeBooking('${booking.id}')">Remove</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+      renderStats();
+    }
+
+    function renderBlockedDates() {
+      const list = $("blockedDatesList");
+      if (!state.blockedDates.length) {
+        list.innerHTML = `<div class="muted">No blocked dates.</div>`;
+        return;
+      }
+      list.innerHTML = state.blockedDates
+        .slice()
+        .sort((a, b) => String(a.date).localeCompare(String(b.date)))
+        .map((item) => `
+          <div class="blocked-row">
+            <div><strong>${escapeHtml(formatDate(item.date))}</strong><br><span class="muted">${escapeHtml(item.reason || "Blocked")}</span></div>
+            <button type="button" class="danger" onclick="removeBlockedDate('${item.date}')">Remove</button>
+          </div>
+        `).join("");
+    }
+
+    async function loadStaffData() {
+      if (!state.authed) return;
+      $("todayLabel").textContent = `Today: ${formatDate(todayKey())}`;
+      try {
+        const [bookings, blockedDates] = await Promise.all([
+          supabaseFetch("bookings?select=*&order=created_at.desc"),
+          supabaseFetch("blocked_dates?select=*&order=date.asc"),
+        ]);
+        state.bookings = bookings || [];
+        state.blockedDates = blockedDates || [];
+        renderBookings();
+        renderBlockedDates();
+      } catch (error) {
+        setNotice("Could not load staff data. Please refresh and try again.", true);
+      }
+    }
+
+    async function patchBooking(id, updates) {
+      await supabaseFetch(`bookings?id=eq.${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: { Prefer: "return=representation" },
+        body: JSON.stringify(updates),
+      });
+      await loadStaffData();
+    }
+
+    window.markBooking = async function markBooking(id, field) {
+      try {
+        await patchBooking(id, { [field]: new Date().toISOString() });
+      } catch {
+        setNotice("Could not update booking.", true);
+      }
+    };
+
+    window.removeBooking = async function removeBooking(id) {
+      if (!confirm("Remove this booking?")) return;
+      try {
+        await supabaseFetch(`bookings?id=eq.${encodeURIComponent(id)}`, { method: "DELETE" });
+        await loadStaffData();
+      } catch {
+        setNotice("Could not remove booking.", true);
+      }
+    };
+
+    window.editTags = async function editTags(id) {
+      const booking = state.bookings.find((item) => item.id === id);
+      if (!booking) return;
+      const current = (booking.tag_numbers || []).join(", ");
+      const value = prompt("Enter tag numbers separated by commas", current);
+      if (value === null) return;
+      const tags = value.split(",").map((tag) => tag.trim().replace(/^0*(\d+)$/, (_, n) => String(n).padStart(3, "0"))).filter(Boolean);
+      try {
+        await patchBooking(id, { tag_numbers: tags });
+      } catch {
+        setNotice("Could not update tags.", true);
+      }
+    };
+
+    window.openWhatsAppForBookingById = function openWhatsAppForBookingById(id) {
+      const booking = state.bookings.find((item) => item.id === id);
+      if (booking) openWhatsAppForBooking(booking);
+    };
+
+    window.removeBlockedDate = async function removeBlockedDate(date) {
+      try {
+        await supabaseFetch(`blocked_dates?date=eq.${encodeURIComponent(date)}`, { method: "DELETE" });
+        await loadStaffData();
+      } catch {
+        setNotice("Could not remove blocked date.", true);
+      }
+    };
+
+    function exportCsv() {
+      const rows = filteredBookings();
+      const headers = ["Reference", "Date", "Customer", "Mobile", "Email", "Items", "Tags", "Collection time", "Status", "Notes", "Total"];
+      const csvRows = [headers, ...rows.map((booking) => {
+        const [status] = bookingStatus(booking);
+        return [
+          booking.reference,
+          booking.booking_date,
+          booking.name,
+          booking.mobile,
+          booking.email || "",
+          booking.items,
+          (booking.tag_numbers || []).join(", "),
+          formatTime(booking.collection_time),
+          status,
+          booking.notes || "",
+          booking.total_cost || Number(booking.items || 0) * PRICE_PER_ITEM,
+        ];
+      })].map((row) => row.map((cell) => `"${String(cell ?? "").replace(/"/g, '""')}"`).join(","));
+      const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `granary-luggage-bookings-${todayKey()}.csv`;
-      document.body.appendChild(link);
+      link.download = `granary-bookings-${todayKey()}.csv`;
       link.click();
-      link.remove();
       URL.revokeObjectURL(url);
     }
 
-    async function handleBookingSubmit(event) {
-      event.preventDefault();
-      await refreshData();
-      validateBookingForm();
-      if (!bookingForm.reportValidity()) return;
-      const form = new FormData(bookingForm);
-      const submitButton = bookingForm.querySelector("button[type='submit']");
-      const bookingDate = form.get("bookingDate");
-      const items = Number(form.get("items"));
-      submitButton.disabled = true;
-      submitButton.textContent = "Submitting...";
-
+    async function sendConfirmationEmail(bookingId) {
       try {
-        let savedBooking = null;
-        for (let attempt = 0; attempt < 3; attempt += 1) {
-          if (attempt > 0) await refreshData();
-          const tagNumbers = assignNextTags(items, bookingsCache, bookingDate);
-          if (tagNumbers.length < items) {
-            itemsInput.setCustomValidity("There are not enough luggage tags available for that number of items.");
-            bookingAvailability.textContent = "Storage is currently full for that number of items. Please reduce the number of items or speak to staff.";
-            bookingAvailability.classList.add("closed");
-            bookingForm.reportValidity();
-            return;
-          }
-          const booking = {
-            id: makeId(),
-            reference: makeReference(bookingsCache, bookingDate),
-            bookingDate,
-            createdDate: bookingDate,
-            name: form.get("customerName").trim(),
-            mobile: form.get("mobile").trim(),
-            email: form.get("email").trim(),
-            items,
-            collectionTime: form.get("collectionTime"),
-            totalCost: items * 7,
-            tagNumbers,
-            notes: form.get("notes").trim(),
-            createdAt: new Date().toISOString(),
-            arrivedAt: "",
-            paymentReceivedAt: "",
-            collectedAt: ""
-          };
-
-          try {
-            savedBooking = await createBooking(booking);
-            break;
-          } catch (error) {
-            if (!String(error.message || "").includes("duplicate")) throw error;
-          }
-        }
-
-        if (!savedBooking) throw new Error("Could not create booking reference.");
-        submitButton.textContent = "Sending confirmation...";
-        let emailSent = false;
-        try {
-          await sendBookingConfirmationEmail(savedBooking);
-          emailSent = true;
-        } catch (emailError) {
-          console.error(emailError);
-        }
-        await refreshData();
-        confirmationRef.textContent = savedBooking.reference;
-        const fridayCollectionNote = isFriday(savedBooking.bookingDate)
-          ? " The Granary is closed on Saturday, so your items must be collected by 5:00pm on Friday."
-          : "";
-        confirmationSummary.textContent = `Your booking reference is ${savedBooking.reference}. Staff will attach your luggage tags when you arrive. Number of items: ${savedBooking.items}. Booking date: ${formatDate(savedBooking.bookingDate)}. Expected collection time: ${formatTime(savedBooking.collectionTime)}. Payment due at drop-off: ${formatMoney(savedBooking.totalCost)}.${fridayCollectionNote}`;
-        confirmationTotal.textContent = formatMoney(savedBooking.totalCost);
-        paymentInstruction.textContent = emailSent
-          ? `A confirmation email has been sent to ${savedBooking.email}. Please show it when collecting your items. Payment is due at drop-off.`
-          : "Your booking is saved, but the confirmation email could not be sent. Please screenshot this reference and show it when collecting your items.";
-        bookingForm.style.display = "none";
-        confirmation.classList.add("active");
-      } catch (error) {
-        console.error(error);
-        alert("Sorry, the booking could not be saved. Please try again or speak to staff.");
-      } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "Submit booking";
-        updateBookingAvailability();
-      }
-    }
-
-    async function handleStaffEntrySubmit(event) {
-      event.preventDefault();
-      await refreshData();
-      const form = new FormData(staffEntryForm);
-      const bookingDate = form.get("bookingDate");
-      const items = Math.max(1, Number(form.get("items")) || 1);
-      const submitButton = staffEntryForm.querySelector("button[type='submit']");
-
-      if (isDateBlocked(bookingDate)) {
-        alert("Luggage storage is blocked for this date.");
-        return;
-      }
-
-      const tagNumbers = assignNextTags(items, bookingsCache, bookingDate);
-      if (tagNumbers.length < items) {
-        alert("There are not enough luggage tags available for that number of items.");
-        return;
-      }
-
-      submitButton.disabled = true;
-      submitButton.textContent = "Creating...";
-
-      try {
-        const booking = {
-          id: makeId(),
-          reference: makeReference(bookingsCache, bookingDate),
-          bookingDate,
-          createdDate: bookingDate,
-          name: form.get("customerName").trim(),
-          mobile: form.get("mobile").trim(),
-          email: form.get("email").trim(),
-          items,
-          collectionTime: "17:00",
-          totalCost: items * 7,
-          tagNumbers,
-          notes: form.get("notes").trim() || "Staff entry",
-          createdAt: new Date().toISOString(),
-          arrivedAt: new Date().toISOString(),
-          paymentReceivedAt: "",
-          collectedAt: ""
-        };
-
-        const savedBooking = await createBooking(booking);
-        if (savedBooking.email) {
-          try {
-            await sendBookingConfirmationEmail(savedBooking);
-          } catch (error) {
-            console.error(error);
-          }
-        }
-        await refreshData();
-        staffEntryForm.reset();
-        staffEntryDate.value = selectedStaffDate();
-        staffEntryForm.classList.remove("active");
-        renderRows();
-        updateBookingAvailability();
-      } catch (error) {
-        console.error(error);
-        alert("Sorry, the staff booking could not be created.");
-      } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "Create booking";
-      }
-    }
-
-    function resetBookingForm() {
-      bookingForm.reset();
-      bookingDateInput.value = todayKey();
-      setItemCount("1");
-      updatePriceTotal();
-      confirmation.classList.remove("active");
-      bookingForm.style.display = "grid";
-    }
-
-    function setInitialDates() {
-      const today = todayKey();
-      if (bookingDateInput) {
-        bookingDateInput.value = today;
-        bookingDateInput.min = today;
-      }
-      if (collectionTimeInput) collectionTimeInput.value = "17:00";
-      if (staffDateInput) staffDateInput.value = today;
-      if (staffEntryDate) {
-        staffEntryDate.value = today;
-        staffEntryDate.min = today;
-      }
-      if (blockDateInput) {
-        blockDateInput.value = today;
-        blockDateInput.min = today;
-      }
-    }
-
-    itemButtons.forEach((button) => {
-      button.addEventListener("click", () => setItemCount(button.dataset.itemCount));
-    });
-    bookingForm?.addEventListener("submit", handleBookingSubmit);
-    newBookingButton?.addEventListener("click", resetBookingForm);
-    exactItemsInput?.addEventListener("input", () => {
-      itemsInput.value = Math.max(5, Number(exactItemsInput.value) || 5);
-      updatePriceTotal();
-      validateBookingForm();
-    });
-    bookingDateInput?.addEventListener("change", () => {
-      validateBookingForm();
-      updateBookingAvailability();
-    });
-    collectionTimeInput?.addEventListener("input", validateBookingForm);
-
-    staffBookingButton?.addEventListener("click", () => { window.location.href = "index.html"; });
-    searchInput?.addEventListener("input", renderRows);
-    staffDateInput?.addEventListener("change", () => {
-      if (staffEntryDate) staffEntryDate.value = selectedStaffDate();
-      renderRows();
-    });
-    staffLoginForm?.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const submitButton = staffLoginForm.querySelector("button[type='submit']");
-      submitButton.disabled = true;
-      submitButton.textContent = "Checking...";
-      try {
-        const result = await staffAuthRequest({
-          pin: staffPinInput.value,
-          remember: Boolean(rememberStaffDevice?.checked)
+        await fetch(EMAIL_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bookingId }),
         });
-        storeStaffToken(result.token, Boolean(rememberStaffDevice?.checked));
-        staffPinInput.value = "";
-        await unlockStaffDashboard();
-      } catch (error) {
-        staffPinInput.value = "";
-        showStaffLogin("Incorrect PIN.");
-      } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "Unlock dashboard";
-      }
-    });
-    staffLogoutButton?.addEventListener("click", clearStaffAccess);
-    refreshStaffButton?.addEventListener("click", () => refreshStaffDashboard(true));
-    toggleStaffEntryButton?.addEventListener("click", () => {
-      if (staffEntryDate) staffEntryDate.value = selectedStaffDate();
-      staffEntryForm?.classList.toggle("active");
-    });
-    cancelStaffEntryButton?.addEventListener("click", () => { staffEntryForm?.classList.remove("active"); });
-    staffEntryForm?.addEventListener("submit", handleStaffEntrySubmit);
-    exportCsvButton?.addEventListener("click", downloadCsv);
-    blockDateButton?.addEventListener("click", handleBlockDate);
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden && staffView?.classList.contains("active")) refreshStaffDashboard();
-    });
-    showTodayButton?.addEventListener("click", () => {
-      dashboardMode = "today";
-      if (staffDateInput) staffDateInput.value = todayKey();
-      showTodayButton.className = "secondary";
-      if (showHistoryButton) showHistoryButton.className = "ghost";
-      renderRows();
-    });
-    showHistoryButton?.addEventListener("click", () => {
-      dashboardMode = "history";
-      if (showTodayButton) showTodayButton.className = "ghost";
-      showHistoryButton.className = "secondary";
-      renderRows();
-    });
-
-    printQrButton?.addEventListener("click", () => {
-      const bookingUrl = new URL("index.html", location.href).href.split(/[?#]/)[0];
-      const qrSrc = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" + encodeURIComponent(bookingUrl);
-      const printWindow = window.open("", "granaryQr", "width=560,height=760");
-      printWindow.document.write("<!doctype html><html lang=\"en\"><head><title>The Granary booking QR</title><style>body{font-family:Arial,sans-serif;margin:0;padding:40px;text-align:center;color:#17201b}h1{font-size:42px;margin:0 0 12px}p{font-size:20px;line-height:1.4}.box{border:3px solid #17201b;padding:26px;display:inline-block;margin:18px auto}img{width:300px;height:300px}.url{font-size:12px;overflow-wrap:anywhere;color:#555}</style></head><body><h1>Book luggage storage</h1><p>Scan to book luggage storage, then pay when you drop off your items.</p><div class=\"box\"><img alt=\"Booking QR code\" src=\"" + qrSrc + "\"></div><p class=\"url\">" + bookingUrl + "</p></body></html>");
-      printWindow.document.close();
-      printWindow.focus();
-    });
-    async function initialise() {
-      setInitialDates();
-      if (bookingForm) {
-        await refreshData();
-        updatePriceTotal();
-        setView("booking", false);
-      }
-      if (staffView) {
-        if (await staffAccessGranted()) {
-          await unlockStaffDashboard();
-        } else {
-          showStaffLogin();
-        }
+      } catch {
+        // Staff can still use the booking even if the confirmation email fails.
       }
     }
 
-    initialise();
+    $("staffLoginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const error = $("staffLoginError");
+      error.style.display = "none";
+      try {
+        const data = await staffAuth({
+          pin: $("staffPin").value,
+          remember: $("rememberStaffDevice").checked,
+        });
+        if ($("rememberStaffDevice").checked) {
+          localStorage.setItem(STAFF_REMEMBER_KEY, data.token);
+        } else {
+          sessionStorage.setItem(STAFF_SESSION_KEY, data.token);
+        }
+        openDashboard();
+      } catch (err) {
+        error.textContent = err.message || "Incorrect PIN.";
+        error.style.display = "block";
+      }
+    });
+
+    $("staffLogoutButton").addEventListener("click", closeDashboard);
+    $("refreshButton").addEventListener("click", loadStaffData);
+    $("exportCsvButton").addEventListener("click", exportCsv);
+    $("bookingSearch").addEventListener("input", renderBookings);
+
+    $("manualBookingForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const items = Math.max(1, Number($("manualItems").value || 1));
+      const tags = getNextTags(items);
+      if (tags.length !== items) {
+        setNotice("There are not enough available tags for this booking.", true);
+        return;
+      }
+      const booking = {
+        reference: getNextReference(),
+        booking_date: todayKey(),
+        name: $("manualName").value.trim(),
+        mobile: $("manualMobile").value.trim(),
+        email: $("manualEmail").value.trim(),
+        items,
+        collection_time: "17:00",
+        total_cost: items * PRICE_PER_ITEM,
+        tag_numbers: tags,
+        notes: $("manualNotes").value.trim() || null,
+      };
+      try {
+        const created = await supabaseFetch("bookings", {
+          method: "POST",
+          headers: { Prefer: "return=representation" },
+          body: JSON.stringify(booking),
+        });
+        $("manualBookingForm").reset();
+        $("manualItems").value = "1";
+        setNotice(`Manual booking ${booking.reference} created.`);
+        if (created && created[0]) sendConfirmationEmail(created[0].id);
+        await loadStaffData();
+      } catch {
+        setNotice("Could not create manual booking.", true);
+      }
+    });
+
+    $("blockedDateForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      try {
+        await supabaseFetch("blocked_dates", {
+          method: "POST",
+          headers: { Prefer: "resolution=merge-duplicates" },
+          body: JSON.stringify({
+            date: $("blockedDate").value,
+            reason: $("blockedReason").value.trim() || "Blocked",
+          }),
+        });
+        $("blockedDateForm").reset();
+        await loadStaffData();
+      } catch {
+        setNotice("Could not block date.", true);
+      }
+    });
+
+    tryRememberedLogin();
   </script>
 </body>
 </html>
