@@ -589,6 +589,38 @@
       gap: 18px;
     }
 
+    .app-promo {
+      max-width: 1180px;
+      margin: 24px auto 0;
+      border: 1px solid rgba(47, 107, 79, .28);
+      border-radius: 8px;
+      background: #eef5ef;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .app-promo h2 {
+      margin: 0 0 6px;
+      color: var(--brand-dark);
+      font-size: 22px;
+    }
+
+    .app-promo p {
+      margin: 0;
+      color: #4a554d;
+      line-height: 1.5;
+      font-weight: 700;
+    }
+
+    .app-promo-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
     .find-us, .faq-section {
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -1408,6 +1440,15 @@
         padding: 14px;
       }
 
+      .app-promo {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .app-promo-actions a {
+        width: 100%;
+      }
+
       h1 {
         font-size: 36px;
       }
@@ -1585,6 +1626,17 @@
             </div>
           </div>
         </div>
+
+        <section class="app-promo" aria-labelledby="skyeCompanionTitle">
+          <div>
+            <h2 id="skyeCompanionTitle">Explore with Skye Companion</h2>
+            <p>Discover useful places and make more of your time on the Isle of Skye.</p>
+          </div>
+          <div class="app-promo-actions">
+            <a class="primary" href="https://apps.apple.com/gb/app/skye-companion/id6790186718" target="_blank" rel="noopener">Download on the App Store</a>
+            <a class="secondary" href="skye-companion.html">App support</a>
+          </div>
+        </section>
 
         <div class="local-info" aria-label="Location and luggage storage questions">
           <section class="find-us">
