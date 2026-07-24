@@ -793,6 +793,7 @@
                 <button type="button" class="blue" onclick="markBooking('${booking.id}', 'arrived_at')" ${booking.arrived_at ? "disabled" : ""}>Arrived</button>
                 <button type="button" class="amber" onclick="markBooking('${booking.id}', 'payment_received_at')" ${booking.payment_received_at ? "disabled" : ""}>Paid</button>
                 <button type="button" onclick="markBooking('${booking.id}', 'collected_at')" ${booking.collected_at ? "disabled" : ""}>Collected</button>
+                <button type="button" class="secondary" onclick="editStay('${booking.id}')" ${booking.collected_at ? "disabled" : ""}>Edit stay</button>
                 <button type="button" class="secondary" onclick="editTags('${booking.id}')">Edit tags</button>
                 <button type="button" class="secondary" onclick="openWhatsAppForBookingById('${booking.id}')" ${whatsappLive ? "" : "disabled"} title="${whatsappLive ? "Open WhatsApp" : "WhatsApp contact not live yet"}">WhatsApp</button>
                 <button type="button" class="danger" onclick="removeBooking('${booking.id}')">Remove</button>
@@ -875,6 +876,47 @@
         await patchBooking(id, { tag_numbers: tags });
       } catch {
         setNotice("Could not update tags.", true);
+      }
+    };
+
+    window.editStay = async function editStay(id) {
+      const booking = state.bookings.find((item) => item.id === id);
+      if (!booking) return;
+      const endDate = prompt("Collection date (YYYY-MM-DD)", bookingEndDate(booking));
+      if (endDate === null) return;
+      const days = storageDays(booking.booking_date, endDate.trim());
+      if (!days) {
+        setNotice("Collection date must be the same as or after the drop-off date.", true);
+        return;
+      }
+      const collectionTime = prompt("Collection time (24-hour HH:MM)", formatTime(booking.collection_time));
+      if (collectionTime === null) return;
+      if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(collectionTime.trim()) || collectionTime.trim() > "17:00") {
+        setNotice("Enter a valid collection time no later than 17:00.", true);
+        return;
+      }
+      const suggestedTotal = Number(booking.items || 0) * days * PRICE_PER_ITEM;
+      const total = prompt("Total charge (£)", String(suggestedTotal));
+      if (total === null) return;
+      const totalNumber = Number(total);
+      if (!Number.isFinite(totalNumber) || totalNumber < 0) {
+        setNotice("Enter a valid total charge.", true);
+        return;
+      }
+      const notes = [
+        dropOffEtaFromNotes(booking.notes) ? `[Drop-off ETA: ${dropOffEtaFromNotes(booking.notes)}]` : "",
+        `[Collection date: ${endDate.trim()}]`,
+        customerNotes(booking.notes),
+      ].filter(Boolean).join("\n");
+      try {
+        await patchBooking(id, {
+          collection_time: collectionTime.trim(),
+          total_cost: totalNumber,
+          notes,
+        });
+        setNotice(`${booking.reference} updated to collect ${formatDate(endDate.trim())}.`);
+      } catch {
+        setNotice("Could not update the booking dates.", true);
       }
     };
 
