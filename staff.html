@@ -702,7 +702,7 @@
       const labels = {
         past: ["Past bookings", "Previous dates, nearest to today first", "Paid (past)"],
         current: ["Current bookings", `Today: ${formatDate(todayKey())}`, "Paid today"],
-        future: ["Future bookings", "Upcoming dates, nearest to today first", "Paid (future)"],
+        future: ["Future bookings", "Upcoming arrivals and collections, nearest first", "Paid (future)"],
       };
       const [title, subtitle, paidLabel] = labels[bookingsView];
       $("bookingsTitle").textContent = title;
@@ -723,7 +723,7 @@
           const startDate = booking.booking_date;
           const endDate = bookingEndDate(booking);
           if (bookingsView === "past") return endDate < today;
-          if (bookingsView === "future") return startDate > today;
+          if (bookingsView === "future") return !booking.collected_at && endDate > today;
           return startDate <= today && endDate >= today;
         })
         .sort((a, b) => {
