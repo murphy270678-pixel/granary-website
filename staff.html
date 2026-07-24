@@ -142,6 +142,10 @@
     }
 
     button.secondary:hover { background: #ded4c1; }
+    button.view-button.active {
+      background: var(--green);
+      color: #fff;
+    }
 
     button.danger { background: var(--red); }
     button.blue { background: var(--blue); }
@@ -365,9 +369,9 @@
           <div id="selectedDateLabel" class="muted"></div>
         </div>
         <div class="toolbar-actions">
-          <input id="bookingDate" type="date" aria-label="Booking date">
-          <button id="todayButton" type="button" class="secondary">Today</button>
-          <button id="allOpenButton" type="button" class="secondary">All open</button>
+          <button id="pastButton" type="button" class="secondary view-button" aria-pressed="false">Past bookings</button>
+          <button id="currentButton" type="button" class="secondary view-button active" aria-pressed="true">Current</button>
+          <button id="futureButton" type="button" class="secondary view-button" aria-pressed="false">Future</button>
           <input id="bookingSearch" type="search" placeholder="Search name, reference, mobile">
           <button id="refreshButton" type="button" class="secondary">Refresh</button>
           <button id="exportCsvButton" type="button">Export CSV</button>
@@ -562,7 +566,6 @@
 
     function openDashboard() {
       state.authed = true;
-      if (!$("bookingDate").value) $("bookingDate").value = todayKey();
       $("staffLogin").classList.add("hidden");
       $("staffDashboard").classList.remove("hidden");
       $("staffLogoutButton").classList.remove("hidden");
@@ -648,31 +651,44 @@
       return `G${String(next).padStart(3, "0")}`;
     }
 
-    function selectedBookingDate() {
-      return $("bookingDate").value || todayKey();
-    }
-
-    let bookingsView = "date";
+    let bookingsView = "current";
 
     function updateSelectedDateLabels() {
-      if (bookingsView === "open") {
-        $("bookingsTitle").textContent = "All open bookings";
-        $("selectedDateLabel").textContent = "Every booking not yet marked as collected";
-        $("paidLabel").textContent = "Paid (open)";
-        return;
-      }
-      const selectedDate = selectedBookingDate();
-      const isToday = selectedDate === todayKey();
-      $("bookingsTitle").textContent = isToday ? "Today's bookings" : "Previous bookings";
-      $("selectedDateLabel").textContent = `${isToday ? "Today" : "Selected date"}: ${formatDate(selectedDate)}`;
-      $("paidLabel").textContent = isToday ? "Paid today" : "Paid on date";
+      const labels = {
+        past: ["Past bookings", "Previous dates, nearest to today first", "Paid (past)"],
+        current: ["Current bookings", `Today: ${formatDate(todayKey())}`, "Paid today"],
+        future: ["Future bookings", "Upcoming dates, nearest to today first", "Paid (future)"],
+      };
+      const [title, subtitle, paidLabel] = labels[bookingsView];
+      $("bookingsTitle").textContent = title;
+      $("selectedDateLabel").textContent = subtitle;
+      $("paidLabel").textContent = paidLabel;
+      ["past", "current", "future"].forEach((view) => {
+        const button = $(`${view}Button`);
+        const isActive = view === bookingsView;
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+    }
+
+    function bookingsInView() {
+      const today = todayKey();
+      return state.bookings
+        .filter((booking) => {
+          if (bookingsView === "past") return booking.booking_date < today;
+          if (bookingsView === "future") return booking.booking_date > today;
+          return booking.booking_date === today;
+        })
+        .sort((a, b) => {
+          const dateOrder = String(a.booking_date).localeCompare(String(b.booking_date));
+          if (dateOrder !== 0) return bookingsView === "past" ? -dateOrder : dateOrder;
+          return String(a.collection_time || "").localeCompare(String(b.collection_time || ""));
+        });
     }
 
     function filteredBookings() {
       const q = $("bookingSearch").value.trim().toLowerCase();
-      const selected = bookingsView === "open"
-        ? state.bookings.filter((booking) => !booking.collected_at)
-        : state.bookings.filter((booking) => booking.booking_date === selectedBookingDate());
+      const selected = bookingsInView();
       if (!q) return selected;
       return selected.filter((booking) => [
         booking.reference,
@@ -684,13 +700,9 @@
     }
 
     function renderStats() {
-      const selectedDate = selectedBookingDate();
-      const active = bookingsView === "open"
-        ? state.bookings.filter((booking) => !booking.collected_at)
-        : state.bookings.filter((booking) => booking.booking_date === selectedDate && !booking.collected_at);
-      const paid = bookingsView === "open"
-        ? active.filter((booking) => booking.payment_received_at)
-        : state.bookings.filter((booking) => booking.booking_date === selectedDate && booking.payment_received_at);
+      const visible = bookingsInView();
+      const active = visible.filter((booking) => !booking.collected_at);
+      const paid = visible.filter((booking) => booking.payment_received_at);
       const activeItems = active.reduce((sum, booking) => sum + Number(booking.items || 0), 0);
       $("activeBookings").textContent = String(active.length);
       $("itemsInStore").textContent = String(activeItems);
@@ -853,9 +865,7 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = bookingsView === "open"
-        ? "granary-bookings-all-open.csv"
-        : `granary-bookings-${selectedBookingDate()}.csv`;
+      link.download = `granary-bookings-${bookingsView}.csv`;
       link.click();
       URL.revokeObjectURL(url);
     }
@@ -897,19 +907,9 @@
     $("refreshButton").addEventListener("click", loadStaffData);
     $("exportCsvButton").addEventListener("click", exportCsv);
     $("bookingSearch").addEventListener("input", renderBookings);
-    $("bookingDate").addEventListener("change", () => {
-      bookingsView = "date";
-      renderBookings();
-    });
-    $("todayButton").addEventListener("click", () => {
-      bookingsView = "date";
-      $("bookingDate").value = todayKey();
-      renderBookings();
-    });
-    $("allOpenButton").addEventListener("click", () => {
-      bookingsView = "open";
-      renderBookings();
-    });
+    $("pastButton").addEventListener("click", () => { bookingsView = "past"; renderBookings(); });
+    $("currentButton").addEventListener("click", () => { bookingsView = "current"; renderBookings(); });
+    $("futureButton").addEventListener("click", () => { bookingsView = "future"; renderBookings(); });
 
     $("manualBookingForm").addEventListener("submit", async (event) => {
       event.preventDefault();
