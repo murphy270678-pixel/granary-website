@@ -361,10 +361,12 @@
     <section id="staffDashboard" class="hidden">
       <div class="toolbar">
         <div>
-          <h2 class="section-title">Today's bookings</h2>
-          <div id="todayLabel" class="muted"></div>
+          <h2 id="bookingsTitle" class="section-title">Today's bookings</h2>
+          <div id="selectedDateLabel" class="muted"></div>
         </div>
         <div class="toolbar-actions">
+          <input id="bookingDate" type="date" aria-label="Booking date">
+          <button id="todayButton" type="button" class="secondary">Today</button>
           <input id="bookingSearch" type="search" placeholder="Search name, reference, mobile">
           <button id="refreshButton" type="button" class="secondary">Refresh</button>
           <button id="exportCsvButton" type="button">Export CSV</button>
@@ -376,7 +378,7 @@
       <div class="stats">
         <div class="stat"><span>Active bookings</span><strong id="activeBookings">0</strong></div>
         <div class="stat"><span>Items in store</span><strong id="itemsInStore">0</strong></div>
-        <div class="stat"><span>Paid today</span><strong id="paidToday">0</strong></div>
+        <div class="stat"><span id="paidLabel">Paid today</span><strong id="paidToday">0</strong></div>
         <div class="stat"><span>Available tags</span><strong id="availableTags">0</strong></div>
       </div>
 
@@ -559,6 +561,7 @@
 
     function openDashboard() {
       state.authed = true;
+      if (!$("bookingDate").value) $("bookingDate").value = todayKey();
       $("staffLogin").classList.add("hidden");
       $("staffDashboard").classList.remove("hidden");
       $("staffLogoutButton").classList.remove("hidden");
@@ -644,11 +647,23 @@
       return `G${String(next).padStart(3, "0")}`;
     }
 
+    function selectedBookingDate() {
+      return $("bookingDate").value || todayKey();
+    }
+
+    function updateSelectedDateLabels() {
+      const selectedDate = selectedBookingDate();
+      const isToday = selectedDate === todayKey();
+      $("bookingsTitle").textContent = isToday ? "Today's bookings" : "Previous bookings";
+      $("selectedDateLabel").textContent = `${isToday ? "Today" : "Selected date"}: ${formatDate(selectedDate)}`;
+      $("paidLabel").textContent = isToday ? "Paid today" : "Paid on date";
+    }
+
     function filteredBookings() {
       const q = $("bookingSearch").value.trim().toLowerCase();
-      const todays = state.bookings.filter((booking) => booking.booking_date === todayKey());
-      if (!q) return todays;
-      return todays.filter((booking) => [
+      const selected = state.bookings.filter((booking) => booking.booking_date === selectedBookingDate());
+      if (!q) return selected;
+      return selected.filter((booking) => [
         booking.reference,
         booking.name,
         booking.mobile,
@@ -658,8 +673,9 @@
     }
 
     function renderStats() {
-      const active = state.bookings.filter((booking) => booking.booking_date === todayKey() && !booking.collected_at);
-      const paid = state.bookings.filter((booking) => booking.booking_date === todayKey() && booking.payment_received_at);
+      const selectedDate = selectedBookingDate();
+      const active = state.bookings.filter((booking) => booking.booking_date === selectedDate && !booking.collected_at);
+      const paid = state.bookings.filter((booking) => booking.booking_date === selectedDate && booking.payment_received_at);
       const activeItems = active.reduce((sum, booking) => sum + Number(booking.items || 0), 0);
       $("activeBookings").textContent = String(active.length);
       $("itemsInStore").textContent = String(activeItems);
@@ -668,6 +684,7 @@
     }
 
     function renderBookings() {
+      updateSelectedDateLabels();
       const rows = filteredBookings();
       const body = $("bookingsBody");
       if (!rows.length) {
@@ -729,7 +746,6 @@
 
     async function loadStaffData() {
       if (!state.authed) return;
-      $("todayLabel").textContent = `Today: ${formatDate(todayKey())}`;
       try {
         const [bookings, blockedDates] = await Promise.all([
           supabaseFetch("bookings?select=*&order=created_at.desc"),
@@ -822,7 +838,7 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `granary-bookings-${todayKey()}.csv`;
+      link.download = `granary-bookings-${selectedBookingDate()}.csv`;
       link.click();
       URL.revokeObjectURL(url);
     }
@@ -864,6 +880,11 @@
     $("refreshButton").addEventListener("click", loadStaffData);
     $("exportCsvButton").addEventListener("click", exportCsv);
     $("bookingSearch").addEventListener("input", renderBookings);
+    $("bookingDate").addEventListener("change", renderBookings);
+    $("todayButton").addEventListener("click", () => {
+      $("bookingDate").value = todayKey();
+      renderBookings();
+    });
 
     $("manualBookingForm").addEventListener("submit", async (event) => {
       event.preventDefault();
