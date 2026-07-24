@@ -395,7 +395,7 @@
               <th>Customer</th>
               <th>Items</th>
               <th>Tags</th>
-              <th>Collection time</th>
+              <th>Estimated times</th>
               <th>Status</th>
               <th>Staff notes</th>
               <th>Actions</th>
@@ -490,6 +490,14 @@
 
     function formatTime(value) {
       return String(value || "").slice(0, 5) || "17:00";
+    }
+
+    function dropOffEtaFromNotes(notes) {
+      return String(notes || "").match(/^\[Drop-off ETA: ([0-2]\d:[0-5]\d)\]/)?.[1] || "";
+    }
+
+    function customerNotes(notes) {
+      return String(notes || "").replace(/^\[Drop-off ETA: [0-2]\d:[0-5]\d\]\n?/, "");
     }
 
     function formatDate(value) {
@@ -735,9 +743,12 @@
             </td>
             <td><strong>${Number(booking.items || 0)}</strong><br><span class="muted">${money(booking.total_cost || Number(booking.items || 0) * PRICE_PER_ITEM)}</span></td>
             <td>${escapeHtml(tags)}</td>
-            <td>${escapeHtml(formatTime(booking.collection_time))}</td>
+            <td>
+              <strong>Drop-off:</strong> ${escapeHtml(dropOffEtaFromNotes(booking.notes) ? formatTime(dropOffEtaFromNotes(booking.notes)) : "Not given")}<br>
+              <strong>Collect:</strong> ${escapeHtml(formatTime(booking.collection_time))}
+            </td>
             <td><span class="status ${statusClass}">${statusLabel}</span></td>
-            <td>${escapeHtml(booking.notes || "")}</td>
+            <td>${escapeHtml(customerNotes(booking.notes))}</td>
             <td>
               <div class="actions">
                 <button type="button" class="blue" onclick="markBooking('${booking.id}', 'arrived_at')" ${booking.arrived_at ? "disabled" : ""}>Arrived</button>
@@ -844,7 +855,7 @@
 
     function exportCsv() {
       const rows = filteredBookings();
-      const headers = ["Reference", "Date", "Customer", "Mobile", "Email", "Items", "Tags", "Collection time", "Status", "Notes", "Total"];
+      const headers = ["Reference", "Date", "Customer", "Mobile", "Email", "Items", "Tags", "Drop-off ETA", "Collection ETA", "Status", "Notes", "Total"];
       const csvRows = [headers, ...rows.map((booking) => {
         const [status] = bookingStatus(booking);
         return [
@@ -855,9 +866,10 @@
           booking.email || "",
           booking.items,
           (booking.tag_numbers || []).join(", "),
+          dropOffEtaFromNotes(booking.notes),
           formatTime(booking.collection_time),
           status,
-          booking.notes || "",
+          customerNotes(booking.notes),
           booking.total_cost || Number(booking.items || 0) * PRICE_PER_ITEM,
         ];
       })].map((row) => row.map((cell) => `"${String(cell ?? "").replace(/"/g, '""')}"`).join(","));

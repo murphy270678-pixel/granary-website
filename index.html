@@ -1490,6 +1490,15 @@
                 <label for="bookingDate">Booking date</label>
                 <input id="bookingDate" name="bookingDate" type="date" required>
               </div>
+              <div class="field">
+                <label for="dropOffTime">Estimated drop-off time</label>
+                <input id="dropOffTime" name="dropOffTime" type="time" min="08:00" max="16:30" step="900" required>
+              </div>
+              <div class="field">
+                <label for="collectionTime">Estimated collection time</label>
+                <input id="collectionTime" name="collectionTime" type="time" min="08:15" max="17:00" step="900" required>
+                <p class="helper-text">An estimate is fine. All bags must be collected by 5:00pm.</p>
+              </div>
               <div id="fridayWarning" class="date-warning" aria-live="polite">
                 Friday bookings must be collected by 5:00pm. The Granary is closed on Saturday, so items cannot be left overnight.
               </div>
@@ -1702,6 +1711,7 @@ const STORAGE_KEY = "granaryHubBookings";
     const itemButtons = document.querySelectorAll("[data-item-count]");
     const exactItemsField = document.getElementById("exactItemsField");
     const exactItemsInput = document.getElementById("exactItems");
+    const dropOffTimeInput = document.getElementById("dropOffTime");
     const collectionTimeInput = document.getElementById("collectionTime");
     const priceBreakdown = document.getElementById("priceBreakdown");
     const priceTotal = document.getElementById("priceTotal");
@@ -1789,6 +1799,14 @@ const STORAGE_KEY = "granaryHubBookings";
       return text ? JSON.parse(text) : null;
     }
 
+    function dropOffEtaFromNotes(notes) {
+      return String(notes || "").match(/^\[Drop-off ETA: ([0-2]\d:[0-5]\d)\]/)?.[1] || "";
+    }
+
+    function customerNotes(notes) {
+      return String(notes || "").replace(/^\[Drop-off ETA: [0-2]\d:[0-5]\d\]\n?/, "");
+    }
+
     function fromDbBooking(row) {
       return {
         id: row.id,
@@ -1799,10 +1817,11 @@ const STORAGE_KEY = "granaryHubBookings";
         mobile: row.mobile,
         email: row.email || "",
         items: row.items,
+        dropOffTime: dropOffEtaFromNotes(row.notes),
         collectionTime: String(row.collection_time || "").slice(0, 5),
         totalCost: row.total_cost,
         tagNumbers: Array.isArray(row.tag_numbers) ? row.tag_numbers.map(String) : [],
-        notes: row.notes || "",
+        notes: customerNotes(row.notes),
         createdAt: row.created_at,
         arrivedAt: row.arrived_at || "",
         paymentReceivedAt: row.payment_received_at || "",
@@ -1822,7 +1841,9 @@ const STORAGE_KEY = "granaryHubBookings";
         collection_time: booking.collectionTime,
         total_cost: booking.totalCost,
         tag_numbers: booking.tagNumbers,
-        notes: booking.notes || null
+        notes: booking.dropOffTime
+          ? `[Drop-off ETA: ${booking.dropOffTime}]${booking.notes ? `\n${booking.notes}` : ""}`
+          : (booking.notes || null)
       };
     }
 
@@ -2100,6 +2121,7 @@ const STORAGE_KEY = "granaryHubBookings";
 
     function validateBookingForm() {
       const dateKey = selectedBookingDate();
+      dropOffTimeInput?.setCustomValidity("");
       collectionTimeInput?.setCustomValidity("");
       itemsInput.setCustomValidity("");
       bookingDateInput.setCustomValidity("");
@@ -2114,6 +2136,18 @@ const STORAGE_KEY = "granaryHubBookings";
 
       if (collectionTimeInput?.value && collectionTimeInput.value > "17:00") {
         collectionTimeInput.setCustomValidity("Items must be collected by 5:00pm.");
+      }
+
+      if (dropOffTimeInput?.value && dropOffTimeInput.value < "08:00") {
+        dropOffTimeInput.setCustomValidity("Drop-off is available from 8:00am.");
+      }
+
+      if (dropOffTimeInput?.value && dropOffTimeInput.value > "16:30") {
+        dropOffTimeInput.setCustomValidity("Please choose a drop-off time no later than 4:30pm.");
+      }
+
+      if (dropOffTimeInput?.value && collectionTimeInput?.value && collectionTimeInput.value <= dropOffTimeInput.value) {
+        collectionTimeInput.setCustomValidity("Collection time must be after the drop-off time.");
       }
 
       if (selectedItemCount() > remainingItemCapacity(dateKey)) {
@@ -2483,7 +2517,8 @@ const STORAGE_KEY = "granaryHubBookings";
             mobile: form.get("mobile").trim(),
             email: form.get("email").trim(),
             items,
-            collectionTime: "17:00",
+            dropOffTime: form.get("dropOffTime"),
+            collectionTime: form.get("collectionTime"),
             totalCost: items * 7,
             tagNumbers,
             notes: form.get("notes").trim(),
@@ -2515,7 +2550,7 @@ const STORAGE_KEY = "granaryHubBookings";
         const fridayCollectionNote = isFriday(savedBooking.bookingDate)
           ? " The Granary is closed on Saturday, so your items must be collected by 5:00pm on Friday."
           : "";
-        confirmationSummary.textContent = `Your booking reference is ${savedBooking.reference}. Staff will attach your luggage tags when you arrive. Number of items: ${savedBooking.items}. Booking date: ${formatDate(savedBooking.bookingDate)}. Payment due at drop-off: ${formatMoney(savedBooking.totalCost)}.${fridayCollectionNote}`;
+        confirmationSummary.textContent = `Your booking reference is ${savedBooking.reference}. Staff will attach your luggage tags when you arrive. Number of items: ${savedBooking.items}. Booking date: ${formatDate(savedBooking.bookingDate)}. Estimated drop-off: ${formatTime(savedBooking.dropOffTime)}. Estimated collection: ${formatTime(savedBooking.collectionTime)}. Payment due at drop-off: ${formatMoney(savedBooking.totalCost)}.${fridayCollectionNote}`;
         confirmationTotal.textContent = formatMoney(savedBooking.totalCost);
         paymentInstruction.textContent = emailSent
           ? `A confirmation email has been sent to ${savedBooking.email}. Please show it when collecting your items. Payment is due at drop-off.`
@@ -2600,6 +2635,8 @@ const STORAGE_KEY = "granaryHubBookings";
     function resetBookingForm() {
       bookingForm.reset();
       bookingDateInput.value = todayKey();
+      if (dropOffTimeInput) dropOffTimeInput.value = "09:00";
+      if (collectionTimeInput) collectionTimeInput.value = "17:00";
       setItemCount("1");
       updatePriceTotal();
       confirmation.classList.remove("active");
@@ -2612,6 +2649,7 @@ const STORAGE_KEY = "granaryHubBookings";
         bookingDateInput.value = today;
         bookingDateInput.min = today;
       }
+      if (dropOffTimeInput) dropOffTimeInput.value = "09:00";
       if (collectionTimeInput) collectionTimeInput.value = "17:00";
       if (staffDateInput) staffDateInput.value = today;
       if (staffEntryDate) {
@@ -2639,6 +2677,7 @@ const STORAGE_KEY = "granaryHubBookings";
       updateBookingAvailability();
     });
     collectionTimeInput?.addEventListener("input", validateBookingForm);
+    dropOffTimeInput?.addEventListener("input", validateBookingForm);
 
     staffBookingButton?.addEventListener("click", () => { window.location.href = "index.html"; });
     searchInput?.addEventListener("input", renderRows);
