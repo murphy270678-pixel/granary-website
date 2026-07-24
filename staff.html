@@ -367,6 +367,7 @@
         <div class="toolbar-actions">
           <input id="bookingDate" type="date" aria-label="Booking date">
           <button id="todayButton" type="button" class="secondary">Today</button>
+          <button id="allOpenButton" type="button" class="secondary">All open</button>
           <input id="bookingSearch" type="search" placeholder="Search name, reference, mobile">
           <button id="refreshButton" type="button" class="secondary">Refresh</button>
           <button id="exportCsvButton" type="button">Export CSV</button>
@@ -651,7 +652,15 @@
       return $("bookingDate").value || todayKey();
     }
 
+    let bookingsView = "date";
+
     function updateSelectedDateLabels() {
+      if (bookingsView === "open") {
+        $("bookingsTitle").textContent = "All open bookings";
+        $("selectedDateLabel").textContent = "Every booking not yet marked as collected";
+        $("paidLabel").textContent = "Paid (open)";
+        return;
+      }
       const selectedDate = selectedBookingDate();
       const isToday = selectedDate === todayKey();
       $("bookingsTitle").textContent = isToday ? "Today's bookings" : "Previous bookings";
@@ -661,7 +670,9 @@
 
     function filteredBookings() {
       const q = $("bookingSearch").value.trim().toLowerCase();
-      const selected = state.bookings.filter((booking) => booking.booking_date === selectedBookingDate());
+      const selected = bookingsView === "open"
+        ? state.bookings.filter((booking) => !booking.collected_at)
+        : state.bookings.filter((booking) => booking.booking_date === selectedBookingDate());
       if (!q) return selected;
       return selected.filter((booking) => [
         booking.reference,
@@ -674,8 +685,12 @@
 
     function renderStats() {
       const selectedDate = selectedBookingDate();
-      const active = state.bookings.filter((booking) => booking.booking_date === selectedDate && !booking.collected_at);
-      const paid = state.bookings.filter((booking) => booking.booking_date === selectedDate && booking.payment_received_at);
+      const active = bookingsView === "open"
+        ? state.bookings.filter((booking) => !booking.collected_at)
+        : state.bookings.filter((booking) => booking.booking_date === selectedDate && !booking.collected_at);
+      const paid = bookingsView === "open"
+        ? active.filter((booking) => booking.payment_received_at)
+        : state.bookings.filter((booking) => booking.booking_date === selectedDate && booking.payment_received_at);
       const activeItems = active.reduce((sum, booking) => sum + Number(booking.items || 0), 0);
       $("activeBookings").textContent = String(active.length);
       $("itemsInStore").textContent = String(activeItems);
@@ -838,7 +853,9 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `granary-bookings-${selectedBookingDate()}.csv`;
+      link.download = bookingsView === "open"
+        ? "granary-bookings-all-open.csv"
+        : `granary-bookings-${selectedBookingDate()}.csv`;
       link.click();
       URL.revokeObjectURL(url);
     }
@@ -880,9 +897,17 @@
     $("refreshButton").addEventListener("click", loadStaffData);
     $("exportCsvButton").addEventListener("click", exportCsv);
     $("bookingSearch").addEventListener("input", renderBookings);
-    $("bookingDate").addEventListener("change", renderBookings);
+    $("bookingDate").addEventListener("change", () => {
+      bookingsView = "date";
+      renderBookings();
+    });
     $("todayButton").addEventListener("click", () => {
+      bookingsView = "date";
       $("bookingDate").value = todayKey();
+      renderBookings();
+    });
+    $("allOpenButton").addEventListener("click", () => {
+      bookingsView = "open";
       renderBookings();
     });
 
