@@ -2122,9 +2122,9 @@ const STORAGE_KEY = "granaryHubBookings";
       return blocked ? blocked.reason : "";
     }
 
-    function makeReference(bookings, dateKey) {
-      const refs = bookingsForDate(bookings, dateKey)
-        .map((booking) => /^G(\d{3})$/.exec(booking.reference || ""))
+    function makeReference(bookings) {
+      const refs = bookings
+        .map((booking) => /^G(\d+)$/i.exec(booking.reference || ""))
         .filter(Boolean)
         .map((match) => Number(match[1]));
       const nextNumber = (refs.length ? Math.max(...refs) : 0) + 1;
@@ -2603,7 +2603,7 @@ const STORAGE_KEY = "granaryHubBookings";
           }
           const booking = {
             id: makeId(),
-            reference: makeReference(bookingsCache, bookingDate),
+            reference: makeReference(bookingsCache),
             bookingDate,
             createdDate: bookingDate,
             name: form.get("customerName").trim(),
@@ -2685,7 +2685,7 @@ const STORAGE_KEY = "granaryHubBookings";
       try {
         const booking = {
           id: makeId(),
-          reference: makeReference(bookingsCache, bookingDate),
+          reference: makeReference(bookingsCache),
           bookingDate,
           createdDate: bookingDate,
           name: form.get("customerName").trim(),

@@ -688,9 +688,8 @@
       return tags.length === count ? tags : [];
     }
 
-    function getNextReference(dateKey = todayKey()) {
+    function getNextReference() {
       const numbers = state.bookings
-        .filter((booking) => booking.booking_date === dateKey)
         .map((booking) => Number(String(booking.reference || "").replace(/^G/i, "")))
         .filter(Number.isFinite);
       const next = numbers.length ? Math.max(...numbers) + 1 : 1;
@@ -1001,7 +1000,7 @@
         return;
       }
       const booking = {
-        reference: getNextReference(startDate),
+        reference: getNextReference(),
         booking_date: startDate,
         name: $("manualName").value.trim(),
         mobile: $("manualMobile").value.trim(),
