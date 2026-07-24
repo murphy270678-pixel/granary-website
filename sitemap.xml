@@ -11,6 +11,46 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://granaryportree.uk/skye-guide.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://granaryportree.uk/things-to-do-isle-of-skye.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://granaryportree.uk/isle-of-skye-itinerary.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://granaryportree.uk/portree-guide.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://granaryportree.uk/skye-weather-packing.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://granaryportree.uk/skye-parking-driving.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://granaryportree.uk/fairy-pools-guide.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://granaryportree.uk/old-man-of-storr-guide.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://granaryportree.uk/skye-companion-privacy.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
