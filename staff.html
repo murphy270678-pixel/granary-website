@@ -426,8 +426,29 @@
             <input id="manualItems" type="number" min="1" value="1" required>
           </div>
           <div>
+            <label for="manualStartDate">Drop-off date</label>
+            <input id="manualStartDate" type="date" required>
+          </div>
+          <div>
+            <label for="manualDropOffTime">Estimated drop-off time</label>
+            <input id="manualDropOffTime" type="time" min="08:00" max="16:30" step="900" value="09:00" required>
+          </div>
+          <div>
+            <label for="manualEndDate">Collection date</label>
+            <input id="manualEndDate" type="date" required>
+          </div>
+          <div>
+            <label for="manualCollectionTime">Estimated collection time</label>
+            <input id="manualCollectionTime" type="time" min="08:15" max="17:00" step="900" value="17:00" required>
+          </div>
+          <div>
             <label for="manualTags">Tag numbers</label>
             <input id="manualTags" placeholder="001, 002" required>
+          </div>
+          <div>
+            <label for="manualTotal">Total charge (£)</label>
+            <input id="manualTotal" type="number" min="0" step="1" value="7" required>
+            <div id="manualPriceHelp" class="muted">£7 × 1 item × 1 day</div>
           </div>
           <div style="grid-column: 1 / -1;">
             <label for="manualNotes">Notes</label>
@@ -493,11 +514,29 @@
     }
 
     function dropOffEtaFromNotes(notes) {
-      return String(notes || "").match(/^\[Drop-off ETA: ([0-2]\d:[0-5]\d)\]/)?.[1] || "";
+      return String(notes || "").match(/\[Drop-off ETA: ([0-2]\d:[0-5]\d)\]/)?.[1] || "";
+    }
+
+    function collectionDateFromNotes(notes) {
+      return String(notes || "").match(/\[Collection date: (\d{4}-\d{2}-\d{2})\]/)?.[1] || "";
+    }
+
+    function bookingEndDate(booking) {
+      return collectionDateFromNotes(booking.notes) || booking.booking_date;
     }
 
     function customerNotes(notes) {
-      return String(notes || "").replace(/^\[Drop-off ETA: [0-2]\d:[0-5]\d\]\n?/, "");
+      return String(notes || "")
+        .replace(/\[Drop-off ETA: [0-2]\d:[0-5]\d\]\n?/g, "")
+        .replace(/\[Collection date: \d{4}-\d{2}-\d{2}\]\n?/g, "")
+        .trim();
+    }
+
+    function storageDays(startDate, endDate) {
+      const start = new Date(`${startDate}T00:00:00Z`);
+      const end = new Date(`${endDate}T00:00:00Z`);
+      if (!startDate || !endDate || Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end < start) return 0;
+      return Math.floor((end - start) / 86400000) + 1;
     }
 
     function formatDate(value) {
@@ -649,10 +688,9 @@
       return tags.length === count ? tags : [];
     }
 
-    function getNextReference() {
-      const today = todayKey();
+    function getNextReference(dateKey = todayKey()) {
       const numbers = state.bookings
-        .filter((booking) => booking.booking_date === today)
+        .filter((booking) => booking.booking_date === dateKey)
         .map((booking) => Number(String(booking.reference || "").replace(/^G/i, "")))
         .filter(Number.isFinite);
       const next = numbers.length ? Math.max(...numbers) + 1 : 1;
@@ -683,9 +721,11 @@
       const today = todayKey();
       return state.bookings
         .filter((booking) => {
-          if (bookingsView === "past") return booking.booking_date < today;
-          if (bookingsView === "future") return booking.booking_date > today;
-          return booking.booking_date === today;
+          const startDate = booking.booking_date;
+          const endDate = bookingEndDate(booking);
+          if (bookingsView === "past") return endDate < today;
+          if (bookingsView === "future") return startDate > today;
+          return startDate <= today && endDate >= today;
         })
         .sort((a, b) => {
           const dateOrder = String(a.booking_date).localeCompare(String(b.booking_date));
@@ -735,7 +775,7 @@
         const whatsappLive = WHATSAPP_ENABLED && whatsappNumber;
         return `
           <tr>
-            <td><div class="ref">${escapeHtml(booking.reference)}</div><div class="muted">${escapeHtml(formatDate(booking.booking_date))}</div></td>
+            <td><div class="ref">${escapeHtml(booking.reference)}</div><div class="muted">${escapeHtml(formatDate(booking.booking_date))}${bookingEndDate(booking) !== booking.booking_date ? ` → ${escapeHtml(formatDate(bookingEndDate(booking)))}` : ""}</div></td>
             <td>
               <strong>${escapeHtml(booking.name)}</strong><br>
               <span class="muted">${escapeHtml(booking.mobile)}</span><br>
@@ -745,7 +785,7 @@
             <td>${escapeHtml(tags)}</td>
             <td>
               <strong>Drop-off:</strong> ${escapeHtml(dropOffEtaFromNotes(booking.notes) ? formatTime(dropOffEtaFromNotes(booking.notes)) : "Not given")}<br>
-              <strong>Collect:</strong> ${escapeHtml(formatTime(booking.collection_time))}
+              <strong>Collect:</strong> ${escapeHtml(formatDate(bookingEndDate(booking)))} at ${escapeHtml(formatTime(booking.collection_time))}
             </td>
             <td><span class="status ${statusClass}">${statusLabel}</span></td>
             <td>${escapeHtml(customerNotes(booking.notes))}</td>
@@ -855,12 +895,13 @@
 
     function exportCsv() {
       const rows = filteredBookings();
-      const headers = ["Reference", "Date", "Customer", "Mobile", "Email", "Items", "Tags", "Drop-off ETA", "Collection ETA", "Status", "Notes", "Total"];
+      const headers = ["Reference", "Drop-off date", "Collection date", "Customer", "Mobile", "Email", "Items", "Tags", "Drop-off ETA", "Collection ETA", "Status", "Notes", "Total"];
       const csvRows = [headers, ...rows.map((booking) => {
         const [status] = bookingStatus(booking);
         return [
           booking.reference,
           booking.booking_date,
+          bookingEndDate(booking),
           booking.name,
           booking.mobile,
           booking.email || "",
@@ -926,6 +967,14 @@
     $("manualBookingForm").addEventListener("submit", async (event) => {
       event.preventDefault();
       const items = Math.max(1, Number($("manualItems").value || 1));
+      const startDate = $("manualStartDate").value;
+      const endDate = $("manualEndDate").value;
+      const days = storageDays(startDate, endDate);
+      if (!days) {
+        setNotice("Collection date must be the same as or after the drop-off date.", true);
+        $("manualEndDate").focus();
+        return;
+      }
       const tags = $("manualTags").value
         .split(",")
         .map((tag) => tag.trim().replace(/^0*(\d+)$/, (_, n) => String(n).padStart(3, "0")))
@@ -952,16 +1001,20 @@
         return;
       }
       const booking = {
-        reference: getNextReference(),
-        booking_date: todayKey(),
+        reference: getNextReference(startDate),
+        booking_date: startDate,
         name: $("manualName").value.trim(),
         mobile: $("manualMobile").value.trim(),
         email: $("manualEmail").value.trim(),
         items,
-        collection_time: "17:00",
-        total_cost: items * PRICE_PER_ITEM,
+        collection_time: $("manualCollectionTime").value,
+        total_cost: Number($("manualTotal").value || 0),
         tag_numbers: tags,
-        notes: $("manualNotes").value.trim() || null,
+        notes: [
+          `[Drop-off ETA: ${$("manualDropOffTime").value}]`,
+          `[Collection date: ${endDate}]`,
+          $("manualNotes").value.trim(),
+        ].filter(Boolean).join("\n"),
       };
       try {
         const created = await supabaseFetch("bookings", {
@@ -971,6 +1024,7 @@
         });
         $("manualBookingForm").reset();
         $("manualItems").value = "1";
+        setManualBookingDefaults();
         setNotice(`Manual booking ${booking.reference} created.`);
         if (created && created[0]) sendConfirmationEmail(created[0].id);
         await loadStaffData();
@@ -978,6 +1032,36 @@
         setNotice("Could not create manual booking.", true);
       }
     });
+
+    function updateManualPrice() {
+      const items = Math.max(1, Number($("manualItems").value || 1));
+      const days = storageDays($("manualStartDate").value, $("manualEndDate").value) || 1;
+      const total = items * days * PRICE_PER_ITEM;
+      $("manualTotal").value = String(total);
+      $("manualPriceHelp").textContent = `£${PRICE_PER_ITEM} × ${items} item${items === 1 ? "" : "s"} × ${days} day${days === 1 ? "" : "s"}`;
+    }
+
+    function setManualBookingDefaults() {
+      const today = todayKey();
+      $("manualStartDate").value = today;
+      $("manualStartDate").min = today;
+      $("manualEndDate").value = today;
+      $("manualEndDate").min = today;
+      $("manualDropOffTime").value = "09:00";
+      $("manualCollectionTime").value = "17:00";
+      updateManualPrice();
+    }
+
+    ["manualItems", "manualStartDate", "manualEndDate"].forEach((id) => {
+      $(id).addEventListener("change", () => {
+        if (id === "manualStartDate" && $("manualEndDate").value < $("manualStartDate").value) {
+          $("manualEndDate").value = $("manualStartDate").value;
+        }
+        $("manualEndDate").min = $("manualStartDate").value;
+        updateManualPrice();
+      });
+    });
+    setManualBookingDefaults();
 
     $("blockedDateForm").addEventListener("submit", async (event) => {
       event.preventDefault();
