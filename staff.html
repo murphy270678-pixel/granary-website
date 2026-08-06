@@ -268,6 +268,12 @@
       background: #fff;
     }
 
+    .lunch-panel {
+      border-color: #b8cdbf;
+      background: #fbfff9;
+      margin-bottom: 18px;
+    }
+
     .lunch-order h3,
     .prep-category h3 {
       margin: 0 0 8px;
@@ -382,7 +388,7 @@
     <div class="wrap brand">
       <div>
         <h1>The Granary</h1>
-        <p>Luggage Storage Staff</p>
+        <p>Staff Dashboard</p>
       </div>
       <button id="staffLogoutButton" class="secondary hidden" type="button">Logout</button>
     </div>
@@ -407,7 +413,7 @@
     <section id="staffDashboard" class="hidden">
       <div class="toolbar">
         <div>
-          <h2 class="section-title">Today's bookings</h2>
+          <h2 class="section-title">Today's orders</h2>
           <div id="todayLabel" class="muted"></div>
         </div>
         <div class="toolbar-actions">
@@ -428,6 +434,13 @@
         <div class="stat"><span>Packed lunches</span><strong id="packedLunchCount">0</strong></div>
       </div>
 
+      <section class="panel lunch-panel">
+        <h2 class="section-title">Packed lunches</h2>
+        <p class="muted no-print">Today and upcoming orders are grouped by collection date and ordered by collection time.</p>
+        <div id="packedLunches" class="lunch-groups"></div>
+      </section>
+
+      <h2 class="section-title">Luggage and customer orders</h2>
       <div class="table-wrap">
         <table>
           <thead>
@@ -445,12 +458,6 @@
           <tbody id="bookingsBody"></tbody>
         </table>
       </div>
-
-      <section class="panel" style="margin-top: 18px;">
-        <h2 class="section-title">Packed Lunches</h2>
-        <p class="muted no-print">Orders are grouped by collection date and ordered by collection time.</p>
-        <div id="packedLunches" class="lunch-groups"></div>
-      </section>
 
       <section class="panel" style="margin-top: 18px;">
         <h2 class="section-title">Manual booking</h2>
@@ -524,6 +531,8 @@
     const PRICE_PER_ITEM = 7;
     const LUNCH_NOTE_START = "[[GRANARY_PACKED_LUNCHES_V1]]";
     const LUNCH_NOTE_END = "[[/GRANARY_PACKED_LUNCHES_V1]]";
+    const LUNCH_SUMMARY_START = "Packed lunch order:";
+    const LUNCH_SUMMARY_END = "End packed lunch order.";
 
     const state = {
       bookings: [],
@@ -580,14 +589,22 @@
       const text = String(notes || "").trim();
       const start = text.indexOf(LUNCH_NOTE_START);
       const end = text.indexOf(LUNCH_NOTE_END);
-      if (start === -1 || end === -1 || end <= start) return text;
-      return `${text.slice(0, start)}${text.slice(end + LUNCH_NOTE_END.length)}`.trim();
+      let withoutPayload = text;
+      if (start !== -1 && end !== -1 && end > start) {
+        withoutPayload = `${text.slice(0, start)}${text.slice(end + LUNCH_NOTE_END.length)}`.trim();
+      }
+      const summaryStart = withoutPayload.indexOf(LUNCH_SUMMARY_START);
+      const summaryEnd = withoutPayload.indexOf(LUNCH_SUMMARY_END);
+      if (summaryStart !== -1 && summaryEnd !== -1 && summaryEnd > summaryStart) {
+        return `${withoutPayload.slice(0, summaryStart)}${withoutPayload.slice(summaryEnd + LUNCH_SUMMARY_END.length)}`.trim();
+      }
+      return withoutPayload;
     }
 
     function buildLunchNotes(customerNotes, lunchOrder) {
       const base = stripLunchOrder(customerNotes);
       if (!lunchOrder) return base || null;
-      return [base, `${LUNCH_NOTE_START}${JSON.stringify(lunchOrder)}${LUNCH_NOTE_END}`].filter(Boolean).join("\n\n");
+      return [base, formatLunchOrderText(lunchOrder), `${LUNCH_NOTE_START}${JSON.stringify(lunchOrder)}${LUNCH_NOTE_END}`].filter(Boolean).join("\n\n");
     }
 
     function lunchOrders() {
@@ -606,6 +623,23 @@
 
     function lunchLine(lunch, index) {
       return `Packed Lunch ${index + 1}: ${lunch.sandwich} sandwich, ${lunch.traybake}, ${lunch.crisps} crisps, ${lunch.drink}, ${lunch.fruit}`;
+    }
+
+    function formatLunchOrderText(order) {
+      if (!order || !order.lunches?.length) return "";
+      return [
+        LUNCH_SUMMARY_START,
+        `Collection: ${order.collectionDate}, ${order.collectionTime}`,
+        `Type: ${order.luggageAttached ? "With luggage storage" : "Packed lunch only"}`,
+        ...order.lunches.map(lunchLine),
+        LUNCH_SUMMARY_END
+      ].join("\n");
+    }
+
+    function luggageItemCountForBooking(booking) {
+      const lunchOrder = parseLunchOrder(booking.notes);
+      if (lunchOrder && lunchOrder.luggageAttached === false) return 0;
+      return Number(booking.items || 0);
     }
 
     function supabaseHeaders(extra = {}) {
@@ -705,6 +739,10 @@
     }
 
     function buildWhatsAppMessage(booking) {
+      const lunchOrder = parseLunchOrder(booking.notes);
+      if (lunchOrder && lunchOrder.luggageAttached === false) {
+        return `Hi ${booking.name}, this is The Granary in Portree regarding your packed lunch order ${booking.reference}.`;
+      }
       return `Hi ${booking.name}, this is The Granary in Portree regarding your luggage storage booking ${booking.reference}.`;
     }
 
@@ -738,7 +776,9 @@
       const today = todayKey();
       const numbers = state.bookings
         .filter((booking) => booking.booking_date === today)
-        .map((booking) => Number(String(booking.reference || "").replace(/^G/i, "")))
+        .map((booking) => /^G(\d{3})$/i.exec(booking.reference || ""))
+        .filter(Boolean)
+        .map((match) => Number(match[1]))
         .filter(Number.isFinite);
       const next = numbers.length ? Math.max(...numbers) + 1 : 1;
       return `G${String(next).padStart(3, "0")}`;
@@ -760,7 +800,7 @@
     function renderStats() {
       const active = state.bookings.filter((booking) => booking.booking_date === todayKey() && !booking.collected_at);
       const paid = state.bookings.filter((booking) => booking.booking_date === todayKey() && booking.payment_received_at);
-      const activeItems = active.reduce((sum, booking) => sum + Number(booking.items || 0), 0);
+      const activeItems = active.reduce((sum, booking) => sum + luggageItemCountForBooking(booking), 0);
       $("activeBookings").textContent = String(active.length);
       $("itemsInStore").textContent = String(activeItems);
       $("paidToday").textContent = money(paid.reduce((sum, booking) => sum + Number(booking.total_cost || 0), 0));
@@ -859,13 +899,16 @@
 
       body.innerHTML = rows.map((booking) => {
         const [statusLabel, statusClass] = bookingStatus(booking);
-        const tags = (booking.tag_numbers || []).map((tag) => String(tag).padStart(3, "0")).join(", ") || "Unassigned";
         const whatsappNumber = normalisePhoneForWhatsApp(booking.mobile);
         const whatsappLive = WHATSAPP_ENABLED && whatsappNumber;
         const lunchOrder = parseLunchOrder(booking.notes);
+        const luggageItemCount = luggageItemCountForBooking(booking);
+        const tags = luggageItemCount
+          ? (booking.tag_numbers || []).map((tag) => String(tag).padStart(3, "0")).join(", ") || "Unassigned"
+          : "No luggage";
         const cleanNotes = stripLunchOrder(booking.notes);
         const lunchSummary = lunchOrder
-          ? `<br><span class="muted">${lunchOrder.lunches.length} packed lunch${lunchOrder.lunches.length === 1 ? "" : "es"}: ${escapeHtml(lunchOrder.collectionDate || "")} ${escapeHtml(lunchOrder.collectionTime || "")}</span>`
+          ? `<ol class="lunch-lines">${lunchOrder.lunches.map((lunch, index) => `<li>${escapeHtml(lunchLine(lunch, index))}</li>`).join("")}</ol>`
           : "";
         return `
           <tr>
@@ -875,11 +918,11 @@
               <span class="muted">${escapeHtml(booking.mobile)}</span><br>
               <span class="muted">${escapeHtml(booking.email || "")}</span>
             </td>
-            <td><strong>${Number(booking.items || 0)}</strong><br><span class="muted">${money(booking.total_cost || Number(booking.items || 0) * PRICE_PER_ITEM)}</span></td>
+            <td><strong>${luggageItemCount ? luggageItemCount : "Lunch only"}</strong><br><span class="muted">${money(booking.total_cost || Number(booking.items || 0) * PRICE_PER_ITEM)}</span></td>
             <td>${escapeHtml(tags)}</td>
             <td>${escapeHtml(formatTime(booking.collection_time))}</td>
             <td><span class="status ${statusClass}">${statusLabel}</span></td>
-            <td>${cleanNotes ? escapeHtml(cleanNotes) : "-"}${lunchSummary}</td>
+            <td>${cleanNotes ? escapeHtml(cleanNotes) : lunchOrder ? "" : "-"}${lunchSummary}</td>
             <td>
               <div class="actions">
                 <button type="button" class="blue" onclick="markBooking('${booking.id}', 'arrived_at')" ${booking.arrived_at ? "disabled" : ""}>Arrived</button>
@@ -1004,17 +1047,21 @@
       const headers = ["Reference", "Date", "Customer", "Mobile", "Email", "Items", "Tags", "Collection time", "Status", "Notes", "Total"];
       const csvRows = [headers, ...rows.map((booking) => {
         const [status] = bookingStatus(booking);
+        const lunchOrder = parseLunchOrder(booking.notes);
+        const cleanNotes = stripLunchOrder(booking.notes);
+        const noteParts = [cleanNotes, formatLunchOrderText(lunchOrder)].filter(Boolean).join("\n\n");
+        const luggageItemCount = luggageItemCountForBooking(booking);
         return [
           booking.reference,
           booking.booking_date,
           booking.name,
           booking.mobile,
           booking.email || "",
-          booking.items,
-          (booking.tag_numbers || []).join(", "),
+          luggageItemCount,
+          luggageItemCount ? (booking.tag_numbers || []).join(", ") : "",
           formatTime(booking.collection_time),
           status,
-          booking.notes || "",
+          noteParts,
           booking.total_cost || Number(booking.items || 0) * PRICE_PER_ITEM,
         ];
       })].map((row) => row.map((cell) => `"${String(cell ?? "").replace(/"/g, '""')}"`).join(","));
