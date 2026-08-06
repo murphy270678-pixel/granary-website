@@ -13,18 +13,18 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Luggage Storage in Portree | The Granary</title>
-  <meta name="description" content="Same-day luggage storage at The Granary in Portree, Isle of Skye. £7 per item. Book online and pay at drop-off.">
+  <title>Luggage Storage in Portree | Bag Storage at The Granary</title>
+  <meta name="description" content="Same-day luggage and bag storage at The Granary in central Portree, Isle of Skye. Store suitcases before check-in, after check-out or while exploring. £7 per item.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://granaryportree.uk/">
   <meta property="og:title" content="Luggage Storage in Portree | The Granary">
-  <meta property="og:description" content="Same-day luggage storage at The Granary in Portree, Isle of Skye. £7 per item. Book online and pay at drop-off.">
+  <meta property="og:description" content="Same-day luggage and bag storage in central Portree. Store suitcases before check-in, after check-out or while exploring Skye.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://granaryportree.uk/">
   <meta property="og:image" content="https://granaryportree.uk/portree-harbour.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Luggage Storage in Portree | The Granary">
-  <meta name="twitter:description" content="Same-day luggage storage at The Granary in Portree, Isle of Skye. £7 per item. Book online and pay at drop-off.">
+  <meta name="twitter:description" content="Same-day luggage and bag storage in central Portree. Store suitcases before check-in, after check-out or while exploring Skye.">
   <meta name="twitter:image" content="https://granaryportree.uk/portree-harbour.jpg">
   <script type="application/ld+json">
   {
@@ -293,6 +293,7 @@
       background: rgba(255, 255, 255, .62);
     }
 
+    .nav a,
     .nav button {
       border: 0;
       background: transparent;
@@ -302,8 +303,13 @@
       border-radius: 7px;
       cursor: pointer;
       font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
     }
 
+    .nav a:hover,
+    .nav button:hover,
     .nav button.active {
       background: linear-gradient(180deg, var(--brand), var(--brand-dark));
       color: #fff;
@@ -538,9 +544,15 @@
       flex: 0 0 auto;
     }
 
-    .cafe-prompt {
+    .feature-prompts {
       max-width: 740px;
       margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .cafe-prompt {
       padding: 18px;
       border: 1px solid rgba(183, 111, 60, .32);
       border-radius: 8px;
@@ -548,6 +560,13 @@
         linear-gradient(135deg, rgba(240, 221, 198, .62), rgba(255,255,255,.78)),
         #fffaf2;
       box-shadow: var(--shadow-soft);
+    }
+
+    .guide-prompt {
+      border-color: rgba(47, 107, 79, .24);
+      background:
+        linear-gradient(135deg, rgba(220, 233, 231, .72), rgba(255,255,255,.78)),
+        #f7fbfa;
     }
 
     .cafe-prompt h2 {
@@ -560,6 +579,10 @@
       color: #4a554d;
       line-height: 1.5;
       font-weight: 700;
+    }
+
+    .cafe-prompt .secondary {
+      margin-top: 14px;
     }
 
     .cafe-list {
@@ -589,80 +612,7 @@
       gap: 18px;
     }
 
-    .app-promo {
-      width: 100%;
-      margin: 24px 0 0;
-      border: 1px solid #d2d2d7;
-      border-radius: 24px;
-      background: rgba(255,255,255,.92);
-      box-shadow: 0 18px 50px rgba(0, 0, 0, .08);
-      padding: clamp(24px, 4vw, 42px);
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 20px;
-      overflow: hidden;
-    }
-
-    .app-promo h2 {
-      margin: 4px 0 8px;
-      max-width: 640px;
-      color: #1d1d1f;
-      font-size: clamp(28px, 4vw, 42px);
-      line-height: 1.08;
-      letter-spacing: -.035em;
-    }
-
-    .app-promo p {
-      margin: 0;
-      color: #6e6e73;
-      line-height: 1.45;
-      font-size: 17px;
-      font-weight: 600;
-    }
-
-    .app-promo-kicker {
-      color: #6e6e73;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-    }
-
-    .app-promo-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      width: 100%;
-    }
-
-    .app-store-button {
-      min-height: 52px;
-      padding: 0 20px;
-      border-radius: 13px;
-      background: #000;
-      color: #fff;
-      font-size: 16px;
-      box-shadow: none;
-    }
-
-    .app-store-button:hover {
-      background: #1d1d1f;
-    }
-
-    .app-support-link {
-      color: #0066cc;
-      padding: 12px;
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .app-support-link:hover {
-      text-decoration: underline;
-    }
-
-    .find-us, .faq-section {
+    .find-us, .faq-section, .seo-section {
       border: 1px solid var(--line);
       border-radius: 8px;
       background: rgba(255,255,255,.78);
@@ -670,17 +620,29 @@
       padding: 18px;
     }
 
-    .find-us h2, .faq-section h2 {
+    .find-us h2, .faq-section h2, .seo-section h2 {
       margin: 0 0 10px;
       color: var(--brand-dark);
       font-size: 22px;
     }
 
-    .find-us p, .faq-section p {
+    .find-us p, .faq-section p, .seo-section p {
       margin: 0;
       color: #4a554d;
       line-height: 1.5;
       font-weight: 700;
+    }
+
+    .seo-section {
+      max-width: 740px;
+      margin-top: 18px;
+    }
+
+    .seo-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
     }
 
     .find-us .secondary {
@@ -881,6 +843,71 @@
       font-size: 22px;
       color: var(--brand-dark);
       white-space: nowrap;
+    }
+
+    .choice-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .lunch-panel {
+      display: none;
+      gap: 14px;
+      padding: 14px;
+      border: 1px solid rgba(183, 111, 60, .32);
+      border-radius: 8px;
+      background: #fffaf2;
+    }
+
+    .lunch-panel.active {
+      display: grid;
+    }
+
+    .lunch-panel h3,
+    .lunch-card h3 {
+      margin: 0;
+      color: var(--brand-dark);
+      font-size: 17px;
+    }
+
+    .lunch-card {
+      display: grid;
+      gap: 12px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .lunch-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .lunch-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .review-list {
+      display: grid;
+      gap: 10px;
+      margin: 10px 0 0;
+    }
+
+    .review-item {
+      padding: 11px;
+      border: 1px solid #dce9e0;
+      border-radius: 8px;
+      background: #fff;
+      color: #354239;
+      font-size: 14px;
+      line-height: 1.45;
+      font-weight: 700;
     }
 
     .availability {
@@ -1420,10 +1447,13 @@
 
       .nav {
         width: 100%;
+        overflow-x: auto;
       }
 
+      .nav a,
       .nav button {
-        flex: 1;
+        flex: 1 0 auto;
+        justify-content: center;
       }
 
       .booking-layout {
@@ -1434,7 +1464,7 @@
         position: static;
       }
 
-      .steps, .stats, .staff-summary, .module-strip, .info-grid, .service-strip, .local-info {
+      .steps, .stats, .staff-summary, .module-strip, .info-grid, .service-strip, .local-info, .feature-prompts {
         grid-template-columns: 1fr;
       }
 
@@ -1477,17 +1507,13 @@
         grid-template-columns: 1fr;
       }
 
+      .choice-strip,
+      .lunch-grid {
+        grid-template-columns: 1fr;
+      }
+
       .booking-panel {
         padding: 14px;
-      }
-
-      .app-promo {
-        align-items: stretch;
-        flex-direction: column;
-      }
-
-      .app-promo-actions a {
-        width: 100%;
       }
 
       h1 {
@@ -1511,28 +1537,37 @@
 </head>
 <body>
   <div class="shell">
-<header>
-      <div class="topbar">
-        <div class="brand" aria-label="The Granary Luggage Storage">
-          <div class="mark">G</div>
-          <div>
-            <div class="brand-title">THE GRANARY</div>
-            <div class="brand-subtitle">Luggage Storage</div>
-          </div>
-        </div>
-      </div>
-    </header>
+	<header>
+	      <div class="topbar">
+	        <div class="brand" aria-label="The Granary Luggage Storage">
+	          <div class="mark">G</div>
+	          <div>
+	            <div class="brand-title">THE GRANARY</div>
+	            <div class="brand-subtitle">Luggage Storage</div>
+	          </div>
+	        </div>
+	        <nav class="nav" aria-label="Main navigation">
+	          <a href="#luggage-storage">Luggage Storage</a>
+	          <a href="#packed-lunches">Packed Lunches</a>
+	          <a href="food-menu.html">Food</a>
+	          <a href="menus.html">Drinks</a>
+	          <a href="luggage-storage-portree.html">Portree Bags</a>
+	          <a href="skye-companion.html">Skye Guide</a>
+	          <a href="#find-us">Find Us</a>
+	        </nav>
+	      </div>
+	    </header>
 
     <main>
-      <section id="bookingView" class="view">
-        <div class="booking-layout">
-          <div class="hero-copy">
+	      <section id="bookingView" class="view">
+	        <div class="booking-layout">
+	          <div class="hero-copy" id="luggage-storage">
             <div class="skye-scene" aria-hidden="true">
               <img src="portree-harbour.jpg" alt="">
             </div>
             <div class="eyebrow">The Granary Luggage Storage</div>
-            <h1>Luggage storage in the heart of Portree.</h1>
-            <p class="lead">Store your luggage safely while you explore Portree. Book in under a minute and pay when you arrive.</p>
+	            <h1>Luggage storage in the heart of Portree.</h1>
+	            <p class="lead">Same-day luggage and bag storage in central Portree. Store suitcases, backpacks and cabin bags safely before check-in, after check-out or while exploring the Isle of Skye.</p>
             <div class="service-strip" aria-label="Luggage storage summary">
               <div>
                 <span>Price</span>
@@ -1551,46 +1586,47 @@
                 <strong>⏰ Same-day collection before closing</strong>
               </div>
             </div>
-            <p class="search-copy">Perfect before check-in, after check-out or while exploring the Isle of Skye.</p>
-            <div class="steps" aria-label="Booking steps">
-              <div class="step">Book your luggage storage</div>
-              <div class="step">Pay at drop-off</div>
-            </div>
-            <div class="cafe-prompt" aria-label="Cafe at The Granary">
-              <h2>While you're here</h2>
-              <p>While you're here, why not enjoy coffee, breakfast, lunch or cake at The Granary?</p>
-            </div>
-            <div class="notice">Please let us know if your luggage contains fragile or high-value items.</div>
-            <section class="app-promo" aria-labelledby="skyeCompanionTitle">
-              <div>
-                <div class="app-promo-kicker">Skye Companion</div>
-                <h2 id="skyeCompanionTitle">Your island guide, in your pocket.</h2>
-                <p>Discover useful places and make more of every day on the Isle of Skye.</p>
-              </div>
-              <div class="app-promo-actions">
-                <a class="primary app-store-button" href="https://apps.apple.com/gb/app/skye-companion/id6790186718" target="_blank" rel="noopener"> Download on the App Store</a>
-                <a class="app-support-link" href="skye-guide.html">Explore our Isle of Skye guide</a>
-              </div>
-            </section>
-          </div>
+	            <p class="search-copy">Perfect before check-in, after check-out, between buses, before a boat trip, or while visiting Portree, the Old Man of Storr, the Quiraing and other Skye day trips.</p>
+	            <div class="steps" aria-label="Booking steps">
+	              <div class="step">Book your luggage storage</div>
+	              <div class="step">Pay at drop-off</div>
+	            </div>
+	            <div class="feature-prompts" aria-label="Day out options">
+	              <div class="cafe-prompt" id="packed-lunches" aria-label="Packed lunches at The Granary">
+	                <h2>Packed lunches for your day out on Skye</h2>
+	                <p>Add packed lunches to your luggage booking, or order lunches on their own before heading out from Portree.</p>
+	                <button class="secondary" type="button" id="startLunchOnlyButton">Order packed lunches</button>
+	              </div>
+	              <div class="cafe-prompt guide-prompt" aria-label="Skye guide">
+	                <h2>Planning your day on Skye?</h2>
+	                <p>Use our local Skye guide for routes, quieter ideas, driving tips and places to visit after dropping off your bags.</p>
+	                <a class="secondary" href="skye-companion.html">Open the Skye guide</a>
+	              </div>
+	            </div>
+	            <section class="seo-section" aria-label="Portree luggage storage details">
+	              <h2>Bag storage near Portree town centre</h2>
+	              <p>The Granary is a simple place to leave luggage in Portree for the day. Book online, bring your bags to staff, pay at drop-off, then collect before closing.</p>
+	              <div class="seo-links">
+	                <a class="secondary" href="luggage-storage-portree.html">Luggage storage in Portree</a>
+	                <a class="secondary" href="bag-storage-isle-of-skye.html">Bag storage on Skye</a>
+	                <a class="secondary" href="packed-lunch-portree.html">Packed lunches in Portree</a>
+	              </div>
+	            </section>
+	            <div class="notice">Please let us know if your luggage contains fragile or high-value items.</div>
+	          </div>
 
           <div class="panel booking-panel">
             <form id="bookingForm">
               <h2>Luggage storage</h2>
               <p class="form-note">Drop off from 8:00am and collect by 5:00pm on your booking date.</p>
+              <div class="choice-strip" aria-label="Booking type">
+                <button class="secondary" type="button" id="bookLuggageButton">Book luggage storage</button>
+                <button class="secondary" type="button" id="orderLunchOnlyButton">Order packed lunches only</button>
+              </div>
               <div id="bookingAvailability" class="availability" aria-live="polite"></div>
               <div class="field">
                 <label for="bookingDate">Booking date</label>
                 <input id="bookingDate" name="bookingDate" type="date" required>
-              </div>
-              <div class="field">
-                <label for="dropOffTime">Estimated drop-off time</label>
-                <input id="dropOffTime" name="dropOffTime" type="time" min="08:00" max="16:30" step="900" required>
-              </div>
-              <div class="field">
-                <label for="collectionTime">Estimated collection time</label>
-                <input id="collectionTime" name="collectionTime" type="time" min="08:15" max="17:00" step="900" required>
-                <p class="helper-text">An estimate is fine. All bags must be collected by 5:00pm.</p>
               </div>
               <div id="fridayWarning" class="date-warning" aria-live="polite">
                 Friday bookings must be collected by 5:00pm. The Granary is closed on Saturday, so items cannot be left overnight.
@@ -1624,10 +1660,35 @@
                 <label for="exactItems">Exact number of items</label>
                 <input id="exactItems" type="number" min="5" max="30" value="5">
               </div>
+              <div class="lunch-panel" id="lunchPanel">
+                <div>
+                  <h3>Add a packed lunch for your day out</h3>
+                  <p class="helper-text">Each packed lunch has its own choices, so different people can choose different items.</p>
+                </div>
+                <div class="row">
+                  <div class="field">
+                    <label for="lunchCollectionDate">Collection date</label>
+                    <input id="lunchCollectionDate" name="lunchCollectionDate" type="date">
+                  </div>
+                  <div class="field">
+                    <label for="lunchCollectionTime">Collection time</label>
+                    <select id="lunchCollectionTime" name="lunchCollectionTime"></select>
+                  </div>
+                </div>
+                <div id="lunchAvailability" class="availability" aria-live="polite"></div>
+                <div id="lunchCards" class="review-list"></div>
+                <button class="secondary" type="button" id="addLunchButton">Add another packed lunch</button>
+                <p class="helper-text">Selections are subject to availability. If an item becomes unavailable after ordering, we'll contact you before collection to arrange a suitable alternative.</p>
+              </div>
+              <label class="terms">
+                <input id="addLunchToggle" type="checkbox">
+                <span>Add packed lunches to this booking</span>
+              </label>
               <div class="price-summary">
                 <span id="priceBreakdown">£7 × 1 item</span>
                 <strong id="priceTotal">£7</strong>
               </div>
+              <div class="review-item" id="orderReview" aria-live="polite"></div>
               <div class="field">
                 <label for="notes">Notes <span aria-hidden="true">(optional)</span></label>
                 <textarea id="notes" name="notes" placeholder="Large cases, pushchair, fragile items..."></textarea>
@@ -1666,7 +1727,7 @@
               <h2>Booking received</h2>
               <p>Please show this reference to staff when you arrive.</p>
               <div id="confirmationRef" class="ref"></div>
-              <p id="confirmationSummary"></p>
+              <div id="confirmationSummary"></div>
               <div class="amount-due">
                 <span>Total due at drop-off</span>
                 <strong id="confirmationTotal">£7</strong>
@@ -1680,7 +1741,7 @@
         </div>
 
         <div class="local-info" aria-label="Location and luggage storage questions">
-          <section class="find-us">
+	          <section class="find-us" id="find-us">
             <h2>Find us</h2>
             <p>You'll find The Granary in central Portree on the Isle of Skye.</p>
             <p>Questions? Email <a href="mailto:contact@granaryportree.uk">contact@granaryportree.uk</a>.</p>
@@ -1690,10 +1751,14 @@
           <section class="faq-section">
             <h2>Frequently Asked Questions</h2>
             <div class="faq-grid">
-              <div class="faq-item">
-                <h3>Where can I store my luggage in Portree?</h3>
-                <p>The Granary offers secure same-day luggage storage in the heart of Portree, making it easy to explore the town or the Isle of Skye without carrying your luggage.</p>
-              </div>
+	              <div class="faq-item">
+	                <h3>Where can I store my luggage in Portree?</h3>
+	                <p>The Granary offers secure same-day luggage storage and bag storage in the heart of Portree, making it easy to explore the town or the Isle of Skye without carrying suitcases, backpacks or cabin bags.</p>
+	              </div>
+	              <div class="faq-item">
+	                <h3>Can I leave bags before hotel check-in?</h3>
+	                <p>Yes. Many visitors use The Granary to store bags before accommodation check-in, after check-out, between bus times or before joining tours from Portree.</p>
+	              </div>
               <div class="faq-item">
                 <h3>How much does luggage storage cost?</h3>
                 <p>Luggage storage costs <strong>£7 per item</strong>.</p>
@@ -1756,10 +1821,14 @@
                 <h3>Where is The Granary?</h3>
                 <p>The Granary is located in the centre of Portree on the Isle of Skye, making it an ideal place to leave your luggage while exploring the town, visiting local shops and restaurants, or waiting for accommodation check-in.</p>
               </div>
-              <div class="faq-item">
-                <h3>Can I get coffee or food while I'm here?</h3>
-                <p>Of course. While dropping off or collecting your luggage, you're welcome to enjoy speciality coffee, breakfast, lunch, homemade cakes or a drink at The Granary.</p>
-              </div>
+	              <div class="faq-item">
+	                <h3>Can I get coffee or food while I'm here?</h3>
+	                <p>Of course. While dropping off or collecting your luggage, you're welcome to enjoy speciality coffee, breakfast, lunch, homemade cakes or a drink at The Granary. You can also order packed lunches for a day out on Skye.</p>
+	              </div>
+	              <div class="faq-item">
+	                <h3>Can I order a packed lunch without luggage storage?</h3>
+	                <p>Yes. Packed lunches can be ordered on their own, or added to a luggage storage booking for the same day.</p>
+	              </div>
             </div>
           </section>
         </div>
@@ -1767,11 +1836,18 @@
 
     </main>
     <footer class="site-footer">
-      <strong>The Granary</strong>
-      <p>Portree, Isle of Skye</p>
-      <p>Café • Coffee • Food • Luggage storage</p>
-      <p><a href="https://www.google.com/maps/search/?api=1&query=The%20Granary%20Portree%20Isle%20of%20Skye" target="_blank" rel="noopener">Get directions</a></p>
-    </footer>
+	      <strong>The Granary</strong>
+	      <p>Portree, Isle of Skye</p>
+	      <p>Café • Coffee • Food • Luggage storage</p>
+	      <p>
+	        <a href="luggage-storage-portree.html">Luggage storage Portree</a> •
+	        <a href="bag-storage-isle-of-skye.html">Bag storage Skye</a> •
+	        <a href="packed-lunch-portree.html">Packed lunches</a> •
+	        <a href="food-menu.html">Food menu</a> •
+	        <a href="menus.html">Drinks menu</a>
+	      </p>
+	      <p><a href="https://www.google.com/maps/search/?api=1&query=The%20Granary%20Portree%20Isle%20of%20Skye" target="_blank" rel="noopener">Get directions</a></p>
+	    </footer>
   </div>
 
   <script>
@@ -1786,6 +1862,51 @@ const STORAGE_KEY = "granaryHubBookings";
     const TAG_COUNT = 60;
     const DAILY_ITEM_CAPACITY = TAG_COUNT;
     const STAFF_REFRESH_MS = 30000;
+    /*
+      PACKED LUNCH CONFIGURATION
+      Edit this block to change price, menu options, sold-out status, collection dates,
+      collection windows, cutoff time and daily packed-lunch capacity.
+    */
+    const PACKED_LUNCH_CONFIG = {
+      price: 15,
+      maxPerDay: 30,
+      cutoffTime: "10:00",
+      availableDates: [],
+      timeWindows: [
+        { value: "09:00-09:30", label: "9:00-9:30am" },
+        { value: "09:30-10:00", label: "9:30-10:00am" }
+      ],
+      options: {
+        sandwich: [
+          { label: "Chicken Caesar", available: true },
+          { label: "Ham & Swiss", available: true },
+          { label: "Brie, tomato and pesto", available: true },
+          { label: "Cheddar ploughman's", available: true }
+        ],
+        traybake: [
+          { label: "Brownie", available: true },
+          { label: "Caramel shortcake", available: true },
+          { label: "Flapjack", available: true }
+        ],
+        crisps: [
+          { label: "Ready salted", available: true },
+          { label: "Salt & vinegar", available: true },
+          { label: "Cheese & onion", available: true }
+        ],
+        drink: [
+          { label: "Still water", available: true },
+          { label: "Orange juice", available: true },
+          { label: "Irn-Bru", available: true }
+        ],
+        fruit: [
+          { label: "Apple", available: true },
+          { label: "Banana", available: true },
+          { label: "Orange", available: true }
+        ]
+      }
+    };
+    const LUNCH_NOTE_START = "[[GRANARY_PACKED_LUNCHES_V1]]";
+    const LUNCH_NOTE_END = "[[/GRANARY_PACKED_LUNCHES_V1]]";
     const bookingView = document.getElementById("bookingView");
     const staffView = document.getElementById("staffView");
     const bookingForm = document.getElementById("bookingForm");
@@ -1804,10 +1925,20 @@ const STORAGE_KEY = "granaryHubBookings";
     const itemButtons = document.querySelectorAll("[data-item-count]");
     const exactItemsField = document.getElementById("exactItemsField");
     const exactItemsInput = document.getElementById("exactItems");
-    const dropOffTimeInput = document.getElementById("dropOffTime");
     const collectionTimeInput = document.getElementById("collectionTime");
     const priceBreakdown = document.getElementById("priceBreakdown");
     const priceTotal = document.getElementById("priceTotal");
+    const startLunchOnlyButton = document.getElementById("startLunchOnlyButton");
+    const bookLuggageButton = document.getElementById("bookLuggageButton");
+    const orderLunchOnlyButton = document.getElementById("orderLunchOnlyButton");
+    const addLunchToggle = document.getElementById("addLunchToggle");
+    const lunchPanel = document.getElementById("lunchPanel");
+    const lunchCollectionDate = document.getElementById("lunchCollectionDate");
+    const lunchCollectionTime = document.getElementById("lunchCollectionTime");
+    const lunchAvailability = document.getElementById("lunchAvailability");
+    const lunchCards = document.getElementById("lunchCards");
+    const addLunchButton = document.getElementById("addLunchButton");
+    const orderReview = document.getElementById("orderReview");
     const bookingRows = document.getElementById("bookingRows");
     const emptyState = document.getElementById("emptyState");
     const searchInput = document.getElementById("searchInput");
@@ -1833,6 +1964,8 @@ const STORAGE_KEY = "granaryHubBookings";
     let dataMessage = "";
     let staffRefreshTimer = null;
     let staffRefreshInProgress = false;
+    let bookingMode = "luggage";
+    let lunchSelections = [];
 
     function todayKey() {
       const now = new Date();
@@ -1892,14 +2025,6 @@ const STORAGE_KEY = "granaryHubBookings";
       return text ? JSON.parse(text) : null;
     }
 
-    function dropOffEtaFromNotes(notes) {
-      return String(notes || "").match(/^\[Drop-off ETA: ([0-2]\d:[0-5]\d)\]/)?.[1] || "";
-    }
-
-    function customerNotes(notes) {
-      return String(notes || "").replace(/^\[Drop-off ETA: [0-2]\d:[0-5]\d\]\n?/, "");
-    }
-
     function fromDbBooking(row) {
       return {
         id: row.id,
@@ -1910,11 +2035,10 @@ const STORAGE_KEY = "granaryHubBookings";
         mobile: row.mobile,
         email: row.email || "",
         items: row.items,
-        dropOffTime: dropOffEtaFromNotes(row.notes),
         collectionTime: String(row.collection_time || "").slice(0, 5),
         totalCost: row.total_cost,
         tagNumbers: Array.isArray(row.tag_numbers) ? row.tag_numbers.map(String) : [],
-        notes: customerNotes(row.notes),
+        notes: row.notes || "",
         createdAt: row.created_at,
         arrivedAt: row.arrived_at || "",
         paymentReceivedAt: row.payment_received_at || "",
@@ -1934,9 +2058,7 @@ const STORAGE_KEY = "granaryHubBookings";
         collection_time: booking.collectionTime,
         total_cost: booking.totalCost,
         tag_numbers: booking.tagNumbers,
-        notes: booking.dropOffTime
-          ? `[Drop-off ETA: ${booking.dropOffTime}]${booking.notes ? `\n${booking.notes}` : ""}`
-          : (booking.notes || null)
+        notes: booking.notes || null
       };
     }
 
@@ -2122,9 +2244,9 @@ const STORAGE_KEY = "granaryHubBookings";
       return blocked ? blocked.reason : "";
     }
 
-    function makeReference(bookings) {
-      const refs = bookings
-        .map((booking) => /^G(\d+)$/i.exec(booking.reference || ""))
+    function makeReference(bookings, dateKey) {
+      const refs = bookingsForDate(bookings, dateKey)
+        .map((booking) => /^G(\d{3})$/.exec(booking.reference || ""))
         .filter(Boolean)
         .map((match) => Number(match[1]));
       const nextNumber = (refs.length ? Math.max(...refs) : 0) + 1;
@@ -2156,7 +2278,241 @@ const STORAGE_KEY = "granaryHubBookings";
       return `£${value}`;
     }
 
+    function lunchCategoryLabel(category) {
+      return {
+        sandwich: "Sandwich",
+        traybake: "Traybake",
+        crisps: "Crisps",
+        drink: "Soft drink",
+        fruit: "Fruit"
+      }[category] || category;
+    }
+
+    function availableLunchOptions(category) {
+      return (PACKED_LUNCH_CONFIG.options[category] || []).filter((option) => option.available);
+    }
+
+    function lunchOrderingActive() {
+      return Boolean(addLunchToggle?.checked || bookingMode === "lunch");
+    }
+
+    function parseLunchOrder(notes) {
+      const text = String(notes || "");
+      const start = text.indexOf(LUNCH_NOTE_START);
+      const end = text.indexOf(LUNCH_NOTE_END);
+      if (start === -1 || end === -1 || end <= start) return null;
+      try {
+        return JSON.parse(text.slice(start + LUNCH_NOTE_START.length, end).trim());
+      } catch {
+        return null;
+      }
+    }
+
+    function stripLunchOrder(notes) {
+      const text = String(notes || "").trim();
+      const start = text.indexOf(LUNCH_NOTE_START);
+      const end = text.indexOf(LUNCH_NOTE_END);
+      if (start === -1 || end === -1 || end <= start) return text;
+      return `${text.slice(0, start)}${text.slice(end + LUNCH_NOTE_END.length)}`.trim();
+    }
+
+    function buildLunchNotes(customerNotes, lunchOrder) {
+      const base = stripLunchOrder(customerNotes);
+      if (!lunchOrder || !lunchOrder.lunches.length) return base;
+      const payload = JSON.stringify(lunchOrder);
+      return [base, `${LUNCH_NOTE_START}${payload}${LUNCH_NOTE_END}`].filter(Boolean).join("\n\n");
+    }
+
+    function lunchCountForDate(dateKey, bookings = bookingsCache) {
+      return bookings.reduce((total, booking) => {
+        const order = parseLunchOrder(booking.notes);
+        if (!order || order.collectionDate !== dateKey) return total;
+        return total + (Array.isArray(order.lunches) ? order.lunches.length : 0);
+      }, 0);
+    }
+
+    function lunchDateAvailable(dateKey) {
+      if (!dateKey) return false;
+      return !PACKED_LUNCH_CONFIG.availableDates.length || PACKED_LUNCH_CONFIG.availableDates.includes(dateKey);
+    }
+
+    function lunchCutoffPassed(dateKey) {
+      if (dateKey !== todayKey()) return false;
+      const now = new Date();
+      const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      return currentTime > PACKED_LUNCH_CONFIG.cutoffTime;
+    }
+
+    function selectedLunchOrder() {
+      if (!lunchOrderingActive()) return null;
+      return {
+        collectionDate: lunchCollectionDate.value,
+        collectionTime: lunchCollectionTime.value,
+        status: "to_prepare",
+        luggageAttached: bookingMode !== "lunch" && selectedItemCount() > 0,
+        lunches: lunchSelections.map((lunch) => ({ ...lunch }))
+      };
+    }
+
+    function renderLunchTimeWindows() {
+      if (!lunchCollectionTime) return;
+      lunchCollectionTime.innerHTML = `<option value="">Select a collection time</option>` + PACKED_LUNCH_CONFIG.timeWindows
+        .map((window) => `<option value="${escapeHtml(window.value)}">${escapeHtml(window.label)}</option>`)
+        .join("");
+    }
+
+    function makeBlankLunch() {
+      return { sandwich: "", traybake: "", crisps: "", drink: "", fruit: "" };
+    }
+
+    function ensureLunchSelection() {
+      if (!lunchSelections.length) lunchSelections.push(makeBlankLunch());
+    }
+
+    function renderLunchCards() {
+      if (!lunchCards) return;
+      ensureLunchSelection();
+      lunchCards.innerHTML = lunchSelections.map((lunch, index) => {
+        const fields = ["sandwich", "traybake", "crisps", "drink", "fruit"].map((category) => {
+          const options = availableLunchOptions(category);
+          const optionHtml = [`<option value="">Select ${lunchCategoryLabel(category).toLowerCase()}</option>`]
+            .concat(options.map((option) => `<option value="${escapeHtml(option.label)}" ${lunch[category] === option.label ? "selected" : ""}>${escapeHtml(option.label)}</option>`))
+            .join("");
+          return `
+            <div class="field">
+              <label for="lunch-${index}-${category}">${lunchCategoryLabel(category)}</label>
+              <select id="lunch-${index}-${category}" data-lunch-index="${index}" data-lunch-category="${category}" required>${optionHtml}</select>
+            </div>
+          `;
+        }).join("");
+        return `
+          <div class="lunch-card">
+            <div class="lunch-card-head">
+              <h3>Packed Lunch ${index + 1}</h3>
+              ${lunchSelections.length > 1 ? `<button class="danger" type="button" data-remove-lunch="${index}">Remove</button>` : ""}
+            </div>
+            <div class="lunch-grid">${fields}</div>
+          </div>
+        `;
+      }).join("");
+      lunchCards.querySelectorAll("select[data-lunch-index]").forEach((select) => {
+        select.addEventListener("change", () => {
+          lunchSelections[Number(select.dataset.lunchIndex)][select.dataset.lunchCategory] = select.value;
+          updatePriceTotal();
+          validateBookingForm();
+        });
+      });
+      lunchCards.querySelectorAll("[data-remove-lunch]").forEach((button) => {
+        button.addEventListener("click", () => {
+          lunchSelections.splice(Number(button.dataset.removeLunch), 1);
+          renderLunchCards();
+          updatePriceTotal();
+          validateBookingForm();
+        });
+      });
+    }
+
+    function setLunchPanelActive(active) {
+      if (!lunchPanel || !addLunchToggle) return;
+      addLunchToggle.checked = active;
+      lunchPanel.classList.toggle("active", active);
+      lunchCollectionDate.required = active;
+      lunchCollectionTime.required = active;
+      if (active) {
+        ensureLunchSelection();
+        if (!lunchCollectionDate.value) lunchCollectionDate.value = bookingDateInput.value || todayKey();
+        if (!lunchCollectionTime.value && PACKED_LUNCH_CONFIG.timeWindows[0]) {
+          lunchCollectionTime.value = PACKED_LUNCH_CONFIG.timeWindows[0].value;
+        }
+        renderLunchCards();
+      } else {
+        lunchCards.innerHTML = "";
+      }
+      updatePriceTotal();
+      validateBookingForm();
+    }
+
+    function setBookingMode(mode) {
+      bookingMode = mode;
+      const lunchOnly = mode === "lunch";
+      document.querySelector(".item-options")?.closest(".field")?.classList.toggle("hidden", lunchOnly);
+      exactItemsField.classList.toggle("hidden", true);
+      document.querySelector("details.terms-details")?.classList.toggle("hidden", lunchOnly);
+      if (lunchOnly) {
+        itemsInput.value = "0";
+        setLunchPanelActive(true);
+      } else if (!Number(itemsInput.value)) {
+        setItemCount("1");
+      }
+      updatePriceTotal();
+      validateBookingForm();
+      bookingForm?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function lunchSelectionErrors() {
+      if (!lunchOrderingActive()) return [];
+      const errors = [];
+      const dateKey = lunchCollectionDate.value;
+      if (!dateKey) errors.push("Choose a packed-lunch collection date.");
+      if (!lunchDateAvailable(dateKey)) errors.push("Packed lunches are not available on the selected date.");
+      if (lunchCutoffPassed(dateKey)) errors.push("The packed-lunch collection cutoff time has passed.");
+      if (!lunchCollectionTime.value) errors.push("Choose a packed-lunch collection time.");
+      const requested = lunchSelections.length;
+      const remaining = PACKED_LUNCH_CONFIG.maxPerDay - lunchCountForDate(dateKey);
+      if (requested > remaining) errors.push(`Only ${Math.max(0, remaining)} packed lunch${remaining === 1 ? "" : "es"} remain for that date.`);
+      lunchSelections.forEach((lunch, index) => {
+        ["sandwich", "traybake", "crisps", "drink", "fruit"].forEach((category) => {
+          if (!lunch[category]) errors.push(`Packed Lunch ${index + 1}: choose ${lunchCategoryLabel(category).toLowerCase()}.`);
+          const configured = (PACKED_LUNCH_CONFIG.options[category] || []).find((option) => option.label === lunch[category]);
+          if (lunch[category] && (!configured || !configured.available)) {
+            errors.push(`Packed Lunch ${index + 1}: ${lunch[category]} is sold out.`);
+          }
+        });
+      });
+      return errors;
+    }
+
+    function renderLunchAvailability() {
+      if (!lunchAvailability) return;
+      const errors = lunchSelectionErrors();
+      lunchAvailability.classList.toggle("closed", Boolean(errors.length));
+      lunchAvailability.textContent = errors[0] || "";
+    }
+
+    function renderOrderReview() {
+      if (!orderReview) return;
+      const luggageItems = selectedItemCount();
+      const lunchOrder = selectedLunchOrder();
+      const lunchCount = lunchOrder ? lunchOrder.lunches.length : 0;
+      const parts = [];
+      if (luggageItems > 0) parts.push(`${luggageItems} luggage item${luggageItems === 1 ? "" : "s"}: ${formatMoney(luggageItems * 7)}`);
+      if (lunchCount) {
+        parts.push(`${lunchCount} packed lunch${lunchCount === 1 ? "" : "es"}: ${formatMoney(lunchCount * PACKED_LUNCH_CONFIG.price)}`);
+        parts.push(`Collection: ${formatDate(lunchOrder.collectionDate)}, ${lunchOrder.collectionTime || "time to choose"}`);
+      }
+      orderReview.innerHTML = parts.length ? `<strong>Review order</strong><br>${parts.map(escapeHtml).join("<br>")}` : "Review order before submitting.";
+    }
+
+    function formatLunchOrderHtml(order) {
+      if (!order || !order.lunches?.length) return "";
+      return `
+        <div class="review-list">
+          ${order.lunches.map((lunch, index) => `
+            <div class="review-item">
+              <strong>Packed Lunch ${index + 1}</strong><br>
+              ${escapeHtml(lunch.sandwich)} sandwich<br>
+              ${escapeHtml(lunch.traybake)}<br>
+              ${escapeHtml(lunch.crisps)} crisps<br>
+              ${escapeHtml(lunch.drink)}<br>
+              ${escapeHtml(lunch.fruit)}
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
     function selectedItemCount() {
+      if (bookingMode === "lunch") return 0;
       return Math.max(1, Number(itemsInput.value) || 1);
     }
 
@@ -2179,8 +2535,15 @@ const STORAGE_KEY = "granaryHubBookings";
     function updatePriceTotal() {
       if (!priceBreakdown || !priceTotal) return;
       const items = selectedItemCount();
-      priceBreakdown.textContent = `£7 × ${items} item${items === 1 ? "" : "s"}`;
-      priceTotal.textContent = formatMoney(items * 7);
+      const lunches = lunchOrderingActive() ? lunchSelections.length : 0;
+      const total = (items * 7) + (lunches * PACKED_LUNCH_CONFIG.price);
+      const parts = [];
+      if (items > 0) parts.push(`£7 × ${items} item${items === 1 ? "" : "s"}`);
+      if (lunches > 0) parts.push(`£${PACKED_LUNCH_CONFIG.price} × ${lunches} packed lunch${lunches === 1 ? "" : "es"}`);
+      priceBreakdown.textContent = parts.length ? parts.join(" + ") : "Packed lunch order";
+      priceTotal.textContent = formatMoney(total);
+      renderLunchAvailability();
+      renderOrderReview();
       updateBookingAvailability();
     }
 
@@ -2193,19 +2556,25 @@ const STORAGE_KEY = "granaryHubBookings";
       const isClosed = bookingsClosedForDate(dateKey);
       const isBlocked = isDateBlocked(dateKey);
       const submitButton = bookingForm.querySelector("button[type='submit']");
-      const unavailable = Boolean(dataMessage) || isBlocked || isClosed || remaining <= 0 || requested > remaining;
+      const lunchErrors = lunchSelectionErrors();
+      const luggageRequested = requested > 0;
+      const unavailable = Boolean(dataMessage)
+        || lunchErrors.length > 0
+        || (luggageRequested && (isBlocked || isClosed || remaining <= 0 || requested > remaining));
       bookingAvailability.classList.toggle("closed", unavailable);
       submitButton.disabled = unavailable;
 
       if (dataMessage) {
         bookingAvailability.textContent = dataMessage;
-      } else if (isBlocked) {
+      } else if (lunchErrors.length) {
+        bookingAvailability.textContent = lunchErrors[0];
+      } else if (luggageRequested && isBlocked) {
         bookingAvailability.textContent = `Luggage storage is unavailable on ${formatDate(dateKey)}${blockedReason(dateKey) ? `: ${blockedReason(dateKey)}` : "."}`;
-      } else if (isClosed) {
+      } else if (luggageRequested && isClosed) {
         bookingAvailability.textContent = "Bookings for today are now closed. Items must be collected by 5:00pm.";
-      } else if (remaining <= 0) {
+      } else if (luggageRequested && remaining <= 0) {
         bookingAvailability.textContent = `Storage is currently full for ${formatDate(dateKey)}.`;
-      } else if (requested > remaining) {
+      } else if (luggageRequested && requested > remaining) {
         bookingAvailability.textContent = `Only ${remaining} item space${remaining === 1 ? "" : "s"} left for ${formatDate(dateKey)}. Please reduce the number of items.`;
       } else {
         bookingAvailability.textContent = "";
@@ -2214,16 +2583,17 @@ const STORAGE_KEY = "granaryHubBookings";
 
     function validateBookingForm() {
       const dateKey = selectedBookingDate();
-      dropOffTimeInput?.setCustomValidity("");
       collectionTimeInput?.setCustomValidity("");
       itemsInput.setCustomValidity("");
       bookingDateInput.setCustomValidity("");
+      lunchCollectionDate?.setCustomValidity("");
+      lunchCollectionTime?.setCustomValidity("");
 
-      if (isDateBlocked(dateKey)) {
+      if (selectedItemCount() > 0 && isDateBlocked(dateKey)) {
         bookingDateInput.setCustomValidity("Luggage storage is unavailable on this date.");
       }
 
-      if (bookingsClosedForDate(dateKey)) {
+      if (selectedItemCount() > 0 && bookingsClosedForDate(dateKey)) {
         bookingDateInput.setCustomValidity("Bookings for today are now closed.");
       }
 
@@ -2231,20 +2601,13 @@ const STORAGE_KEY = "granaryHubBookings";
         collectionTimeInput.setCustomValidity("Items must be collected by 5:00pm.");
       }
 
-      if (dropOffTimeInput?.value && dropOffTimeInput.value < "08:00") {
-        dropOffTimeInput.setCustomValidity("Drop-off is available from 8:00am.");
-      }
-
-      if (dropOffTimeInput?.value && dropOffTimeInput.value > "16:30") {
-        dropOffTimeInput.setCustomValidity("Please choose a drop-off time no later than 4:30pm.");
-      }
-
-      if (dropOffTimeInput?.value && collectionTimeInput?.value && collectionTimeInput.value <= dropOffTimeInput.value) {
-        collectionTimeInput.setCustomValidity("Collection time must be after the drop-off time.");
-      }
-
-      if (selectedItemCount() > remainingItemCapacity(dateKey)) {
+      if (selectedItemCount() > 0 && selectedItemCount() > remainingItemCapacity(dateKey)) {
         itemsInput.setCustomValidity("There is not enough luggage storage space remaining for this date.");
+      }
+
+      const lunchError = lunchSelectionErrors()[0];
+      if (lunchError) {
+        (lunchCollectionDate || bookingDateInput).setCustomValidity(lunchError);
       }
     }
 
@@ -2393,6 +2756,11 @@ const STORAGE_KEY = "granaryHubBookings";
       filtered.forEach((booking) => {
         const row = document.createElement("tr");
         const bookingTags = getTagNumbers(booking);
+        const lunchOrder = parseLunchOrder(booking.notes);
+        const cleanNotes = stripLunchOrder(booking.notes);
+        const lunchSummary = lunchOrder
+          ? `<br><span>${lunchOrder.lunches.length} packed lunch${lunchOrder.lunches.length === 1 ? "" : "es"}: ${escapeHtml(lunchOrder.collectionDate || "")} ${escapeHtml(lunchOrder.collectionTime || "")}</span>`
+          : "";
         const flags = [
           booking.arrivedAt && !booking.paymentReceivedAt && !booking.collectedAt ? "Payment not recorded" : "",
           collectionTimePassed(booking) ? "Collection time passed" : ""
@@ -2404,7 +2772,7 @@ const STORAGE_KEY = "granaryHubBookings";
           <td><strong>${bookingTags.length ? bookingTags.map(formatTagNumber).join(", ") : "Unassigned"}</strong></td>
           <td>${formatTime(booking.collectionTime)}</td>
           <td><span class="status ${statusClass(booking)}">${statusFor(booking)}</span>${flags.map((flag) => `<span class="staff-flag">${flag}</span>`).join("")}</td>
-          <td>${booking.notes ? escapeHtml(booking.notes) : "-"}</td>
+          <td>${cleanNotes ? escapeHtml(cleanNotes) : "-"}${lunchSummary}</td>
           <td></td>
         `;
 
@@ -2586,6 +2954,9 @@ const STORAGE_KEY = "granaryHubBookings";
       const submitButton = bookingForm.querySelector("button[type='submit']");
       const bookingDate = form.get("bookingDate");
       const items = Number(form.get("items"));
+      const lunchOrder = selectedLunchOrder();
+      const lunchTotal = lunchOrder ? lunchOrder.lunches.length * PACKED_LUNCH_CONFIG.price : 0;
+      const orderTotal = (items * 7) + lunchTotal;
       submitButton.disabled = true;
       submitButton.textContent = "Submitting...";
 
@@ -2603,18 +2974,17 @@ const STORAGE_KEY = "granaryHubBookings";
           }
           const booking = {
             id: makeId(),
-            reference: makeReference(bookingsCache),
+            reference: makeReference(bookingsCache, bookingDate),
             bookingDate,
             createdDate: bookingDate,
             name: form.get("customerName").trim(),
             mobile: form.get("mobile").trim(),
             email: form.get("email").trim(),
             items,
-            dropOffTime: form.get("dropOffTime"),
-            collectionTime: form.get("collectionTime"),
-            totalCost: items * 7,
+            collectionTime: "17:00",
+            totalCost: orderTotal,
             tagNumbers,
-            notes: form.get("notes").trim(),
+            notes: buildLunchNotes(form.get("notes").trim(), lunchOrder),
             createdAt: new Date().toISOString(),
             arrivedAt: "",
             paymentReceivedAt: "",
@@ -2643,7 +3013,11 @@ const STORAGE_KEY = "granaryHubBookings";
         const fridayCollectionNote = isFriday(savedBooking.bookingDate)
           ? " The Granary is closed on Saturday, so your items must be collected by 5:00pm on Friday."
           : "";
-        confirmationSummary.textContent = `Your booking reference is ${savedBooking.reference}. Staff will attach your luggage tags when you arrive. Number of items: ${savedBooking.items}. Booking date: ${formatDate(savedBooking.bookingDate)}. Estimated drop-off: ${formatTime(savedBooking.dropOffTime)}. Estimated collection: ${formatTime(savedBooking.collectionTime)}. Payment due at drop-off: ${formatMoney(savedBooking.totalCost)}.${fridayCollectionNote}`;
+        const savedLunchOrder = parseLunchOrder(savedBooking.notes) || lunchOrder;
+        const luggageText = savedBooking.items > 0
+          ? `Number of luggage items: ${savedBooking.items}. Booking date: ${formatDate(savedBooking.bookingDate)}.`
+          : "No luggage storage attached.";
+        confirmationSummary.innerHTML = `Your booking reference is ${escapeHtml(savedBooking.reference)}. ${escapeHtml(luggageText)} ${savedLunchOrder ? `Packed lunches: ${savedLunchOrder.lunches.length}. Collection: ${escapeHtml(formatDate(savedLunchOrder.collectionDate))}, ${escapeHtml(savedLunchOrder.collectionTime)}.` : ""} Payment due at drop-off: ${escapeHtml(formatMoney(savedBooking.totalCost))}.${escapeHtml(fridayCollectionNote)}${formatLunchOrderHtml(savedLunchOrder)}`;
         confirmationTotal.textContent = formatMoney(savedBooking.totalCost);
         paymentInstruction.textContent = emailSent
           ? `A confirmation email has been sent to ${savedBooking.email}. Please show it when collecting your items. Payment is due at drop-off.`
@@ -2685,7 +3059,7 @@ const STORAGE_KEY = "granaryHubBookings";
       try {
         const booking = {
           id: makeId(),
-          reference: makeReference(bookingsCache),
+          reference: makeReference(bookingsCache, bookingDate),
           bookingDate,
           createdDate: bookingDate,
           name: form.get("customerName").trim(),
@@ -2728,8 +3102,9 @@ const STORAGE_KEY = "granaryHubBookings";
     function resetBookingForm() {
       bookingForm.reset();
       bookingDateInput.value = todayKey();
-      if (dropOffTimeInput) dropOffTimeInput.value = "09:00";
-      if (collectionTimeInput) collectionTimeInput.value = "17:00";
+      bookingMode = "luggage";
+      lunchSelections = [];
+      setLunchPanelActive(false);
       setItemCount("1");
       updatePriceTotal();
       confirmation.classList.remove("active");
@@ -2742,7 +3117,10 @@ const STORAGE_KEY = "granaryHubBookings";
         bookingDateInput.value = today;
         bookingDateInput.min = today;
       }
-      if (dropOffTimeInput) dropOffTimeInput.value = "09:00";
+      if (lunchCollectionDate) {
+        lunchCollectionDate.value = today;
+        lunchCollectionDate.min = today;
+      }
       if (collectionTimeInput) collectionTimeInput.value = "17:00";
       if (staffDateInput) staffDateInput.value = today;
       if (staffEntryDate) {
@@ -2758,19 +3136,36 @@ const STORAGE_KEY = "granaryHubBookings";
     itemButtons.forEach((button) => {
       button.addEventListener("click", () => setItemCount(button.dataset.itemCount));
     });
+    renderLunchTimeWindows();
     bookingForm?.addEventListener("submit", handleBookingSubmit);
     newBookingButton?.addEventListener("click", resetBookingForm);
+    startLunchOnlyButton?.addEventListener("click", () => setBookingMode("lunch"));
+    orderLunchOnlyButton?.addEventListener("click", () => setBookingMode("lunch"));
+    bookLuggageButton?.addEventListener("click", () => setBookingMode("luggage"));
+    addLunchToggle?.addEventListener("change", () => setLunchPanelActive(addLunchToggle.checked));
+    addLunchButton?.addEventListener("click", () => {
+      lunchSelections.push(makeBlankLunch());
+      renderLunchCards();
+      updatePriceTotal();
+      validateBookingForm();
+    });
+    lunchCollectionDate?.addEventListener("change", () => {
+      if (bookingMode !== "lunch" && lunchCollectionDate.value) bookingDateInput.value = lunchCollectionDate.value;
+      updatePriceTotal();
+      validateBookingForm();
+    });
+    lunchCollectionTime?.addEventListener("change", validateBookingForm);
     exactItemsInput?.addEventListener("input", () => {
       itemsInput.value = Math.max(5, Number(exactItemsInput.value) || 5);
       updatePriceTotal();
       validateBookingForm();
     });
     bookingDateInput?.addEventListener("change", () => {
+      if (lunchOrderingActive()) lunchCollectionDate.value = bookingDateInput.value;
       validateBookingForm();
       updateBookingAvailability();
     });
     collectionTimeInput?.addEventListener("input", validateBookingForm);
-    dropOffTimeInput?.addEventListener("input", validateBookingForm);
 
     staffBookingButton?.addEventListener("click", () => { window.location.href = "index.html"; });
     searchInput?.addEventListener("input", renderRows);
@@ -2815,10 +3210,13 @@ const STORAGE_KEY = "granaryHubBookings";
     async function initialise() {
       setInitialDates();
       await refreshData();
-      if (bookingForm) {
-        updatePriceTotal();
-        setView("booking", false);
-      }
+	      if (bookingForm) {
+	        updatePriceTotal();
+	        setView("booking", false);
+	        if (window.location.hash === "#packed-lunches") {
+	          setBookingMode("lunch");
+	        }
+	      }
       if (staffView) {
         renderBlockedDates();
         setView("staff", false);
