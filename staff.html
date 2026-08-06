@@ -167,6 +167,46 @@
       align-items: center;
     }
 
+    .date-switcher {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: end;
+      margin: 0 0 16px;
+    }
+
+    .date-switcher label {
+      margin: 0 0 6px;
+    }
+
+    .date-switcher input {
+      min-width: 180px;
+    }
+
+    .view-toggle {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .view-toggle button {
+      border-radius: 0;
+      background: #fff;
+      color: var(--green);
+      border-right: 1px solid var(--line);
+    }
+
+    .view-toggle button:last-child {
+      border-right: 0;
+    }
+
+    .view-toggle button.active {
+      background: var(--green);
+      color: #fff;
+    }
+
     .stats {
       display: grid;
       grid-template-columns: repeat(5, minmax(140px, 1fr));
@@ -413,7 +453,7 @@
     <section id="staffDashboard" class="hidden">
       <div class="toolbar">
         <div>
-          <h2 class="section-title">Today's orders</h2>
+          <h2 class="section-title">Staff orders</h2>
           <div id="todayLabel" class="muted"></div>
         </div>
         <div class="toolbar-actions">
@@ -426,38 +466,54 @@
 
       <div id="staffNotice" class="notice hidden"></div>
 
+      <div class="date-switcher no-print">
+        <div>
+          <label for="staffDate">Order date</label>
+          <input id="staffDate" type="date">
+        </div>
+        <div>
+          <label>Show</label>
+          <div class="view-toggle" aria-label="Order type">
+            <button id="showLuggageButton" type="button" class="active">Luggage</button>
+            <button id="showLunchButton" type="button">Packed lunches</button>
+          </div>
+        </div>
+      </div>
+
       <div class="stats">
         <div class="stat"><span>Active bookings</span><strong id="activeBookings">0</strong></div>
         <div class="stat"><span>Items in store</span><strong id="itemsInStore">0</strong></div>
-        <div class="stat"><span>Paid today</span><strong id="paidToday">0</strong></div>
+        <div class="stat"><span>Paid</span><strong id="paidToday">0</strong></div>
         <div class="stat"><span>Available tags</span><strong id="availableTags">0</strong></div>
         <div class="stat"><span>Packed lunches</span><strong id="packedLunchCount">0</strong></div>
       </div>
 
-      <section class="panel lunch-panel">
+      <section id="packedLunchPanel" class="panel lunch-panel hidden">
         <h2 class="section-title">Packed lunches</h2>
-        <p class="muted no-print">Today and upcoming orders are grouped by collection date and ordered by collection time.</p>
+        <p class="muted no-print">Orders for the selected date, with prep totals and customer choices.</p>
         <div id="packedLunches" class="lunch-groups"></div>
       </section>
 
-      <h2 class="section-title">Luggage and customer orders</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Reference</th>
-              <th>Customer</th>
-              <th>Items</th>
-              <th>Tags</th>
-              <th>Collection time</th>
-              <th>Status</th>
-              <th>Staff notes</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="bookingsBody"></tbody>
-        </table>
-      </div>
+      <section id="luggagePanel">
+        <h2 class="section-title">Luggage bookings</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Tags</th>
+                <th>Collection time</th>
+                <th>Status</th>
+                <th>Staff notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bookingsBody"></tbody>
+          </table>
+        </div>
+      </section>
 
       <section class="panel" style="margin-top: 18px;">
         <h2 class="section-title">Manual booking</h2>
@@ -538,12 +594,18 @@
       bookings: [],
       blockedDates: [],
       authed: false,
+      selectedDate: "",
+      viewMode: "luggage",
     };
 
     const $ = (id) => document.getElementById(id);
 
     function todayKey() {
       return new Date().toLocaleDateString("en-CA", { timeZone: "Europe/London" });
+    }
+
+    function selectedStaffDate() {
+      return state.selectedDate || todayKey();
     }
 
     function formatTime(value) {
@@ -786,9 +848,11 @@
 
     function filteredBookings() {
       const q = $("bookingSearch").value.trim().toLowerCase();
-      const todays = state.bookings.filter((booking) => booking.booking_date === todayKey());
-      if (!q) return todays;
-      return todays.filter((booking) => [
+      const dated = state.bookings
+        .filter((booking) => booking.booking_date === selectedStaffDate())
+        .filter((booking) => luggageItemCountForBooking(booking) > 0);
+      if (!q) return dated;
+      return dated.filter((booking) => [
         booking.reference,
         booking.name,
         booking.mobile,
@@ -798,15 +862,16 @@
     }
 
     function renderStats() {
-      const active = state.bookings.filter((booking) => booking.booking_date === todayKey() && !booking.collected_at);
-      const paid = state.bookings.filter((booking) => booking.booking_date === todayKey() && booking.payment_received_at);
+      const dateKey = selectedStaffDate();
+      const active = state.bookings.filter((booking) => booking.booking_date === dateKey && !booking.collected_at && luggageItemCountForBooking(booking) > 0);
+      const paid = state.bookings.filter((booking) => booking.booking_date === dateKey && booking.payment_received_at);
       const activeItems = active.reduce((sum, booking) => sum + luggageItemCountForBooking(booking), 0);
       $("activeBookings").textContent = String(active.length);
       $("itemsInStore").textContent = String(activeItems);
       $("paidToday").textContent = money(paid.reduce((sum, booking) => sum + Number(booking.total_cost || 0), 0));
       $("availableTags").textContent = String(Math.max(0, TOTAL_TAGS - usedTags().size));
       $("packedLunchCount").textContent = String(lunchOrders()
-        .filter(({ order }) => order.collectionDate === todayKey())
+        .filter(({ order }) => order.collectionDate === dateKey)
         .reduce((sum, { order }) => sum + order.lunches.length, 0));
     }
 
@@ -844,30 +909,24 @@
 
     function renderPackedLunches() {
       const container = $("packedLunches");
-      const entries = lunchOrders().sort((a, b) => {
-        return String(a.order.collectionDate).localeCompare(String(b.order.collectionDate))
-          || String(a.order.collectionTime).localeCompare(String(b.order.collectionTime));
-      });
+      const dateKey = selectedStaffDate();
+      const entries = lunchOrders()
+        .filter(({ booking, order }) => (order.collectionDate || booking.booking_date) === dateKey)
+        .sort((a, b) => String(a.order.collectionTime).localeCompare(String(b.order.collectionTime)));
       if (!entries.length) {
-        container.innerHTML = `<div class="muted">No packed-lunch orders found.</div>`;
+        container.innerHTML = `<div class="muted">No packed-lunch orders found for ${escapeHtml(formatDate(dateKey))}.</div>`;
         return;
       }
-      const grouped = entries.reduce((groups, entry) => {
-        const date = entry.order.collectionDate || entry.booking.booking_date;
-        groups[date] = groups[date] || [];
-        groups[date].push(entry);
-        return groups;
-      }, {});
-      container.innerHTML = Object.entries(grouped).map(([date, dateEntries]) => `
+      container.innerHTML = `
         <section class="lunch-order">
-          <h3>${escapeHtml(formatDate(date))}</h3>
+          <h3>${escapeHtml(formatDate(dateKey))}</h3>
           <div class="prep-list">
             <h3>Daily prep totals</h3>
-            ${renderPrepTotals(dateEntries)}
+            ${renderPrepTotals(entries)}
           </div>
           <div class="customer-orders">
             <h3>Customer orders</h3>
-            ${dateEntries.map(({ booking, order }) => `
+            ${entries.map(({ booking, order }) => `
               <div class="lunch-order">
                 <strong>${escapeHtml(order.collectionTime || "Collection time")} - ${escapeHtml(booking.name)}</strong><br>
                 <span class="muted">${escapeHtml(booking.mobile)} ${booking.email ? `- ${escapeHtml(booking.email)}` : ""}</span><br>
@@ -885,14 +944,14 @@
             `).join("")}
           </div>
         </section>
-      `).join("");
+      `;
     }
 
     function renderBookings() {
       const rows = filteredBookings();
       const body = $("bookingsBody");
       if (!rows.length) {
-        body.innerHTML = `<tr><td colspan="8" class="muted">No bookings found.</td></tr>`;
+        body.innerHTML = `<tr><td colspan="8" class="muted">No luggage bookings found for ${escapeHtml(formatDate(selectedStaffDate()))}.</td></tr>`;
         renderStats();
         return;
       }
@@ -939,6 +998,19 @@
       renderStats();
     }
 
+    function renderStaffView() {
+      const dateKey = selectedStaffDate();
+      $("todayLabel").textContent = `Showing: ${formatDate(dateKey)}`;
+      $("staffDate").value = dateKey;
+      $("showLuggageButton").classList.toggle("active", state.viewMode === "luggage");
+      $("showLunchButton").classList.toggle("active", state.viewMode === "lunch");
+      $("luggagePanel").classList.toggle("hidden", state.viewMode !== "luggage");
+      $("packedLunchPanel").classList.toggle("hidden", state.viewMode !== "lunch");
+      renderBookings();
+      renderPackedLunches();
+      renderStats();
+    }
+
     function renderBlockedDates() {
       const list = $("blockedDatesList");
       if (!state.blockedDates.length) {
@@ -958,7 +1030,7 @@
 
     async function loadStaffData() {
       if (!state.authed) return;
-      $("todayLabel").textContent = `Today: ${formatDate(todayKey())}`;
+      if (!state.selectedDate) state.selectedDate = todayKey();
       try {
         const [bookings, blockedDates] = await Promise.all([
           supabaseFetch("bookings?select=*&order=created_at.desc"),
@@ -966,8 +1038,7 @@
         ]);
         state.bookings = bookings || [];
         state.blockedDates = blockedDates || [];
-        renderBookings();
-        renderPackedLunches();
+        renderStaffView();
         renderBlockedDates();
       } catch (error) {
         setNotice("Could not load staff data. Please refresh and try again.", true);
@@ -1112,6 +1183,18 @@
     $("exportCsvButton").addEventListener("click", exportCsv);
     $("printPrepButton").addEventListener("click", () => window.print());
     $("bookingSearch").addEventListener("input", renderBookings);
+    $("staffDate").addEventListener("change", () => {
+      state.selectedDate = $("staffDate").value || todayKey();
+      renderStaffView();
+    });
+    $("showLuggageButton").addEventListener("click", () => {
+      state.viewMode = "luggage";
+      renderStaffView();
+    });
+    $("showLunchButton").addEventListener("click", () => {
+      state.viewMode = "lunch";
+      renderStaffView();
+    });
 
     $("manualBookingForm").addEventListener("submit", async (event) => {
       event.preventDefault();
