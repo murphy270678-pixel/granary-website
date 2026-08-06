@@ -332,14 +332,19 @@
       header,
       .toolbar,
       .stats,
+      .date-switcher,
       .table-wrap,
       .no-print,
+      .admin-panel,
+      #luggagePanel,
+      #staffNotice,
       .actions,
       .login,
       footer { display: none !important; }
 
       body { background: #fff; }
       .panel { box-shadow: none; border: 0; }
+      #packedLunchPanel { display: block !important; }
       .print-only { display: block; }
     }
 
@@ -515,7 +520,7 @@
         </div>
       </section>
 
-      <section class="panel" style="margin-top: 18px;">
+      <section class="panel admin-panel" style="margin-top: 18px;">
         <h2 class="section-title">Manual booking</h2>
         <p class="muted">Use this if someone cannot access the public booking page.</p>
         <form id="manualBookingForm" class="grid-2">
@@ -549,7 +554,7 @@
         </form>
       </section>
 
-      <section class="panel" style="margin-top: 18px;">
+      <section class="panel admin-panel" style="margin-top: 18px;">
         <h2 class="section-title">Blocked dates</h2>
         <p class="muted">Block dates when luggage storage should not be available.</p>
         <form id="blockedDateForm" class="grid-2">
@@ -1181,7 +1186,11 @@
     $("staffLogoutButton").addEventListener("click", closeDashboard);
     $("refreshButton").addEventListener("click", loadStaffData);
     $("exportCsvButton").addEventListener("click", exportCsv);
-    $("printPrepButton").addEventListener("click", () => window.print());
+    $("printPrepButton").addEventListener("click", () => {
+      state.viewMode = "lunch";
+      renderStaffView();
+      setTimeout(() => window.print(), 50);
+    });
     $("bookingSearch").addEventListener("input", renderBookings);
     $("staffDate").addEventListener("change", () => {
       state.selectedDate = $("staffDate").value || todayKey();
