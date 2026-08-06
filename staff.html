@@ -142,10 +142,6 @@
     }
 
     button.secondary:hover { background: #ded4c1; }
-    button.view-button.active {
-      background: var(--green);
-      color: #fff;
-    }
 
     button.danger { background: var(--red); }
     button.blue { background: var(--blue); }
@@ -173,7 +169,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(4, minmax(140px, 1fr));
+      grid-template-columns: repeat(5, minmax(140px, 1fr));
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -254,6 +250,52 @@
     .status.arrived { background: #e7f1ea; color: #1d623f; }
     .status.paid { background: #eef3f6; color: #245b7a; }
     .status.collected { background: #eee; color: #555; }
+    .status.prepared { background: #e7f1ea; color: #1d623f; }
+    .status.to_prepare { background: #fff7db; color: #59400f; }
+
+    .lunch-groups,
+    .prep-list,
+    .customer-orders {
+      display: grid;
+      gap: 12px;
+    }
+
+    .lunch-order,
+    .prep-category {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .lunch-order h3,
+    .prep-category h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      color: var(--green);
+    }
+
+    .lunch-lines {
+      margin: 8px 0 0;
+      padding-left: 18px;
+    }
+
+    .print-only { display: none; }
+
+    @media print {
+      header,
+      .toolbar,
+      .stats,
+      .table-wrap,
+      .no-print,
+      .actions,
+      .login,
+      footer { display: none !important; }
+
+      body { background: #fff; }
+      .panel { box-shadow: none; border: 0; }
+      .print-only { display: block; }
+    }
 
     .actions {
       display: flex;
@@ -365,16 +407,14 @@
     <section id="staffDashboard" class="hidden">
       <div class="toolbar">
         <div>
-          <h2 id="bookingsTitle" class="section-title">Today's bookings</h2>
-          <div id="selectedDateLabel" class="muted"></div>
+          <h2 class="section-title">Today's bookings</h2>
+          <div id="todayLabel" class="muted"></div>
         </div>
         <div class="toolbar-actions">
-          <button id="pastButton" type="button" class="secondary view-button" aria-pressed="false">Past bookings</button>
-          <button id="currentButton" type="button" class="secondary view-button active" aria-pressed="true">Current</button>
-          <button id="futureButton" type="button" class="secondary view-button" aria-pressed="false">Future</button>
           <input id="bookingSearch" type="search" placeholder="Search name, reference, mobile">
           <button id="refreshButton" type="button" class="secondary">Refresh</button>
           <button id="exportCsvButton" type="button">Export CSV</button>
+          <button id="printPrepButton" type="button" class="secondary">Print prep list</button>
         </div>
       </div>
 
@@ -383,8 +423,9 @@
       <div class="stats">
         <div class="stat"><span>Active bookings</span><strong id="activeBookings">0</strong></div>
         <div class="stat"><span>Items in store</span><strong id="itemsInStore">0</strong></div>
-        <div class="stat"><span id="paidLabel">Paid today</span><strong id="paidToday">0</strong></div>
+        <div class="stat"><span>Paid today</span><strong id="paidToday">0</strong></div>
         <div class="stat"><span>Available tags</span><strong id="availableTags">0</strong></div>
+        <div class="stat"><span>Packed lunches</span><strong id="packedLunchCount">0</strong></div>
       </div>
 
       <div class="table-wrap">
@@ -395,7 +436,7 @@
               <th>Customer</th>
               <th>Items</th>
               <th>Tags</th>
-              <th>Estimated times</th>
+              <th>Collection time</th>
               <th>Status</th>
               <th>Staff notes</th>
               <th>Actions</th>
@@ -404,6 +445,12 @@
           <tbody id="bookingsBody"></tbody>
         </table>
       </div>
+
+      <section class="panel" style="margin-top: 18px;">
+        <h2 class="section-title">Packed Lunches</h2>
+        <p class="muted no-print">Orders are grouped by collection date and ordered by collection time.</p>
+        <div id="packedLunches" class="lunch-groups"></div>
+      </section>
 
       <section class="panel" style="margin-top: 18px;">
         <h2 class="section-title">Manual booking</h2>
@@ -426,29 +473,8 @@
             <input id="manualItems" type="number" min="1" value="1" required>
           </div>
           <div>
-            <label for="manualStartDate">Drop-off date</label>
-            <input id="manualStartDate" type="date" required>
-          </div>
-          <div>
-            <label for="manualDropOffTime">Estimated drop-off time</label>
-            <input id="manualDropOffTime" type="time" min="08:00" max="16:30" step="900" value="09:00" required>
-          </div>
-          <div>
-            <label for="manualEndDate">Collection date</label>
-            <input id="manualEndDate" type="date" required>
-          </div>
-          <div>
-            <label for="manualCollectionTime">Estimated collection time</label>
-            <input id="manualCollectionTime" type="time" min="08:15" max="17:00" step="900" value="17:00" required>
-          </div>
-          <div>
             <label for="manualTags">Tag numbers</label>
             <input id="manualTags" placeholder="001, 002" required>
-          </div>
-          <div>
-            <label for="manualTotal">Total charge (£)</label>
-            <input id="manualTotal" type="number" min="0" step="1" value="7" required>
-            <div id="manualPriceHelp" class="muted">£7 × 1 item × 1 day</div>
           </div>
           <div style="grid-column: 1 / -1;">
             <label for="manualNotes">Notes</label>
@@ -496,6 +522,8 @@
     const WHATSAPP_BUSINESS_NUMBER = "";
     const TOTAL_TAGS = 80;
     const PRICE_PER_ITEM = 7;
+    const LUNCH_NOTE_START = "[[GRANARY_PACKED_LUNCHES_V1]]";
+    const LUNCH_NOTE_END = "[[/GRANARY_PACKED_LUNCHES_V1]]";
 
     const state = {
       bookings: [],
@@ -511,32 +539,6 @@
 
     function formatTime(value) {
       return String(value || "").slice(0, 5) || "17:00";
-    }
-
-    function dropOffEtaFromNotes(notes) {
-      return String(notes || "").match(/\[Drop-off ETA: ([0-2]\d:[0-5]\d)\]/)?.[1] || "";
-    }
-
-    function collectionDateFromNotes(notes) {
-      return String(notes || "").match(/\[Collection date: (\d{4}-\d{2}-\d{2})\]/)?.[1] || "";
-    }
-
-    function bookingEndDate(booking) {
-      return collectionDateFromNotes(booking.notes) || booking.booking_date;
-    }
-
-    function customerNotes(notes) {
-      return String(notes || "")
-        .replace(/\[Drop-off ETA: [0-2]\d:[0-5]\d\]\n?/g, "")
-        .replace(/\[Collection date: \d{4}-\d{2}-\d{2}\]\n?/g, "")
-        .trim();
-    }
-
-    function storageDays(startDate, endDate) {
-      const start = new Date(`${startDate}T00:00:00Z`);
-      const end = new Date(`${endDate}T00:00:00Z`);
-      if (!startDate || !endDate || Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end < start) return 0;
-      return Math.floor((end - start) / 86400000) + 1;
     }
 
     function formatDate(value) {
@@ -560,6 +562,50 @@
         '"': "&quot;",
         "'": "&#039;",
       }[char]));
+    }
+
+    function parseLunchOrder(notes) {
+      const text = String(notes || "");
+      const start = text.indexOf(LUNCH_NOTE_START);
+      const end = text.indexOf(LUNCH_NOTE_END);
+      if (start === -1 || end === -1 || end <= start) return null;
+      try {
+        return JSON.parse(text.slice(start + LUNCH_NOTE_START.length, end).trim());
+      } catch {
+        return null;
+      }
+    }
+
+    function stripLunchOrder(notes) {
+      const text = String(notes || "").trim();
+      const start = text.indexOf(LUNCH_NOTE_START);
+      const end = text.indexOf(LUNCH_NOTE_END);
+      if (start === -1 || end === -1 || end <= start) return text;
+      return `${text.slice(0, start)}${text.slice(end + LUNCH_NOTE_END.length)}`.trim();
+    }
+
+    function buildLunchNotes(customerNotes, lunchOrder) {
+      const base = stripLunchOrder(customerNotes);
+      if (!lunchOrder) return base || null;
+      return [base, `${LUNCH_NOTE_START}${JSON.stringify(lunchOrder)}${LUNCH_NOTE_END}`].filter(Boolean).join("\n\n");
+    }
+
+    function lunchOrders() {
+      return state.bookings
+        .map((booking) => ({ booking, order: parseLunchOrder(booking.notes) }))
+        .filter((entry) => entry.order && Array.isArray(entry.order.lunches) && entry.order.lunches.length);
+    }
+
+    function lunchStatusLabel(status) {
+      return {
+        to_prepare: "To prepare",
+        prepared: "Prepared",
+        collected: "Collected"
+      }[status || "to_prepare"] || "To prepare";
+    }
+
+    function lunchLine(lunch, index) {
+      return `Packed Lunch ${index + 1}: ${lunch.sandwich} sandwich, ${lunch.traybake}, ${lunch.crisps} crisps, ${lunch.drink}, ${lunch.fruit}`;
     }
 
     function supabaseHeaders(extra = {}) {
@@ -689,55 +735,20 @@
     }
 
     function getNextReference() {
+      const today = todayKey();
       const numbers = state.bookings
+        .filter((booking) => booking.booking_date === today)
         .map((booking) => Number(String(booking.reference || "").replace(/^G/i, "")))
         .filter(Number.isFinite);
       const next = numbers.length ? Math.max(...numbers) + 1 : 1;
       return `G${String(next).padStart(3, "0")}`;
     }
 
-    let bookingsView = "current";
-
-    function updateSelectedDateLabels() {
-      const labels = {
-        past: ["Past bookings", "Previous dates, nearest to today first", "Paid (past)"],
-        current: ["Current bookings", `Today: ${formatDate(todayKey())}`, "Paid today"],
-        future: ["Future bookings", "Upcoming arrivals and collections, nearest first", "Paid (future)"],
-      };
-      const [title, subtitle, paidLabel] = labels[bookingsView];
-      $("bookingsTitle").textContent = title;
-      $("selectedDateLabel").textContent = subtitle;
-      $("paidLabel").textContent = paidLabel;
-      ["past", "current", "future"].forEach((view) => {
-        const button = $(`${view}Button`);
-        const isActive = view === bookingsView;
-        button.classList.toggle("active", isActive);
-        button.setAttribute("aria-pressed", String(isActive));
-      });
-    }
-
-    function bookingsInView() {
-      const today = todayKey();
-      return state.bookings
-        .filter((booking) => {
-          const startDate = booking.booking_date;
-          const endDate = bookingEndDate(booking);
-          if (bookingsView === "past") return endDate < today;
-          if (bookingsView === "future") return !booking.collected_at && endDate > today;
-          return startDate <= today && endDate >= today;
-        })
-        .sort((a, b) => {
-          const dateOrder = String(a.booking_date).localeCompare(String(b.booking_date));
-          if (dateOrder !== 0) return bookingsView === "past" ? -dateOrder : dateOrder;
-          return String(a.collection_time || "").localeCompare(String(b.collection_time || ""));
-        });
-    }
-
     function filteredBookings() {
       const q = $("bookingSearch").value.trim().toLowerCase();
-      const selected = bookingsInView();
-      if (!q) return selected;
-      return selected.filter((booking) => [
+      const todays = state.bookings.filter((booking) => booking.booking_date === todayKey());
+      if (!q) return todays;
+      return todays.filter((booking) => [
         booking.reference,
         booking.name,
         booking.mobile,
@@ -747,18 +758,97 @@
     }
 
     function renderStats() {
-      const visible = bookingsInView();
-      const active = visible.filter((booking) => !booking.collected_at);
-      const paid = visible.filter((booking) => booking.payment_received_at);
+      const active = state.bookings.filter((booking) => booking.booking_date === todayKey() && !booking.collected_at);
+      const paid = state.bookings.filter((booking) => booking.booking_date === todayKey() && booking.payment_received_at);
       const activeItems = active.reduce((sum, booking) => sum + Number(booking.items || 0), 0);
       $("activeBookings").textContent = String(active.length);
       $("itemsInStore").textContent = String(activeItems);
       $("paidToday").textContent = money(paid.reduce((sum, booking) => sum + Number(booking.total_cost || 0), 0));
       $("availableTags").textContent = String(Math.max(0, TOTAL_TAGS - usedTags().size));
+      $("packedLunchCount").textContent = String(lunchOrders()
+        .filter(({ order }) => order.collectionDate === todayKey())
+        .reduce((sum, { order }) => sum + order.lunches.length, 0));
+    }
+
+    function addPrepCount(totals, category, value) {
+      if (!value) return;
+      totals[category][value] = (totals[category][value] || 0) + 1;
+    }
+
+    function renderPrepTotals(entries) {
+      const totals = {
+        Sandwiches: {},
+        Traybakes: {},
+        Crisps: {},
+        "Soft drinks": {},
+        Fruit: {},
+      };
+      entries.forEach(({ order }) => {
+        order.lunches.forEach((lunch) => {
+          addPrepCount(totals, "Sandwiches", lunch.sandwich);
+          addPrepCount(totals, "Traybakes", lunch.traybake);
+          addPrepCount(totals, "Crisps", lunch.crisps);
+          addPrepCount(totals, "Soft drinks", lunch.drink);
+          addPrepCount(totals, "Fruit", lunch.fruit);
+        });
+      });
+      return Object.entries(totals).map(([category, counts]) => `
+        <div class="prep-category">
+          <h3>${escapeHtml(category)}</h3>
+          ${Object.keys(counts).length
+            ? Object.entries(counts).map(([item, count]) => `<div>${escapeHtml(item)}: <strong>${count}</strong></div>`).join("")
+            : `<div class="muted">None</div>`}
+        </div>
+      `).join("");
+    }
+
+    function renderPackedLunches() {
+      const container = $("packedLunches");
+      const entries = lunchOrders().sort((a, b) => {
+        return String(a.order.collectionDate).localeCompare(String(b.order.collectionDate))
+          || String(a.order.collectionTime).localeCompare(String(b.order.collectionTime));
+      });
+      if (!entries.length) {
+        container.innerHTML = `<div class="muted">No packed-lunch orders found.</div>`;
+        return;
+      }
+      const grouped = entries.reduce((groups, entry) => {
+        const date = entry.order.collectionDate || entry.booking.booking_date;
+        groups[date] = groups[date] || [];
+        groups[date].push(entry);
+        return groups;
+      }, {});
+      container.innerHTML = Object.entries(grouped).map(([date, dateEntries]) => `
+        <section class="lunch-order">
+          <h3>${escapeHtml(formatDate(date))}</h3>
+          <div class="prep-list">
+            <h3>Daily prep totals</h3>
+            ${renderPrepTotals(dateEntries)}
+          </div>
+          <div class="customer-orders">
+            <h3>Customer orders</h3>
+            ${dateEntries.map(({ booking, order }) => `
+              <div class="lunch-order">
+                <strong>${escapeHtml(order.collectionTime || "Collection time")} - ${escapeHtml(booking.name)}</strong><br>
+                <span class="muted">${escapeHtml(booking.mobile)} ${booking.email ? `- ${escapeHtml(booking.email)}` : ""}</span><br>
+                <span>${order.lunches.length} packed lunch${order.lunches.length === 1 ? "" : "es"} - ${order.luggageAttached ? "Luggage attached" : "Lunch only"} - ${booking.payment_received_at ? "Paid" : "Payment due"}</span><br>
+                <span class="status ${escapeHtml(order.status || "to_prepare")}">${escapeHtml(lunchStatusLabel(order.status))}</span>
+                <ol class="lunch-lines">
+                  ${order.lunches.map((lunch, index) => `<li>${escapeHtml(lunchLine(lunch, index))}</li>`).join("")}
+                </ol>
+                <div class="actions no-print" style="margin-top: 10px;">
+                  <button type="button" class="amber" onclick="markLunchStatus('${booking.id}', 'to_prepare')">To prepare</button>
+                  <button type="button" class="blue" onclick="markLunchStatus('${booking.id}', 'prepared')">Prepared</button>
+                  <button type="button" onclick="markLunchStatus('${booking.id}', 'collected')">Collected</button>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </section>
+      `).join("");
     }
 
     function renderBookings() {
-      updateSelectedDateLabels();
       const rows = filteredBookings();
       const body = $("bookingsBody");
       if (!rows.length) {
@@ -772,9 +862,14 @@
         const tags = (booking.tag_numbers || []).map((tag) => String(tag).padStart(3, "0")).join(", ") || "Unassigned";
         const whatsappNumber = normalisePhoneForWhatsApp(booking.mobile);
         const whatsappLive = WHATSAPP_ENABLED && whatsappNumber;
+        const lunchOrder = parseLunchOrder(booking.notes);
+        const cleanNotes = stripLunchOrder(booking.notes);
+        const lunchSummary = lunchOrder
+          ? `<br><span class="muted">${lunchOrder.lunches.length} packed lunch${lunchOrder.lunches.length === 1 ? "" : "es"}: ${escapeHtml(lunchOrder.collectionDate || "")} ${escapeHtml(lunchOrder.collectionTime || "")}</span>`
+          : "";
         return `
           <tr>
-            <td><div class="ref">${escapeHtml(booking.reference)}</div><div class="muted">${escapeHtml(formatDate(booking.booking_date))}${bookingEndDate(booking) !== booking.booking_date ? ` → ${escapeHtml(formatDate(bookingEndDate(booking)))}` : ""}</div></td>
+            <td><div class="ref">${escapeHtml(booking.reference)}</div><div class="muted">${escapeHtml(formatDate(booking.booking_date))}</div></td>
             <td>
               <strong>${escapeHtml(booking.name)}</strong><br>
               <span class="muted">${escapeHtml(booking.mobile)}</span><br>
@@ -782,18 +877,14 @@
             </td>
             <td><strong>${Number(booking.items || 0)}</strong><br><span class="muted">${money(booking.total_cost || Number(booking.items || 0) * PRICE_PER_ITEM)}</span></td>
             <td>${escapeHtml(tags)}</td>
-            <td>
-              <strong>Drop-off:</strong> ${escapeHtml(dropOffEtaFromNotes(booking.notes) ? formatTime(dropOffEtaFromNotes(booking.notes)) : "Not given")}<br>
-              <strong>Collect:</strong> ${escapeHtml(formatDate(bookingEndDate(booking)))} at ${escapeHtml(formatTime(booking.collection_time))}
-            </td>
+            <td>${escapeHtml(formatTime(booking.collection_time))}</td>
             <td><span class="status ${statusClass}">${statusLabel}</span></td>
-            <td>${escapeHtml(customerNotes(booking.notes))}</td>
+            <td>${cleanNotes ? escapeHtml(cleanNotes) : "-"}${lunchSummary}</td>
             <td>
               <div class="actions">
                 <button type="button" class="blue" onclick="markBooking('${booking.id}', 'arrived_at')" ${booking.arrived_at ? "disabled" : ""}>Arrived</button>
                 <button type="button" class="amber" onclick="markBooking('${booking.id}', 'payment_received_at')" ${booking.payment_received_at ? "disabled" : ""}>Paid</button>
                 <button type="button" onclick="markBooking('${booking.id}', 'collected_at')" ${booking.collected_at ? "disabled" : ""}>Collected</button>
-                <button type="button" class="secondary" onclick="editStay('${booking.id}')" ${booking.collected_at ? "disabled" : ""}>Edit stay</button>
                 <button type="button" class="secondary" onclick="editTags('${booking.id}')">Edit tags</button>
                 <button type="button" class="secondary" onclick="openWhatsAppForBookingById('${booking.id}')" ${whatsappLive ? "" : "disabled"} title="${whatsappLive ? "Open WhatsApp" : "WhatsApp contact not live yet"}">WhatsApp</button>
                 <button type="button" class="danger" onclick="removeBooking('${booking.id}')">Remove</button>
@@ -824,6 +915,7 @@
 
     async function loadStaffData() {
       if (!state.authed) return;
+      $("todayLabel").textContent = `Today: ${formatDate(todayKey())}`;
       try {
         const [bookings, blockedDates] = await Promise.all([
           supabaseFetch("bookings?select=*&order=created_at.desc"),
@@ -832,6 +924,7 @@
         state.bookings = bookings || [];
         state.blockedDates = blockedDates || [];
         renderBookings();
+        renderPackedLunches();
         renderBlockedDates();
       } catch (error) {
         setNotice("Could not load staff data. Please refresh and try again.", true);
@@ -852,6 +945,19 @@
         await patchBooking(id, { [field]: new Date().toISOString() });
       } catch {
         setNotice("Could not update booking.", true);
+      }
+    };
+
+    window.markLunchStatus = async function markLunchStatus(id, status) {
+      const booking = state.bookings.find((item) => item.id === id);
+      if (!booking) return;
+      const order = parseLunchOrder(booking.notes);
+      if (!order) return;
+      order.status = status;
+      try {
+        await patchBooking(id, { notes: buildLunchNotes(booking.notes, order) });
+      } catch {
+        setNotice("Could not update packed-lunch status.", true);
       }
     };
 
@@ -879,47 +985,6 @@
       }
     };
 
-    window.editStay = async function editStay(id) {
-      const booking = state.bookings.find((item) => item.id === id);
-      if (!booking) return;
-      const endDate = prompt("Collection date (YYYY-MM-DD)", bookingEndDate(booking));
-      if (endDate === null) return;
-      const days = storageDays(booking.booking_date, endDate.trim());
-      if (!days) {
-        setNotice("Collection date must be the same as or after the drop-off date.", true);
-        return;
-      }
-      const collectionTime = prompt("Collection time (24-hour HH:MM)", formatTime(booking.collection_time));
-      if (collectionTime === null) return;
-      if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(collectionTime.trim()) || collectionTime.trim() > "17:00") {
-        setNotice("Enter a valid collection time no later than 17:00.", true);
-        return;
-      }
-      const suggestedTotal = Number(booking.items || 0) * days * PRICE_PER_ITEM;
-      const total = prompt("Total charge (£)", String(suggestedTotal));
-      if (total === null) return;
-      const totalNumber = Number(total);
-      if (!Number.isFinite(totalNumber) || totalNumber < 0) {
-        setNotice("Enter a valid total charge.", true);
-        return;
-      }
-      const notes = [
-        dropOffEtaFromNotes(booking.notes) ? `[Drop-off ETA: ${dropOffEtaFromNotes(booking.notes)}]` : "",
-        `[Collection date: ${endDate.trim()}]`,
-        customerNotes(booking.notes),
-      ].filter(Boolean).join("\n");
-      try {
-        await patchBooking(id, {
-          collection_time: collectionTime.trim(),
-          total_cost: totalNumber,
-          notes,
-        });
-        setNotice(`${booking.reference} updated to collect ${formatDate(endDate.trim())}.`);
-      } catch {
-        setNotice("Could not update the booking dates.", true);
-      }
-    };
-
     window.openWhatsAppForBookingById = function openWhatsAppForBookingById(id) {
       const booking = state.bookings.find((item) => item.id === id);
       if (booking) openWhatsAppForBooking(booking);
@@ -936,22 +1001,20 @@
 
     function exportCsv() {
       const rows = filteredBookings();
-      const headers = ["Reference", "Drop-off date", "Collection date", "Customer", "Mobile", "Email", "Items", "Tags", "Drop-off ETA", "Collection ETA", "Status", "Notes", "Total"];
+      const headers = ["Reference", "Date", "Customer", "Mobile", "Email", "Items", "Tags", "Collection time", "Status", "Notes", "Total"];
       const csvRows = [headers, ...rows.map((booking) => {
         const [status] = bookingStatus(booking);
         return [
           booking.reference,
           booking.booking_date,
-          bookingEndDate(booking),
           booking.name,
           booking.mobile,
           booking.email || "",
           booking.items,
           (booking.tag_numbers || []).join(", "),
-          dropOffEtaFromNotes(booking.notes),
           formatTime(booking.collection_time),
           status,
-          customerNotes(booking.notes),
+          booking.notes || "",
           booking.total_cost || Number(booking.items || 0) * PRICE_PER_ITEM,
         ];
       })].map((row) => row.map((cell) => `"${String(cell ?? "").replace(/"/g, '""')}"`).join(","));
@@ -959,7 +1022,7 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `granary-bookings-${bookingsView}.csv`;
+      link.download = `granary-bookings-${todayKey()}.csv`;
       link.click();
       URL.revokeObjectURL(url);
     }
@@ -1000,22 +1063,12 @@
     $("staffLogoutButton").addEventListener("click", closeDashboard);
     $("refreshButton").addEventListener("click", loadStaffData);
     $("exportCsvButton").addEventListener("click", exportCsv);
+    $("printPrepButton").addEventListener("click", () => window.print());
     $("bookingSearch").addEventListener("input", renderBookings);
-    $("pastButton").addEventListener("click", () => { bookingsView = "past"; renderBookings(); });
-    $("currentButton").addEventListener("click", () => { bookingsView = "current"; renderBookings(); });
-    $("futureButton").addEventListener("click", () => { bookingsView = "future"; renderBookings(); });
 
     $("manualBookingForm").addEventListener("submit", async (event) => {
       event.preventDefault();
       const items = Math.max(1, Number($("manualItems").value || 1));
-      const startDate = $("manualStartDate").value;
-      const endDate = $("manualEndDate").value;
-      const days = storageDays(startDate, endDate);
-      if (!days) {
-        setNotice("Collection date must be the same as or after the drop-off date.", true);
-        $("manualEndDate").focus();
-        return;
-      }
       const tags = $("manualTags").value
         .split(",")
         .map((tag) => tag.trim().replace(/^0*(\d+)$/, (_, n) => String(n).padStart(3, "0")))
@@ -1043,19 +1096,15 @@
       }
       const booking = {
         reference: getNextReference(),
-        booking_date: startDate,
+        booking_date: todayKey(),
         name: $("manualName").value.trim(),
         mobile: $("manualMobile").value.trim(),
         email: $("manualEmail").value.trim(),
         items,
-        collection_time: $("manualCollectionTime").value,
-        total_cost: Number($("manualTotal").value || 0),
+        collection_time: "17:00",
+        total_cost: items * PRICE_PER_ITEM,
         tag_numbers: tags,
-        notes: [
-          `[Drop-off ETA: ${$("manualDropOffTime").value}]`,
-          `[Collection date: ${endDate}]`,
-          $("manualNotes").value.trim(),
-        ].filter(Boolean).join("\n"),
+        notes: $("manualNotes").value.trim() || null,
       };
       try {
         const created = await supabaseFetch("bookings", {
@@ -1065,7 +1114,6 @@
         });
         $("manualBookingForm").reset();
         $("manualItems").value = "1";
-        setManualBookingDefaults();
         setNotice(`Manual booking ${booking.reference} created.`);
         if (created && created[0]) sendConfirmationEmail(created[0].id);
         await loadStaffData();
@@ -1073,36 +1121,6 @@
         setNotice("Could not create manual booking.", true);
       }
     });
-
-    function updateManualPrice() {
-      const items = Math.max(1, Number($("manualItems").value || 1));
-      const days = storageDays($("manualStartDate").value, $("manualEndDate").value) || 1;
-      const total = items * days * PRICE_PER_ITEM;
-      $("manualTotal").value = String(total);
-      $("manualPriceHelp").textContent = `£${PRICE_PER_ITEM} × ${items} item${items === 1 ? "" : "s"} × ${days} day${days === 1 ? "" : "s"}`;
-    }
-
-    function setManualBookingDefaults() {
-      const today = todayKey();
-      $("manualStartDate").value = today;
-      $("manualStartDate").min = today;
-      $("manualEndDate").value = today;
-      $("manualEndDate").min = today;
-      $("manualDropOffTime").value = "09:00";
-      $("manualCollectionTime").value = "17:00";
-      updateManualPrice();
-    }
-
-    ["manualItems", "manualStartDate", "manualEndDate"].forEach((id) => {
-      $(id).addEventListener("change", () => {
-        if (id === "manualStartDate" && $("manualEndDate").value < $("manualStartDate").value) {
-          $("manualEndDate").value = $("manualStartDate").value;
-        }
-        $("manualEndDate").min = $("manualStartDate").value;
-        updateManualPrice();
-      });
-    });
-    setManualBookingDefaults();
 
     $("blockedDateForm").addEventListener("submit", async (event) => {
       event.preventDefault();
