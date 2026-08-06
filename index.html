@@ -1533,6 +1533,175 @@
         margin-bottom: 18px;
       }
     }
+
+    /* Customer-facing glow-up layer */
+    :root {
+      --paper: #f5efe3;
+      --panel: #fffdf7;
+      --line: #d8cdbb;
+      --brand: #256653;
+      --brand-dark: #173d34;
+      --accent: #c9793e;
+      --accent-soft: #f5ddc8;
+      --heather: #6f607d;
+      --sea: #d6e8e3;
+      --shadow: 0 22px 54px rgba(27, 42, 36, .14);
+      --shadow-soft: 0 12px 26px rgba(27, 42, 36, .09);
+    }
+
+    body {
+      background:
+        linear-gradient(180deg, rgba(255, 253, 247, .72), rgba(245, 239, 227, .36) 42%, rgba(220, 232, 225, .42)),
+        linear-gradient(135deg, rgba(37, 102, 83, .15), transparent 36%),
+        linear-gradient(45deg, transparent 56%, rgba(201, 121, 62, .13)),
+        var(--paper);
+    }
+
+    body::before {
+      opacity: .34;
+      background-size: 34px 34px;
+    }
+
+    header {
+      border-bottom-color: rgba(216, 205, 187, .82);
+      background: rgba(255, 252, 245, .88);
+      box-shadow: 0 8px 28px rgba(27, 42, 36, .06);
+    }
+
+    .topbar {
+      padding-block: 12px;
+    }
+
+    .mark {
+      background:
+        linear-gradient(140deg, rgba(255,255,255,.22), transparent 48%),
+        linear-gradient(180deg, var(--brand), var(--brand-dark));
+      box-shadow: 0 12px 26px rgba(37, 102, 83, .25);
+    }
+
+    .nav {
+      background: rgba(255, 253, 247, .74);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+    }
+
+    .booking-layout {
+      gap: 42px;
+    }
+
+    .hero-copy {
+      padding-top: 8px;
+    }
+
+    .skye-scene {
+      height: clamp(220px, 30vw, 360px);
+      max-width: 790px;
+      border-color: rgba(255, 253, 247, .72);
+      box-shadow: 0 26px 72px rgba(27, 42, 36, .2);
+    }
+
+    .skye-scene::before {
+      background:
+        linear-gradient(90deg, rgba(23, 32, 27, .56), rgba(23, 32, 27, .08) 68%),
+        linear-gradient(0deg, rgba(23, 32, 27, .18), transparent 44%);
+    }
+
+    .eyebrow {
+      border-color: rgba(201, 121, 62, .34);
+      background: rgba(255, 252, 245, .88);
+      color: #784b2a;
+    }
+
+    h1 {
+      color: #14261f;
+      text-wrap: balance;
+    }
+
+    .lead {
+      color: #334940;
+      font-size: clamp(17px, 2vw, 21px);
+    }
+
+    .service-strip,
+    .steps,
+    .info-grid,
+    .feature-prompts {
+      max-width: 790px;
+    }
+
+    .service-strip,
+    .step,
+    .info-block,
+    .cafe-prompt,
+    .find-us,
+    .faq-section,
+    .seo-section,
+    .panel {
+      box-shadow: var(--shadow-soft);
+    }
+
+    .service-strip div,
+    .step,
+    .info-block,
+    .find-us,
+    .faq-section,
+    .seo-section {
+      background: rgba(255, 253, 247, .86);
+    }
+
+    .step::before {
+      background: linear-gradient(90deg, var(--accent), var(--heather));
+    }
+
+    .cafe-prompt {
+      background:
+        linear-gradient(135deg, rgba(245, 221, 200, .78), rgba(255, 253, 247, .9)),
+        #fff9f0;
+    }
+
+    .guide-prompt {
+      background:
+        linear-gradient(135deg, rgba(214, 232, 227, .86), rgba(255, 253, 247, .9)),
+        #f6fbf8;
+    }
+
+    .booking-panel {
+      background:
+        linear-gradient(180deg, rgba(255, 253, 247, .98), rgba(255, 248, 237, .92));
+      border-color: rgba(37, 102, 83, .22);
+      box-shadow: 0 24px 62px rgba(27, 42, 36, .16);
+    }
+
+    input,
+    textarea,
+    select,
+    .item-option,
+    .lunch-card,
+    .review-item,
+    .terms-details {
+      background: #fffdfa;
+      border-color: #d4c6b2;
+    }
+
+    .primary {
+      background: linear-gradient(180deg, var(--brand), var(--brand-dark));
+      box-shadow: 0 14px 28px rgba(37, 102, 83, .24);
+    }
+
+    .secondary {
+      background: #fff7ec;
+    }
+
+    @media (min-width: 861px) {
+      .booking-panel {
+        top: 92px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .skye-scene {
+        height: 180px;
+      }
+    }
   </style>
 </head>
 <body>
