@@ -80,6 +80,48 @@
     font-size: 0.8rem;
     opacity: 0.6;
   }
+  /* Granary glow-up layer */
+  :root {
+    --paper: #F5EFE3;
+    --ink: #17201B;
+    --blue: #256653;
+    --gold: #C9793E;
+    --card: #FFFDF7;
+    --border: rgba(23,32,27,0.12);
+  }
+  body {
+    background:
+      linear-gradient(180deg, rgba(255,253,247,.78), rgba(245,239,227,.46) 46%, rgba(214,232,227,.42)),
+      linear-gradient(135deg, rgba(37,102,83,.14), transparent 38%),
+      var(--paper);
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: .22;
+    background-image:
+      linear-gradient(rgba(23,61,52,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(23,61,52,.04) 1px, transparent 1px);
+    background-size: 34px 34px;
+  }
+  .wrap {
+    position: relative;
+    max-width: 720px;
+  }
+  h1 {
+    color: #14261f;
+    font-size: clamp(2rem, 6vw, 3.75rem);
+    line-height: .96;
+  }
+  .eyebrow {
+    color: var(--gold);
+  }
+  .card {
+    border-radius: 8px;
+    box-shadow: 0 16px 38px rgba(27,42,36,.1);
+  }
 </style>
 </head>
 <body>
