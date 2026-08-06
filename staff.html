@@ -477,6 +477,13 @@
           <input id="staffDate" type="date">
         </div>
         <div>
+          <label>Dates</label>
+          <div class="view-toggle" aria-label="Date range">
+            <button id="showDayButton" type="button" class="active">Selected day</button>
+            <button id="showFutureButton" type="button">Future orders</button>
+          </div>
+        </div>
+        <div>
           <label>Show</label>
           <div class="view-toggle" aria-label="Order type">
             <button id="showLuggageButton" type="button" class="active">Luggage</button>
@@ -600,6 +607,7 @@
       blockedDates: [],
       authed: false,
       selectedDate: "",
+      dateMode: "day",
       viewMode: "luggage",
     };
 
@@ -611,6 +619,19 @@
 
     function selectedStaffDate() {
       return state.selectedDate || todayKey();
+    }
+
+    function orderDateForLunch(booking, order) {
+      return order?.collectionDate || booking.booking_date;
+    }
+
+    function dateInStaffScope(dateKey) {
+      if (state.dateMode === "future") return String(dateKey || "") > todayKey();
+      return dateKey === selectedStaffDate();
+    }
+
+    function scopeLabel() {
+      return state.dateMode === "future" ? "Future orders" : formatDate(selectedStaffDate());
     }
 
     function formatTime(value) {
@@ -854,8 +875,10 @@
     function filteredBookings() {
       const q = $("bookingSearch").value.trim().toLowerCase();
       const dated = state.bookings
-        .filter((booking) => booking.booking_date === selectedStaffDate())
-        .filter((booking) => luggageItemCountForBooking(booking) > 0);
+        .filter((booking) => dateInStaffScope(booking.booking_date))
+        .filter((booking) => luggageItemCountForBooking(booking) > 0)
+        .sort((a, b) => String(a.booking_date).localeCompare(String(b.booking_date))
+          || String(a.collection_time || "17:00").localeCompare(String(b.collection_time || "17:00")));
       if (!q) return dated;
       return dated.filter((booking) => [
         booking.reference,
@@ -867,16 +890,15 @@
     }
 
     function renderStats() {
-      const dateKey = selectedStaffDate();
-      const active = state.bookings.filter((booking) => booking.booking_date === dateKey && !booking.collected_at && luggageItemCountForBooking(booking) > 0);
-      const paid = state.bookings.filter((booking) => booking.booking_date === dateKey && booking.payment_received_at);
+      const active = state.bookings.filter((booking) => dateInStaffScope(booking.booking_date) && !booking.collected_at && luggageItemCountForBooking(booking) > 0);
+      const paid = state.bookings.filter((booking) => dateInStaffScope(booking.booking_date) && booking.payment_received_at);
       const activeItems = active.reduce((sum, booking) => sum + luggageItemCountForBooking(booking), 0);
       $("activeBookings").textContent = String(active.length);
       $("itemsInStore").textContent = String(activeItems);
       $("paidToday").textContent = money(paid.reduce((sum, booking) => sum + Number(booking.total_cost || 0), 0));
       $("availableTags").textContent = String(Math.max(0, TOTAL_TAGS - usedTags().size));
       $("packedLunchCount").textContent = String(lunchOrders()
-        .filter(({ order }) => order.collectionDate === dateKey)
+        .filter(({ booking, order }) => dateInStaffScope(orderDateForLunch(booking, order)))
         .reduce((sum, { order }) => sum + order.lunches.length, 0));
     }
 
@@ -914,24 +936,30 @@
 
     function renderPackedLunches() {
       const container = $("packedLunches");
-      const dateKey = selectedStaffDate();
       const entries = lunchOrders()
-        .filter(({ booking, order }) => (order.collectionDate || booking.booking_date) === dateKey)
-        .sort((a, b) => String(a.order.collectionTime).localeCompare(String(b.order.collectionTime)));
+        .filter(({ booking, order }) => dateInStaffScope(orderDateForLunch(booking, order)))
+        .sort((a, b) => String(orderDateForLunch(a.booking, a.order)).localeCompare(String(orderDateForLunch(b.booking, b.order)))
+          || String(a.order.collectionTime).localeCompare(String(b.order.collectionTime)));
       if (!entries.length) {
-        container.innerHTML = `<div class="muted">No packed-lunch orders found for ${escapeHtml(formatDate(dateKey))}.</div>`;
+        container.innerHTML = `<div class="muted">No packed-lunch orders found for ${escapeHtml(scopeLabel())}.</div>`;
         return;
       }
-      container.innerHTML = `
+      const grouped = entries.reduce((groups, entry) => {
+        const date = orderDateForLunch(entry.booking, entry.order);
+        groups[date] = groups[date] || [];
+        groups[date].push(entry);
+        return groups;
+      }, {});
+      container.innerHTML = Object.entries(grouped).map(([date, dateEntries]) => `
         <section class="lunch-order">
-          <h3>${escapeHtml(formatDate(dateKey))}</h3>
+          <h3>${escapeHtml(formatDate(date))}</h3>
           <div class="prep-list">
             <h3>Daily prep totals</h3>
-            ${renderPrepTotals(entries)}
+            ${renderPrepTotals(dateEntries)}
           </div>
           <div class="customer-orders">
             <h3>Customer orders</h3>
-            ${entries.map(({ booking, order }) => `
+            ${dateEntries.map(({ booking, order }) => `
               <div class="lunch-order">
                 <strong>${escapeHtml(order.collectionTime || "Collection time")} - ${escapeHtml(booking.name)}</strong><br>
                 <span class="muted">${escapeHtml(booking.mobile)} ${booking.email ? `- ${escapeHtml(booking.email)}` : ""}</span><br>
@@ -949,14 +977,14 @@
             `).join("")}
           </div>
         </section>
-      `;
+      `).join("");
     }
 
     function renderBookings() {
       const rows = filteredBookings();
       const body = $("bookingsBody");
       if (!rows.length) {
-        body.innerHTML = `<tr><td colspan="8" class="muted">No luggage bookings found for ${escapeHtml(formatDate(selectedStaffDate()))}.</td></tr>`;
+        body.innerHTML = `<tr><td colspan="8" class="muted">No luggage bookings found for ${escapeHtml(scopeLabel())}.</td></tr>`;
         renderStats();
         return;
       }
@@ -1005,8 +1033,11 @@
 
     function renderStaffView() {
       const dateKey = selectedStaffDate();
-      $("todayLabel").textContent = `Showing: ${formatDate(dateKey)}`;
+      $("todayLabel").textContent = `Showing: ${scopeLabel()}`;
       $("staffDate").value = dateKey;
+      $("staffDate").disabled = state.dateMode === "future";
+      $("showDayButton").classList.toggle("active", state.dateMode === "day");
+      $("showFutureButton").classList.toggle("active", state.dateMode === "future");
       $("showLuggageButton").classList.toggle("active", state.viewMode === "luggage");
       $("showLunchButton").classList.toggle("active", state.viewMode === "lunch");
       $("luggagePanel").classList.toggle("hidden", state.viewMode !== "luggage");
@@ -1194,6 +1225,15 @@
     $("bookingSearch").addEventListener("input", renderBookings);
     $("staffDate").addEventListener("change", () => {
       state.selectedDate = $("staffDate").value || todayKey();
+      state.dateMode = "day";
+      renderStaffView();
+    });
+    $("showDayButton").addEventListener("click", () => {
+      state.dateMode = "day";
+      renderStaffView();
+    });
+    $("showFutureButton").addEventListener("click", () => {
+      state.dateMode = "future";
       renderStaffView();
     });
     $("showLuggageButton").addEventListener("click", () => {
