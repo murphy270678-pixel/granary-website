@@ -160,31 +160,41 @@
       margin-bottom: 16px;
     }
 
-    .toolbar-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    .staff-controls {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      margin: 0 0 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: minmax(180px, .9fr) minmax(260px, 1.35fr) minmax(260px, 1.35fr);
+      gap: 12px;
+      align-items: end;
+    }
+
+    .control-actions {
+      grid-template-columns: minmax(260px, 1fr) repeat(3, auto);
       align-items: center;
     }
 
-    .date-switcher {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: end;
-      margin: 0 0 16px;
-    }
-
-    .date-switcher label {
+    .control-field label {
       margin: 0 0 6px;
-    }
-
-    .date-switcher input {
-      min-width: 180px;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .04em;
     }
 
     .view-toggle {
-      display: inline-flex;
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(0, 1fr);
       border: 1px solid var(--line);
       border-radius: 8px;
       overflow: hidden;
@@ -196,6 +206,8 @@
       background: #fff;
       color: var(--green);
       border-right: 1px solid var(--line);
+      min-width: 0;
+      white-space: nowrap;
     }
 
     .view-toggle button:last-child {
@@ -209,7 +221,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(5, minmax(140px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -332,7 +344,7 @@
       header,
       .toolbar,
       .stats,
-      .date-switcher,
+      .staff-controls,
       .table-wrap,
       .no-print,
       .admin-panel,
@@ -413,18 +425,30 @@
 
     .hidden { display: none !important; }
 
-    @media (max-width: 760px) {
+    @media (max-width: 900px) {
+      .wrap {
+        width: min(100% - 20px, 1180px);
+      }
+
       .brand {
         align-items: flex-start;
         flex-direction: column;
       }
 
-      .stats,
       .grid-2 { grid-template-columns: 1fr; }
 
       .toolbar { align-items: stretch; }
-      .toolbar-actions { width: 100%; }
-      .toolbar-actions > * { flex: 1 1 150px; }
+      .control-row,
+      .control-actions { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .view-toggle { grid-auto-flow: row; }
+      .view-toggle button {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .view-toggle button:last-child { border-bottom: 0; }
     }
   </style>
 </head>
@@ -461,34 +485,36 @@
           <h2 class="section-title">Staff orders</h2>
           <div id="todayLabel" class="muted"></div>
         </div>
-        <div class="toolbar-actions">
-          <input id="bookingSearch" type="search" placeholder="Search name, reference, mobile">
-          <button id="refreshButton" type="button" class="secondary">Refresh</button>
-          <button id="exportCsvButton" type="button">Export CSV</button>
-          <button id="printPrepButton" type="button" class="secondary">Print prep list</button>
-        </div>
       </div>
 
       <div id="staffNotice" class="notice hidden"></div>
 
-      <div class="date-switcher no-print">
-        <div>
+      <div class="staff-controls no-print">
+        <div class="control-row">
+          <div class="control-field">
           <label for="staffDate">Order date</label>
           <input id="staffDate" type="date">
-        </div>
-        <div>
+          </div>
+          <div class="control-field">
           <label>Dates</label>
           <div class="view-toggle" aria-label="Date range">
             <button id="showDayButton" type="button" class="active">Selected day</button>
             <button id="showFutureButton" type="button">Future orders</button>
           </div>
-        </div>
-        <div>
+          </div>
+          <div class="control-field">
           <label>Show</label>
           <div class="view-toggle" aria-label="Order type">
             <button id="showLuggageButton" type="button" class="active">Luggage</button>
             <button id="showLunchButton" type="button">Packed lunches</button>
           </div>
+          </div>
+        </div>
+        <div class="control-row control-actions">
+          <input id="bookingSearch" type="search" placeholder="Search name, reference, mobile">
+          <button id="refreshButton" type="button" class="secondary">Refresh</button>
+          <button id="exportCsvButton" type="button">Export CSV</button>
+          <button id="printPrepButton" type="button" class="secondary">Print prep list</button>
         </div>
       </div>
 
