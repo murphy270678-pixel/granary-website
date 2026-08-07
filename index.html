@@ -548,7 +548,7 @@
       max-width: 740px;
       margin-top: 18px;
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 1fr;
       gap: 12px;
     }
 
@@ -560,6 +560,85 @@
         linear-gradient(135deg, rgba(240, 221, 198, .62), rgba(255,255,255,.78)),
         #fffaf2;
       box-shadow: var(--shadow-soft);
+    }
+
+    .standalone-lunch {
+      margin: 28px 0 0;
+      padding: clamp(22px, 4vw, 34px);
+      border: 1px solid rgba(183, 111, 60, .32);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255, 253, 247, .96) 0 58%, rgba(245, 221, 200, .82) 58% 100%),
+        #fff9f0;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .lunch-standalone-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(260px, .85fr);
+      gap: clamp(18px, 3vw, 30px);
+      align-items: start;
+    }
+
+    .standalone-lunch h2 {
+      margin: 0;
+      color: var(--brand-dark);
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1;
+      text-wrap: balance;
+    }
+
+    .standalone-lunch .lead {
+      max-width: 740px;
+      margin-top: 12px;
+    }
+
+    .lunch-price-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 14px 0 0;
+      padding: 9px 12px;
+      border-radius: 8px;
+      background: var(--brand-dark);
+      color: #fff;
+      font-weight: 900;
+    }
+
+    .lunch-includes {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .lunch-includes li {
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid rgba(47, 107, 79, .18);
+      border-radius: 8px;
+      background: rgba(255, 253, 247, .86);
+      color: #24382f;
+      font-weight: 900;
+    }
+
+    .lunch-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .lunch-note {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+      font-weight: 800;
     }
 
     .guide-prompt {
@@ -1464,7 +1543,11 @@
         position: static;
       }
 
-      .steps, .stats, .staff-summary, .module-strip, .info-grid, .service-strip, .local-info, .feature-prompts {
+      .steps, .stats, .staff-summary, .module-strip, .info-grid, .service-strip, .local-info, .feature-prompts, .lunch-standalone-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .lunch-includes {
         grid-template-columns: 1fr;
       }
 
@@ -1702,6 +1785,184 @@
         height: 180px;
       }
     }
+
+    /* Public page tidy-up */
+    body {
+      background: var(--paper);
+    }
+
+    body::before {
+      content: none;
+    }
+
+    header {
+      background: rgba(255, 253, 247, .96);
+      border-bottom: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    main {
+      padding-top: 24px;
+    }
+
+    .topbar {
+      padding-block: 14px;
+    }
+
+    .nav {
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      gap: 6px;
+    }
+
+    .nav a,
+    .nav button {
+      min-height: 38px;
+      padding: 0 12px;
+      border-radius: 7px;
+    }
+
+    .booking-layout {
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 410px);
+      gap: 30px;
+    }
+
+    .hero-copy {
+      padding-top: 0;
+    }
+
+    .skye-scene {
+      height: clamp(190px, 24vw, 285px);
+      max-width: 760px;
+      margin-bottom: 22px;
+      border-color: var(--line);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .skye-scene::before {
+      background: linear-gradient(90deg, rgba(23, 32, 27, .36), rgba(23, 32, 27, .03) 70%);
+    }
+
+    .eyebrow {
+      margin-bottom: 14px;
+      background: #fffdf8;
+      border-color: var(--line);
+      color: var(--brand-dark);
+      box-shadow: none;
+    }
+
+    h1 {
+      max-width: 820px;
+      font-size: clamp(38px, 5.4vw, 62px);
+      line-height: 1;
+    }
+
+    .lead {
+      max-width: 720px;
+      font-size: clamp(17px, 1.8vw, 20px);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .hero-actions .primary,
+    .hero-actions .secondary {
+      min-height: 46px;
+    }
+
+    .service-strip {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      max-width: 760px;
+      margin-top: 24px;
+      border-radius: 8px;
+      box-shadow: none;
+    }
+
+    .service-strip div {
+      background: #fffdf8;
+      padding: 15px;
+    }
+
+    .service-strip strong {
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .search-copy {
+      max-width: 720px;
+      margin-top: 16px;
+    }
+
+    .steps,
+    .feature-prompts,
+    .seo-section {
+      max-width: 760px;
+    }
+
+    .step,
+    .cafe-prompt,
+    .seo-section,
+    .standalone-lunch,
+    .find-us,
+    .faq-section {
+      box-shadow: none;
+    }
+
+    .feature-prompts {
+      margin-top: 16px;
+    }
+
+    .cafe-prompt {
+      background: #fffdf8;
+      border-color: var(--line);
+    }
+
+    .standalone-lunch {
+      background: #fffdf8;
+      border-color: var(--line);
+      margin-top: 26px;
+    }
+
+    .booking-panel {
+      background: #fffdf8;
+      border-color: var(--line);
+      box-shadow: var(--shadow-soft);
+    }
+
+    @media (max-width: 860px) {
+      .nav {
+        justify-content: flex-start;
+      }
+
+      .booking-layout,
+      .service-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .booking-panel {
+        order: 2;
+      }
+    }
+
+    @media (max-width: 520px) {
+      main {
+        padding-inline: 12px;
+      }
+
+      .hero-actions .primary,
+      .hero-actions .secondary {
+        width: 100%;
+      }
+
+      .skye-scene {
+        height: 170px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1715,15 +1976,13 @@
 	            <div class="brand-subtitle">Luggage Storage</div>
 	          </div>
 	        </div>
-	        <nav class="nav" aria-label="Main navigation">
-	          <a href="#luggage-storage">Luggage Storage</a>
-	          <a href="#packed-lunches">Packed Lunches</a>
-	          <a href="food-menu.html">Food</a>
-	          <a href="menus.html">Drinks</a>
-	          <a href="luggage-storage-portree.html">Portree Bags</a>
-	          <a href="skye-companion.html">Skye Guide</a>
-	          <a href="#find-us">Find Us</a>
-	        </nav>
+        <nav class="nav" aria-label="Main navigation">
+          <a href="#luggage-storage">Luggage Storage</a>
+          <a href="#packed-lunches">Packed Lunches</a>
+          <a href="food-menu.html">Food</a>
+          <a href="menus.html">Drinks</a>
+          <a href="#find-us">Find Us</a>
+        </nav>
 	      </div>
 	    </header>
 
@@ -1734,38 +1993,38 @@
             <div class="skye-scene" aria-hidden="true">
               <img src="portree-harbour.jpg" alt="">
             </div>
-            <div class="eyebrow">The Granary Luggage Storage</div>
-	            <h1>Luggage storage in the heart of Portree.</h1>
-	            <p class="lead">Same-day luggage and bag storage in central Portree. Store suitcases, backpacks and cabin bags safely before check-in, after check-out or while exploring the Isle of Skye.</p>
+            <div class="eyebrow">The Granary Portree</div>
+	            <h1>Luggage storage and packed lunches in Portree.</h1>
+	            <p class="lead">Leave your bags safely in central Portree, order packed lunches for a day out on Skye, or do both in one simple booking.</p>
+            <div class="hero-actions" aria-label="Main actions">
+              <a class="primary" href="#bookingForm">Book luggage storage</a>
+              <a class="secondary" href="#packed-lunches">Order packed lunches</a>
+            </div>
             <div class="service-strip" aria-label="Luggage storage summary">
               <div>
-                <span>Price</span>
-                <strong>🧳 £7 per item</strong>
+                <span>Luggage</span>
+                <strong>£7 per item</strong>
               </div>
               <div>
-                <span>Storage</span>
-                <strong>🔒 Locked staff-only storage</strong>
+                <span>Packed lunches</span>
+                <strong>£15 each</strong>
               </div>
               <div>
-                <span>Security</span>
-                <strong>📹 CCTV coverage</strong>
+                <span>Location</span>
+                <strong>Central Portree</strong>
               </div>
               <div>
                 <span>Collection</span>
-                <strong>⏰ Same-day collection before closing</strong>
+                <strong>Same-day luggage, morning lunches</strong>
               </div>
             </div>
-	            <p class="search-copy">Perfect before check-in, after check-out, between buses, before a boat trip, or while visiting Portree, the Old Man of Storr, the Quiraing and other Skye day trips.</p>
+	            <p class="search-copy">Useful before check-in, after check-out, between buses, before a boat trip, or before heading to the Old Man of Storr, the Quiraing and other Skye day trips.</p>
 	            <div class="steps" aria-label="Booking steps">
-	              <div class="step">Book your luggage storage</div>
-	              <div class="step">Pay at drop-off</div>
-	            </div>
+              <div class="step">Choose luggage storage, packed lunches, or both</div>
+              <div class="step">Collect your confirmation email</div>
+              <div class="step">Pay in person at The Granary</div>
+            </div>
 	            <div class="feature-prompts" aria-label="Day out options">
-	              <div class="cafe-prompt" id="packed-lunches" aria-label="Packed lunches at The Granary">
-	                <h2>Packed lunches for your day out on Skye</h2>
-	                <p>£15 each. Add packed lunches to your luggage booking, or order lunches on their own before heading out from Portree.</p>
-	                <button class="secondary" type="button" id="startLunchOnlyButton">Order packed lunches</button>
-	              </div>
 	              <div class="cafe-prompt guide-prompt" aria-label="Skye guide">
 	                <h2>Planning your day on Skye?</h2>
 	                <p>Use our local Skye guide for routes, quieter ideas, driving tips and places to visit after dropping off your bags.</p>
@@ -1786,14 +2045,10 @@
 
           <div class="panel booking-panel">
             <form id="bookingForm">
-              <h2>Luggage storage</h2>
-              <p class="form-note">Drop off from 8:00am and collect by 5:00pm on your booking date.</p>
-              <div class="choice-strip" aria-label="Booking type">
-                <button class="secondary" type="button" id="bookLuggageButton">Book luggage storage</button>
-                <button class="secondary" type="button" id="orderLunchOnlyButton">Order packed lunches only</button>
-              </div>
+              <h2 id="bookingFormTitle">Book luggage storage</h2>
+              <p class="form-note" id="bookingFormNote">Drop off from 8:00am and collect by 5:00pm on your booking date.</p>
               <div id="bookingAvailability" class="availability" aria-live="polite"></div>
-              <div class="field">
+              <div class="field" id="bookingDateField">
                 <label for="bookingDate">Booking date</label>
                 <input id="bookingDate" name="bookingDate" type="date" required>
               </div>
@@ -1812,9 +2067,9 @@
               <div class="field">
                 <label for="email">Email</label>
                 <input id="email" name="email" autocomplete="email" inputmode="email" type="email" required>
-                <p class="helper-text">Required because your confirmation email is used for collection.</p>
+                <p class="helper-text" id="emailHelperText">Required because your confirmation email is used for collection.</p>
               </div>
-              <div class="field">
+              <div class="field" id="luggageItemsField">
                 <label>How many items are you storing?</label>
                 <div class="item-options" aria-label="Number of items">
                   <button class="item-option active" type="button" data-item-count="1">1 item</button>
@@ -1831,8 +2086,8 @@
               </div>
               <div class="lunch-panel" id="lunchPanel">
                 <div>
-                  <h3>Add a packed lunch for your day out</h3>
-                  <p class="helper-text">Packed lunches are £15 each. Each lunch has its own choices, so different people can choose different items.</p>
+                  <h3>Choose your packed lunches</h3>
+                  <p class="helper-text">Packed lunches are £15 each. Choose a sandwich, traybake, Torres crisps, soft drink and fruit for each person.</p>
                 </div>
                 <div class="row">
                   <div class="field">
@@ -1849,9 +2104,9 @@
                 <button class="secondary" type="button" id="addLunchButton">Add another packed lunch</button>
                 <p class="helper-text">Selections are subject to availability. If an item becomes unavailable after ordering, we'll contact you before collection to arrange a suitable alternative.</p>
               </div>
-              <label class="terms">
+              <label class="terms hidden" id="addLunchToggleRow">
                 <input id="addLunchToggle" type="checkbox">
-                <span>Add packed lunches to this booking</span>
+                <span>Include packed lunches with this order</span>
               </label>
               <div class="price-summary">
                 <span id="priceBreakdown">£7 × 1 item</span>
@@ -1886,7 +2141,7 @@
               </details>
               <label class="terms">
                 <input id="terms" name="terms" type="checkbox" required>
-                <span>I accept The Granary luggage storage terms and understand payment is due at drop-off.</span>
+                <span id="termsText">I accept The Granary luggage storage terms and understand payment is due when luggage is accepted.</span>
               </label>
               <p class="helper-text">Booking takes less than 60 seconds.</p>
               <button class="primary" type="submit">Submit booking</button>
@@ -1898,7 +2153,7 @@
               <div id="confirmationRef" class="ref"></div>
               <div id="confirmationSummary"></div>
               <div class="amount-due">
-                <span>Total due at drop-off</span>
+                <span id="paymentDueLabel">Total due at drop-off</span>
                 <strong id="confirmationTotal">£7</strong>
               </div>
               <p class="payment-note" id="paymentInstruction">Staff will confirm the number of items and take payment before storage.</p>
@@ -1908,6 +2163,29 @@
             </div>
           </div>
         </div>
+
+        <section class="standalone-lunch" id="packed-lunches" aria-label="Packed lunches at The Granary">
+          <div class="lunch-standalone-grid">
+            <div>
+              <span class="eyebrow">Packed lunches</span>
+              <h2>Packed lunches from The Granary</h2>
+              <p class="lead">Order before a Skye walk, tour, bus journey or drive from Portree. Each lunch is made for collection in the morning, ready to take with you.</p>
+              <div class="lunch-price-badge">£15 each</div>
+              <div class="lunch-actions">
+                <button class="primary" type="button" id="startLunchOnlyButton">Order packed lunches</button>
+                <a class="secondary" href="packed-lunch-portree.html">Packed lunch details</a>
+              </div>
+              <p class="lunch-note">Morning collection from The Granary. Orders close at 10:00am.</p>
+            </div>
+            <ul class="lunch-includes" aria-label="Packed lunch includes">
+              <li>Sandwich</li>
+              <li>Torres crisps</li>
+              <li>Traybake</li>
+              <li>Soft drink</li>
+              <li>Fruit</li>
+            </ul>
+          </div>
+        </section>
 
         <div class="local-info" aria-label="Location and luggage storage questions">
 	          <section class="find-us" id="find-us">
@@ -2085,6 +2363,8 @@ const STORAGE_KEY = "granaryHubBookings";
         ]
       }
     };
+    const LUNCH_SUMMARY_START = "Packed lunch order:";
+    const LUNCH_SUMMARY_END = "End packed lunch order.";
     const LUNCH_NOTE_START = "[[GRANARY_PACKED_LUNCHES_V1]]";
     const LUNCH_NOTE_END = "[[/GRANARY_PACKED_LUNCHES_V1]]";
     const bookingView = document.getElementById("bookingView");
@@ -2095,13 +2375,20 @@ const STORAGE_KEY = "granaryHubBookings";
     const confirmationRef = document.getElementById("confirmationRef");
     const confirmationSummary = document.getElementById("confirmationSummary");
     const confirmationTotal = document.getElementById("confirmationTotal");
+    const paymentDueLabel = document.getElementById("paymentDueLabel");
     const paymentInstruction = document.getElementById("paymentInstruction");
+    const termsText = document.getElementById("termsText");
     const newBookingButton = document.getElementById("newBookingButton");
     const bookingNavButton = document.getElementById("bookingNavButton");
     const staffNavButton = document.getElementById("staffNavButton");
+    const bookingFormTitle = document.getElementById("bookingFormTitle");
+    const bookingFormNote = document.getElementById("bookingFormNote");
+    const bookingDateField = document.getElementById("bookingDateField");
     const bookingDateInput = document.getElementById("bookingDate");
     const fridayWarning = document.getElementById("fridayWarning");
+    const emailHelperText = document.getElementById("emailHelperText");
     const itemsInput = document.getElementById("items");
+    const luggageItemsField = document.getElementById("luggageItemsField");
     const itemButtons = document.querySelectorAll("[data-item-count]");
     const exactItemsField = document.getElementById("exactItemsField");
     const exactItemsInput = document.getElementById("exactItems");
@@ -2109,9 +2396,8 @@ const STORAGE_KEY = "granaryHubBookings";
     const priceBreakdown = document.getElementById("priceBreakdown");
     const priceTotal = document.getElementById("priceTotal");
     const startLunchOnlyButton = document.getElementById("startLunchOnlyButton");
-    const bookLuggageButton = document.getElementById("bookLuggageButton");
-    const orderLunchOnlyButton = document.getElementById("orderLunchOnlyButton");
     const addLunchToggle = document.getElementById("addLunchToggle");
+    const addLunchToggleRow = document.getElementById("addLunchToggleRow");
     const lunchPanel = document.getElementById("lunchPanel");
     const lunchCollectionDate = document.getElementById("lunchCollectionDate");
     const lunchCollectionTime = document.getElementById("lunchCollectionTime");
@@ -2287,7 +2573,7 @@ const STORAGE_KEY = "granaryHubBookings";
       return fromDbBooking(rows[0]);
     }
 
-    async function sendBookingConfirmationEmail(booking) {
+    async function sendBookingConfirmationEmail(booking, context = {}) {
       if (!EMAIL_CONFIRMATIONS_ENABLED || !SUPABASE_ENABLED || !booking.email) {
         return { sent: false, reason: "Email confirmations are not available." };
       }
@@ -2299,7 +2585,7 @@ const STORAGE_KEY = "granaryHubBookings";
           Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ bookingId: booking.id })
+        body: JSON.stringify({ bookingId: booking.id, ...context })
       });
 
       if (!response.ok) {
@@ -2383,7 +2669,7 @@ const STORAGE_KEY = "granaryHubBookings";
 
     function activeItemCountForDate(bookings, dateKey) {
       return activeForDate(bookings, dateKey)
-        .reduce((total, booking) => total + getTagNumbers(booking).length, 0);
+        .reduce((total, booking) => total + luggageItemCountForBooking(booking), 0);
     }
 
     function remainingItemCapacity(dateKey, bookings = bookingsCache) {
@@ -2412,7 +2698,7 @@ const STORAGE_KEY = "granaryHubBookings";
 
     function updateFridayWarning() {
       if (!fridayWarning) return;
-      fridayWarning.classList.toggle("active", isFriday(selectedBookingDate()));
+      fridayWarning.classList.toggle("active", selectedItemCount() > 0 && isFriday(selectedBookingDate()));
     }
 
     function isDateBlocked(dateKey) {
@@ -2424,13 +2710,14 @@ const STORAGE_KEY = "granaryHubBookings";
       return blocked ? blocked.reason : "";
     }
 
-    function makeReference(bookings, dateKey) {
+    function makeReference(bookings, dateKey, prefix = "G") {
+      const pattern = new RegExp(`^${prefix}(\\d{3})$`, "i");
       const refs = bookingsForDate(bookings, dateKey)
-        .map((booking) => /^G(\d{3})$/.exec(booking.reference || ""))
+        .map((booking) => pattern.exec(booking.reference || ""))
         .filter(Boolean)
         .map((match) => Number(match[1]));
       const nextNumber = (refs.length ? Math.max(...refs) : 0) + 1;
-      return `G${String(nextNumber).padStart(3, "0")}`;
+      return `${prefix}${String(nextNumber).padStart(3, "0")}`;
     }
 
     function makeId() {
@@ -2492,15 +2779,38 @@ const STORAGE_KEY = "granaryHubBookings";
       const text = String(notes || "").trim();
       const start = text.indexOf(LUNCH_NOTE_START);
       const end = text.indexOf(LUNCH_NOTE_END);
-      if (start === -1 || end === -1 || end <= start) return text;
-      return `${text.slice(0, start)}${text.slice(end + LUNCH_NOTE_END.length)}`.trim();
+      let withoutPayload = text;
+      if (start !== -1 && end !== -1 && end > start) {
+        withoutPayload = `${text.slice(0, start)}${text.slice(end + LUNCH_NOTE_END.length)}`.trim();
+      }
+      const summaryStart = withoutPayload.indexOf(LUNCH_SUMMARY_START);
+      const summaryEnd = withoutPayload.indexOf(LUNCH_SUMMARY_END);
+      if (summaryStart !== -1 && summaryEnd !== -1 && summaryEnd > summaryStart) {
+        return `${withoutPayload.slice(0, summaryStart)}${withoutPayload.slice(summaryEnd + LUNCH_SUMMARY_END.length)}`.trim();
+      }
+      return withoutPayload;
+    }
+
+    function lunchLine(lunch, index) {
+      return `Packed Lunch ${index + 1}: ${lunch.sandwich} sandwich, ${lunch.traybake}, ${lunch.crisps} crisps, ${lunch.drink}, ${lunch.fruit}`;
+    }
+
+    function formatLunchOrderText(order) {
+      if (!order || !order.lunches?.length) return "";
+      return [
+        LUNCH_SUMMARY_START,
+        `Collection: ${order.collectionDate}, ${order.collectionTime}`,
+        `Type: ${order.luggageAttached ? "With luggage storage" : "Packed lunch only"}`,
+        ...order.lunches.map(lunchLine),
+        LUNCH_SUMMARY_END
+      ].join("\n");
     }
 
     function buildLunchNotes(customerNotes, lunchOrder) {
       const base = stripLunchOrder(customerNotes);
       if (!lunchOrder || !lunchOrder.lunches.length) return base;
       const payload = JSON.stringify(lunchOrder);
-      return [base, `${LUNCH_NOTE_START}${payload}${LUNCH_NOTE_END}`].filter(Boolean).join("\n\n");
+      return [base, formatLunchOrderText(lunchOrder), `${LUNCH_NOTE_START}${payload}${LUNCH_NOTE_END}`].filter(Boolean).join("\n\n");
     }
 
     function lunchCountForDate(dateKey, bookings = bookingsCache) {
@@ -2523,6 +2833,30 @@ const STORAGE_KEY = "granaryHubBookings";
       return currentTime > PACKED_LUNCH_CONFIG.cutoffTime;
     }
 
+    function addDaysKey(dateKey, days) {
+      const date = new Date(`${dateKey}T00:00:00`);
+      date.setDate(date.getDate() + days);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function earliestLunchCollectionDate() {
+      const firstPossibleDate = lunchCutoffPassed(todayKey()) ? addDaysKey(todayKey(), 1) : todayKey();
+      if (!PACKED_LUNCH_CONFIG.availableDates.length) return firstPossibleDate;
+      return PACKED_LUNCH_CONFIG.availableDates
+        .filter((dateKey) => dateKey >= firstPossibleDate)
+        .sort()[0] || firstPossibleDate;
+    }
+
+    function normaliseLunchCollectionDate() {
+      if (!lunchCollectionDate) return;
+      const earliestDate = earliestLunchCollectionDate();
+      lunchCollectionDate.min = earliestDate;
+      if (!lunchCollectionDate.value || lunchCollectionDate.value < earliestDate || !lunchDateAvailable(lunchCollectionDate.value)) {
+        lunchCollectionDate.value = earliestDate;
+      }
+      if (bookingMode === "lunch") bookingDateInput.value = lunchCollectionDate.value;
+    }
+
     function selectedLunchOrder() {
       if (!lunchOrderingActive()) return null;
       return {
@@ -2532,6 +2866,12 @@ const STORAGE_KEY = "granaryHubBookings";
         luggageAttached: bookingMode !== "lunch" && selectedItemCount() > 0,
         lunches: lunchSelections.map((lunch) => ({ ...lunch }))
       };
+    }
+
+    function luggageItemCountForBooking(booking) {
+      const lunchOrder = parseLunchOrder(booking.notes);
+      if (lunchOrder && lunchOrder.luggageAttached === false) return 0;
+      return Number(booking.items || 0);
     }
 
     function renderLunchTimeWindows() {
@@ -2600,7 +2940,7 @@ const STORAGE_KEY = "granaryHubBookings";
       lunchCollectionTime.required = active;
       if (active) {
         ensureLunchSelection();
-        if (!lunchCollectionDate.value) lunchCollectionDate.value = bookingDateInput.value || todayKey();
+        normaliseLunchCollectionDate();
         if (!lunchCollectionTime.value && PACKED_LUNCH_CONFIG.timeWindows[0]) {
           lunchCollectionTime.value = PACKED_LUNCH_CONFIG.timeWindows[0].value;
         }
@@ -2615,7 +2955,20 @@ const STORAGE_KEY = "granaryHubBookings";
     function setBookingMode(mode) {
       bookingMode = mode;
       const lunchOnly = mode === "lunch";
-      document.querySelector(".item-options")?.closest(".field")?.classList.toggle("hidden", lunchOnly);
+      if (bookingFormTitle) bookingFormTitle.textContent = lunchOnly ? "Packed lunch order" : "Book luggage storage";
+      if (bookingFormNote) {
+        bookingFormNote.textContent = lunchOnly
+          ? "Choose your collection time, then pick the lunch items for each person."
+          : "Drop off from 8:00am and collect by 5:00pm on your booking date.";
+      }
+      if (emailHelperText) {
+        emailHelperText.textContent = lunchOnly
+          ? "Required so we can send your packed lunch confirmation."
+          : "Required because your confirmation email is used for collection.";
+      }
+      luggageItemsField?.classList.toggle("hidden", lunchOnly);
+      bookingDateField?.classList.toggle("hidden", lunchOnly);
+      addLunchToggleRow?.classList.add("hidden");
       exactItemsField.classList.toggle("hidden", true);
       document.querySelector("details.terms-details")?.classList.toggle("hidden", lunchOnly);
       if (lunchOnly) {
@@ -2635,7 +2988,7 @@ const STORAGE_KEY = "granaryHubBookings";
       const dateKey = lunchCollectionDate.value;
       if (!dateKey) errors.push("Choose a packed-lunch collection date.");
       if (!lunchDateAvailable(dateKey)) errors.push("Packed lunches are not available on the selected date.");
-      if (lunchCutoffPassed(dateKey)) errors.push("The packed-lunch collection cutoff time has passed.");
+      if (lunchCutoffPassed(dateKey)) errors.push("The 10:00am cutoff has passed for packed-lunch collection today. Please choose a future collection date.");
       if (!lunchCollectionTime.value) errors.push("Choose a packed-lunch collection time.");
       const requested = lunchSelections.length;
       const remaining = PACKED_LUNCH_CONFIG.maxPerDay - lunchCountForDate(dateKey);
@@ -2696,6 +3049,40 @@ const STORAGE_KEY = "granaryHubBookings";
       return Math.max(1, Number(itemsInput.value) || 1);
     }
 
+    function paymentCopyForOrder({ hasLuggage, hasLunch }) {
+      if (hasLunch && !hasLuggage) {
+        return {
+          terms: "I understand payment is due when I collect my packed lunch order.",
+          label: "Total due on collection",
+          summary: "Payment due on collection",
+          instruction: "Please show it when collecting your packed lunch. Payment is due on collection."
+        };
+      }
+      if (hasLunch && hasLuggage) {
+        return {
+          terms: "I accept The Granary luggage storage terms and understand payment is due when I arrive.",
+          label: "Total due when you arrive",
+          summary: "Payment due when you arrive",
+          instruction: "Please show it when you arrive. Payment is due when you arrive."
+        };
+      }
+      return {
+        terms: "I accept The Granary luggage storage terms and understand payment is due when luggage is accepted.",
+        label: "Total due at drop-off",
+        summary: "Payment due at drop-off",
+        instruction: "Please show it when dropping off your luggage. Payment is due at drop-off."
+      };
+    }
+
+    function updateOrderWording() {
+      const copy = paymentCopyForOrder({
+        hasLuggage: selectedItemCount() > 0,
+        hasLunch: lunchOrderingActive()
+      });
+      if (termsText) termsText.textContent = copy.terms;
+      if (paymentDueLabel) paymentDueLabel.textContent = copy.label;
+    }
+
     function setItemCount(value) {
       const isExact = value === "5+";
       exactItemsField.classList.toggle("hidden", !isExact);
@@ -2722,6 +3109,7 @@ const STORAGE_KEY = "granaryHubBookings";
       if (lunches > 0) parts.push(`£${PACKED_LUNCH_CONFIG.price} × ${lunches} packed lunch${lunches === 1 ? "" : "es"}`);
       priceBreakdown.textContent = parts.length ? parts.join(" + ") : "Packed lunch order";
       priceTotal.textContent = formatMoney(total);
+      updateOrderWording();
       renderLunchAvailability();
       renderOrderReview();
       updateBookingAvailability();
@@ -2886,7 +3274,7 @@ const STORAGE_KEY = "granaryHubBookings";
       document.getElementById("statCapacity").textContent = `${activeItemCountForDate(bookings, dateKey)}/${DAILY_ITEM_CAPACITY}`;
       document.getElementById("statExpectedTakings").textContent = formatMoney(expectedTotal);
       document.getElementById("statPaidTakings").textContent = formatMoney(paidTotal);
-      document.getElementById("summaryUncollected").textContent = active.reduce((total, booking) => total + Number(booking.items || 0), 0);
+      document.getElementById("summaryUncollected").textContent = active.reduce((total, booking) => total + luggageItemCountForBooking(booking), 0);
       document.getElementById("summaryUnpaid").textContent = unpaidActive.length;
       document.getElementById("summaryTagsOut").textContent = tagsOut.length ? tagsOut.join(", ") : "None";
       document.getElementById("summaryUncollectedCard").classList.toggle("warning", active.length > 0);
@@ -2903,6 +3291,10 @@ const STORAGE_KEY = "granaryHubBookings";
     }
 
     function buildWhatsAppMessage(booking) {
+      const lunchOrder = parseLunchOrder(booking.notes);
+      if (lunchOrder && lunchOrder.luggageAttached === false) {
+        return `Hi ${booking.name}, this is The Granary in Portree regarding your packed lunch order ${booking.reference}.`;
+      }
       return `Hi ${booking.name}, this is The Granary in Portree regarding your luggage storage booking ${booking.reference}.`;
     }
 
@@ -2937,9 +3329,10 @@ const STORAGE_KEY = "granaryHubBookings";
         const row = document.createElement("tr");
         const bookingTags = getTagNumbers(booking);
         const lunchOrder = parseLunchOrder(booking.notes);
+        const luggageItemCount = luggageItemCountForBooking(booking);
         const cleanNotes = stripLunchOrder(booking.notes);
         const lunchSummary = lunchOrder
-          ? `<br><span>${lunchOrder.lunches.length} packed lunch${lunchOrder.lunches.length === 1 ? "" : "es"}: ${escapeHtml(lunchOrder.collectionDate || "")} ${escapeHtml(lunchOrder.collectionTime || "")}</span>`
+          ? `<div class="review-list">${lunchOrder.lunches.map((lunch, index) => `<div class="review-item"><strong>${escapeHtml(lunchLine(lunch, index))}</strong></div>`).join("")}</div>`
           : "";
         const flags = [
           booking.arrivedAt && !booking.paymentReceivedAt && !booking.collectedAt ? "Payment not recorded" : "",
@@ -2948,11 +3341,11 @@ const STORAGE_KEY = "granaryHubBookings";
         row.innerHTML = `
           <td><strong>${booking.reference}</strong><br><span>${formatDate(booking.bookingDate || booking.createdDate)}</span></td>
           <td><strong>${escapeHtml(booking.name)}</strong><br>${escapeHtml(booking.mobile)}${booking.email ? `<br>${escapeHtml(booking.email)}` : ""}</td>
-          <td>${booking.items}<br><span>Expected ${formatMoney(booking.totalCost || booking.items * 7)}</span></td>
-          <td><strong>${bookingTags.length ? bookingTags.map(formatTagNumber).join(", ") : "Unassigned"}</strong></td>
+          <td>${luggageItemCount ? luggageItemCount : "Lunch only"}<br><span>Expected ${formatMoney(booking.totalCost || booking.items * 7)}</span></td>
+          <td><strong>${luggageItemCount ? (bookingTags.length ? bookingTags.map(formatTagNumber).join(", ") : "Unassigned") : "No luggage"}</strong></td>
           <td>${formatTime(booking.collectionTime)}</td>
           <td><span class="status ${statusClass(booking)}">${statusFor(booking)}</span>${flags.map((flag) => `<span class="staff-flag">${flag}</span>`).join("")}</td>
-          <td>${cleanNotes ? escapeHtml(cleanNotes) : "-"}${lunchSummary}</td>
+          <td>${cleanNotes ? escapeHtml(cleanNotes) : lunchOrder ? "" : "-"}${lunchSummary}</td>
           <td></td>
         `;
 
@@ -3096,23 +3489,29 @@ const STORAGE_KEY = "granaryHubBookings";
     function downloadCsv() {
       const rows = bookingsCache.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
       const headers = ["Reference", "Booking date", "Name", "Mobile", "Email", "Items", "Total", "Collection", "Tags", "Status", "Customer notes", "Created", "Arrived", "Paid", "Collected"];
-      const csvRows = [headers, ...rows.map((booking) => [
-        booking.reference,
-        booking.bookingDate || booking.createdDate,
-        booking.name,
-        booking.mobile,
-        booking.email,
-        booking.items,
-        booking.totalCost || booking.items * 7,
-        booking.collectionTime,
-        getTagNumbers(booking).map(formatTagNumber).join(", "),
-        statusFor(booking),
-        booking.notes,
-        booking.createdAt,
-        booking.arrivedAt,
-        booking.paymentReceivedAt,
-        booking.collectedAt
-      ])];
+      const csvRows = [headers, ...rows.map((booking) => {
+        const lunchOrder = parseLunchOrder(booking.notes);
+        const cleanNotes = stripLunchOrder(booking.notes);
+        const noteParts = [cleanNotes, formatLunchOrderText(lunchOrder)].filter(Boolean).join("\n\n");
+        const luggageItemCount = luggageItemCountForBooking(booking);
+        return [
+          booking.reference,
+          booking.bookingDate || booking.createdDate,
+          booking.name,
+          booking.mobile,
+          booking.email,
+          luggageItemCount,
+          booking.totalCost || booking.items * 7,
+          booking.collectionTime,
+          luggageItemCount ? getTagNumbers(booking).map(formatTagNumber).join(", ") : "",
+          statusFor(booking),
+          noteParts,
+          booking.createdAt,
+          booking.arrivedAt,
+          booking.paymentReceivedAt,
+          booking.collectedAt
+        ];
+      })];
       const csv = csvRows.map((row) => row.map((value) => `"${String(value || "").replace(/"/g, '""')}"`).join(",")).join("\n");
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
       const url = URL.createObjectURL(blob);
@@ -3133,10 +3532,11 @@ const STORAGE_KEY = "granaryHubBookings";
       const form = new FormData(bookingForm);
       const submitButton = bookingForm.querySelector("button[type='submit']");
       const bookingDate = form.get("bookingDate");
-      const items = Number(form.get("items"));
+      const luggageItems = bookingMode === "lunch" ? 0 : Number(form.get("items"));
       const lunchOrder = selectedLunchOrder();
       const lunchTotal = lunchOrder ? lunchOrder.lunches.length * PACKED_LUNCH_CONFIG.price : 0;
-      const orderTotal = (items * 7) + lunchTotal;
+      const storedItems = luggageItems > 0 ? luggageItems : 1;
+      const orderTotal = (luggageItems * 7) + lunchTotal;
       submitButton.disabled = true;
       submitButton.textContent = "Submitting...";
 
@@ -3144,24 +3544,25 @@ const STORAGE_KEY = "granaryHubBookings";
         let savedBooking = null;
         for (let attempt = 0; attempt < 3; attempt += 1) {
           if (attempt > 0) await refreshData();
-          const tagNumbers = assignNextTags(items, bookingsCache, bookingDate);
-          if (tagNumbers.length < items) {
+          const tagNumbers = luggageItems > 0 ? assignNextTags(luggageItems, bookingsCache, bookingDate) : [];
+          if (tagNumbers.length < luggageItems) {
             itemsInput.setCustomValidity("There are not enough luggage tags available for that number of items.");
             bookingAvailability.textContent = "Storage is currently full for that number of items. Please reduce the number of items or speak to staff.";
             bookingAvailability.classList.add("closed");
             bookingForm.reportValidity();
             return;
           }
+          const referencePrefix = luggageItems > 0 ? "G" : "PL";
           const booking = {
             id: makeId(),
-            reference: makeReference(bookingsCache, bookingDate),
+            reference: makeReference(bookingsCache, bookingDate, referencePrefix),
             bookingDate,
             createdDate: bookingDate,
             name: form.get("customerName").trim(),
             mobile: form.get("mobile").trim(),
             email: form.get("email").trim(),
-            items,
-            collectionTime: "17:00",
+            items: storedItems,
+            collectionTime: luggageItems > 0 ? "17:00" : lunchOrder?.collectionTime || "09:00",
             totalCost: orderTotal,
             tagNumbers,
             notes: buildLunchNotes(form.get("notes").trim(), lunchOrder),
@@ -3181,27 +3582,45 @@ const STORAGE_KEY = "granaryHubBookings";
 
         if (!savedBooking) throw new Error("Could not create booking reference.");
         submitButton.textContent = "Sending confirmation...";
+        const lunchOnlyOrder = Boolean(lunchOrder && !lunchOrder.luggageAttached);
         let emailSent = false;
         try {
-          await sendBookingConfirmationEmail(savedBooking);
+          await sendBookingConfirmationEmail(savedBooking, {
+            orderType: lunchOnlyOrder ? "packed_lunch" : lunchOrder ? "luggage_and_packed_lunch" : "luggage_storage",
+            luggageItems,
+            lunchOrder,
+            orderSummary: formatLunchOrderText(lunchOrder)
+          });
           emailSent = true;
         } catch (emailError) {
           console.error(emailError);
         }
         await refreshData();
         confirmationRef.textContent = savedBooking.reference;
-        const fridayCollectionNote = isFriday(savedBooking.bookingDate)
+        const savedLunchOrder = parseLunchOrder(savedBooking.notes) || lunchOrder;
+        const savedLuggageItems = luggageItemCountForBooking(savedBooking);
+        const fridayCollectionNote = savedLuggageItems > 0 && isFriday(savedBooking.bookingDate)
           ? " The Granary is closed on Saturday, so your items must be collected by 5:00pm on Friday."
           : "";
-        const savedLunchOrder = parseLunchOrder(savedBooking.notes) || lunchOrder;
-        const luggageText = savedBooking.items > 0
-          ? `Number of luggage items: ${savedBooking.items}. Booking date: ${formatDate(savedBooking.bookingDate)}.`
+        const luggageText = savedLuggageItems > 0
+          ? `Number of luggage items: ${savedLuggageItems}. Booking date: ${formatDate(savedBooking.bookingDate)}.`
           : "No luggage storage attached.";
-        confirmationSummary.innerHTML = `Your booking reference is ${escapeHtml(savedBooking.reference)}. ${escapeHtml(luggageText)} ${savedLunchOrder ? `Packed lunches: ${savedLunchOrder.lunches.length}. Collection: ${escapeHtml(formatDate(savedLunchOrder.collectionDate))}, ${escapeHtml(savedLunchOrder.collectionTime)}.` : ""} Payment due at drop-off: ${escapeHtml(formatMoney(savedBooking.totalCost))}.${escapeHtml(fridayCollectionNote)}${formatLunchOrderHtml(savedLunchOrder)}`;
+        const paymentCopy = paymentCopyForOrder({
+          hasLuggage: savedLuggageItems > 0,
+          hasLunch: Boolean(savedLunchOrder)
+        });
+        if (paymentDueLabel) paymentDueLabel.textContent = paymentCopy.label;
+        confirmationSummary.innerHTML = `Your booking reference is ${escapeHtml(savedBooking.reference)}. ${escapeHtml(luggageText)} ${savedLunchOrder ? `Packed lunches: ${savedLunchOrder.lunches.length}. Collection: ${escapeHtml(formatDate(savedLunchOrder.collectionDate))}, ${escapeHtml(savedLunchOrder.collectionTime)}.` : ""} ${escapeHtml(paymentCopy.summary)}: ${escapeHtml(formatMoney(savedBooking.totalCost))}.${escapeHtml(fridayCollectionNote)}${formatLunchOrderHtml(savedLunchOrder)}`;
         confirmationTotal.textContent = formatMoney(savedBooking.totalCost);
-        paymentInstruction.textContent = emailSent
-          ? `A confirmation email has been sent to ${savedBooking.email}. Please show it when collecting your items. Payment is due at drop-off.`
-          : "Your booking is saved, but the confirmation email could not be sent. Please screenshot this reference and show it when collecting your items.";
+        if (lunchOnlyOrder) {
+          paymentInstruction.textContent = emailSent
+            ? `A packed lunch confirmation email has been sent to ${savedBooking.email}. Please show it when collecting your packed lunch.`
+            : `Your packed lunch order is saved. Please keep this ${savedBooking.reference} reference and show it when collecting your packed lunch.`;
+        } else {
+          paymentInstruction.textContent = emailSent
+            ? `A confirmation email has been sent to ${savedBooking.email}. ${paymentCopy.instruction}`
+            : `Your booking is saved, but the confirmation email could not be sent. Please screenshot this reference and show it ${savedLuggageItems > 0 ? "when you arrive" : "when collecting your packed lunch"}.`;
+        }
         bookingForm.style.display = "none";
         confirmation.classList.add("active");
       } catch (error) {
@@ -3284,6 +3703,7 @@ const STORAGE_KEY = "granaryHubBookings";
       bookingDateInput.value = todayKey();
       bookingMode = "luggage";
       lunchSelections = [];
+      setBookingMode("luggage");
       setLunchPanelActive(false);
       setItemCount("1");
       updatePriceTotal();
@@ -3298,8 +3718,8 @@ const STORAGE_KEY = "granaryHubBookings";
         bookingDateInput.min = today;
       }
       if (lunchCollectionDate) {
-        lunchCollectionDate.value = today;
-        lunchCollectionDate.min = today;
+        lunchCollectionDate.value = earliestLunchCollectionDate();
+        lunchCollectionDate.min = earliestLunchCollectionDate();
       }
       if (collectionTimeInput) collectionTimeInput.value = "17:00";
       if (staffDateInput) staffDateInput.value = today;
@@ -3320,8 +3740,6 @@ const STORAGE_KEY = "granaryHubBookings";
     bookingForm?.addEventListener("submit", handleBookingSubmit);
     newBookingButton?.addEventListener("click", resetBookingForm);
     startLunchOnlyButton?.addEventListener("click", () => setBookingMode("lunch"));
-    orderLunchOnlyButton?.addEventListener("click", () => setBookingMode("lunch"));
-    bookLuggageButton?.addEventListener("click", () => setBookingMode("luggage"));
     addLunchToggle?.addEventListener("change", () => setLunchPanelActive(addLunchToggle.checked));
     addLunchButton?.addEventListener("click", () => {
       lunchSelections.push(makeBlankLunch());
@@ -3330,7 +3748,7 @@ const STORAGE_KEY = "granaryHubBookings";
       validateBookingForm();
     });
     lunchCollectionDate?.addEventListener("change", () => {
-      if (bookingMode !== "lunch" && lunchCollectionDate.value) bookingDateInput.value = lunchCollectionDate.value;
+      if (lunchCollectionDate.value) bookingDateInput.value = lunchCollectionDate.value;
       updatePriceTotal();
       validateBookingForm();
     });
