@@ -1978,7 +1978,6 @@
 	        </div>
         <nav class="nav" aria-label="Main navigation">
           <a href="#luggage-storage">Luggage Storage</a>
-          <a href="#packed-lunches">Packed Lunches</a>
           <a href="food-menu.html">Food</a>
           <a href="menus.html">Drinks</a>
           <a href="#find-us">Find Us</a>
@@ -1994,11 +1993,10 @@
               <img src="portree-harbour.jpg" alt="">
             </div>
             <div class="eyebrow">The Granary Portree</div>
-	            <h1>Luggage storage and packed lunches in Portree.</h1>
-	            <p class="lead">Leave your bags safely in central Portree, order packed lunches for a day out on Skye, or do both in one simple booking.</p>
+	            <h1>Luggage storage in Portree.</h1>
+	            <p class="lead">Leave your bags safely in central Portree with one simple booking.</p>
             <div class="hero-actions" aria-label="Main actions">
               <a class="primary" href="#bookingForm">Book luggage storage</a>
-              <a class="secondary" href="#packed-lunches">Order packed lunches</a>
             </div>
             <div class="service-strip" aria-label="Luggage storage summary">
               <div>
@@ -2006,21 +2004,17 @@
                 <strong>£7 per item</strong>
               </div>
               <div>
-                <span>Packed lunches</span>
-                <strong>£15 each</strong>
-              </div>
-              <div>
                 <span>Location</span>
                 <strong>Central Portree</strong>
               </div>
               <div>
                 <span>Collection</span>
-                <strong>Same-day luggage, morning lunches</strong>
+                <strong>Same-day luggage</strong>
               </div>
             </div>
 	            <p class="search-copy">Useful before check-in, after check-out, between buses, before a boat trip, or before heading to the Old Man of Storr, the Quiraing and other Skye day trips.</p>
 	            <div class="steps" aria-label="Booking steps">
-              <div class="step">Choose luggage storage, packed lunches, or both</div>
+              <div class="step">Choose how many items you need to store</div>
               <div class="step">Collect your confirmation email</div>
               <div class="step">Pay in person at The Granary</div>
             </div>
@@ -2037,7 +2031,6 @@
 	              <div class="seo-links">
 	                <a class="secondary" href="luggage-storage-portree.html">Luggage storage in Portree</a>
 	                <a class="secondary" href="bag-storage-isle-of-skye.html">Bag storage on Skye</a>
-	                <a class="secondary" href="packed-lunch-portree.html">Packed lunches in Portree</a>
 	              </div>
 	            </section>
 	            <div class="notice">Please let us know if your luggage contains fragile or high-value items.</div>
@@ -2084,7 +2077,7 @@
                 <label for="exactItems">Exact number of items</label>
                 <input id="exactItems" type="number" min="5" max="30" value="5">
               </div>
-              <div class="lunch-panel" id="lunchPanel">
+              <div class="lunch-panel hidden" id="lunchPanel" hidden>
                 <div>
                   <h3>Choose your packed lunches</h3>
                   <p class="helper-text">Packed lunches are £15 each. Choose a sandwich, traybake, Torres crisps, soft drink and fruit for each person.</p>
@@ -2164,7 +2157,7 @@
           </div>
         </div>
 
-        <section class="standalone-lunch" id="packed-lunches" aria-label="Packed lunches at The Granary">
+        <section class="standalone-lunch hidden" id="packed-lunches" aria-label="Packed lunches at The Granary" hidden>
           <div class="lunch-standalone-grid">
             <div>
               <span class="eyebrow">Packed lunches</span>
@@ -2173,7 +2166,6 @@
               <div class="lunch-price-badge">£15 each</div>
               <div class="lunch-actions">
                 <button class="primary" type="button" id="startLunchOnlyButton">Order packed lunches</button>
-                <a class="secondary" href="packed-lunch-portree.html">Packed lunch details</a>
               </div>
               <p class="lunch-note">Morning collection from The Granary. Orders close at 10:00am.</p>
             </div>
@@ -2270,11 +2262,7 @@
               </div>
 	              <div class="faq-item">
 	                <h3>Can I get coffee or food while I'm here?</h3>
-	                <p>Of course. While dropping off or collecting your luggage, you're welcome to enjoy speciality coffee, breakfast, lunch, homemade cakes or a drink at The Granary. You can also order packed lunches for a day out on Skye.</p>
-	              </div>
-	              <div class="faq-item">
-	                <h3>Can I order a packed lunch without luggage storage?</h3>
-	                <p>Yes. Packed lunches can be ordered on their own, or added to a luggage storage booking for the same day.</p>
+	                <p>Of course. While dropping off or collecting your luggage, you're welcome to enjoy speciality coffee, breakfast, lunch, homemade cakes or a drink at The Granary.</p>
 	              </div>
             </div>
           </section>
@@ -2289,7 +2277,6 @@
 	      <p>
 	        <a href="luggage-storage-portree.html">Luggage storage Portree</a> •
 	        <a href="bag-storage-isle-of-skye.html">Bag storage Skye</a> •
-	        <a href="packed-lunch-portree.html">Packed lunches</a> •
 	        <a href="food-menu.html">Food menu</a> •
 	        <a href="menus.html">Drinks menu</a>
 	      </p>
@@ -2315,6 +2302,7 @@ const STORAGE_KEY = "granaryHubBookings";
       collection windows, cutoff time and daily packed-lunch capacity.
     */
     const PACKED_LUNCH_CONFIG = {
+      enabled: false,
       price: 15,
       maxPerDay: 30,
       cutoffTime: "10:00",
@@ -2953,6 +2941,7 @@ const STORAGE_KEY = "granaryHubBookings";
     }
 
     function setBookingMode(mode) {
+      if (mode === "lunch" && !PACKED_LUNCH_CONFIG.enabled) return;
       bookingMode = mode;
       const lunchOnly = mode === "lunch";
       if (bookingFormTitle) bookingFormTitle.textContent = lunchOnly ? "Packed lunch order" : "Book luggage storage";
@@ -3811,7 +3800,7 @@ const STORAGE_KEY = "granaryHubBookings";
 	      if (bookingForm) {
 	        updatePriceTotal();
 	        setView("booking", false);
-	        if (window.location.hash === "#packed-lunches") {
+	        if (PACKED_LUNCH_CONFIG.enabled && window.location.hash === "#packed-lunches") {
 	          setBookingMode("lunch");
 	        }
 	      }
