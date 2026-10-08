@@ -3,14 +3,59 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Food Menu | Breakfast, Soup and Toasties at The Granary Portree</title>
-  <meta name="description" content="View The Granary Portree food menu, including breakfast porridge, toast, pastries, soup of the day, toasties, the classic combo and sides.">
+  <title>Lunch in Portree | Soup, Toasties &amp; Breakfast | The Granary</title>
+  <meta name="description" content="Looking for lunch in Portree? See The Granary's current menu of homemade soup, hot toasties, breakfast, pastries and sides on Somerled Square.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://granaryportree.uk/food-menu.html">
-  <meta property="og:title" content="Food Menu | The Granary Portree">
-  <meta property="og:description" content="Breakfast porridge and toast, soup of the day, toasties and sides at The Granary in Portree.">
+  <meta property="og:title" content="Lunch in Portree | The Granary Food Menu">
+  <meta property="og:description" content="Soup of the day, hot toasties, breakfast and sides at The Granary on Somerled Square in Portree.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://granaryportree.uk/food-menu.html">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CafeOrCoffeeShop",
+        "@id": "https://granaryportree.uk/#cafe",
+        "name": "The Granary",
+        "url": "https://granaryportree.uk/food-menu.html",
+        "image": "https://granaryportree.uk/portree-harbour.jpg",
+        "telephone": "+44 1478 612873",
+        "priceRange": "££",
+        "servesCuisine": ["Cafe", "Breakfast", "Lunch", "Soup", "Toasties"],
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Somerled Square",
+          "addressLocality": "Portree",
+          "addressRegion": "Isle of Skye",
+          "postalCode": "IV51 9EH",
+          "addressCountry": "GB"
+        },
+        "hasMenu": { "@id": "https://granaryportree.uk/food-menu.html#menu" }
+      },
+      {
+        "@type": "Menu",
+        "@id": "https://granaryportree.uk/food-menu.html#menu",
+        "name": "The Granary breakfast and lunch menu",
+        "url": "https://granaryportree.uk/food-menu.html",
+        "hasMenuSection": [
+          { "@type": "MenuSection", "name": "Breakfast", "description": "Porridge, toast and pastries served until 11am." },
+          { "@type": "MenuSection", "name": "Soup", "description": "Soup of the day served with a roll and butter." },
+          { "@type": "MenuSection", "name": "Toasties", "description": "Hot toasties served with coleslaw." },
+          { "@type": "MenuSection", "name": "Sides", "description": "Skinny fries and mozzarella sticks." }
+        ]
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "The Granary", "item": "https://granaryportree.uk/" },
+          { "@type": "ListItem", "position": 2, "name": "Lunch in Portree", "item": "https://granaryportree.uk/food-menu.html" }
+        ]
+      }
+    ]
+  }
+  </script>
   <style>
     :root {
       --ink: #17201b;
@@ -377,8 +422,8 @@
       <a class="brand" href="index.html"><span class="mark">G</span><span>The Granary</span></a>
       <nav aria-label="Main navigation">
         <a href="index.html#luggage-storage">Luggage Storage</a>
-        <a href="food-menu.html">Food</a>
-        <a href="menus.html">Drinks</a>
+        <a href="food-menu.html">Lunch Menu</a>
+        <a href="menus.html#coffee">Coffee &amp; Drinks</a>
         <a href="skye-companion.html">Skye Guide</a>
       </nav>
     </div>
@@ -386,14 +431,22 @@
 
   <main>
     <section class="hero">
-      <h1>Food</h1>
-      <p class="lead">Breakfast porridge and toast, soup of the day, toasties and sides at The Granary in Portree.</p>
+      <h1>Lunch in Portree</h1>
+      <p class="lead">Homemade soup, hot toasties, breakfast and sides at The Granary, a central Portree cafe on Somerled Square.</p>
       <div class="menu-nav" aria-label="Food menu sections">
         <a class="button" href="#breakfast">Breakfast</a>
         <a class="button" href="#soup">Soup</a>
         <a class="button" href="#toasties">Toasties</a>
         <a class="button" href="#sides">Sides</a>
       </div>
+    </section>
+
+    <section class="menu-section" aria-labelledby="portree-cafe-heading">
+      <div class="section-head">
+        <h2 id="portree-cafe-heading">Breakfast and lunch in central Portree</h2>
+      </div>
+      <p class="lead">Stop in for breakfast until 11am, or choose soup and toasties for lunch in the centre of Portree. Our soup changes daily and every toastie is served hot with coleslaw.</p>
+      <p class="note">Find us on Somerled Square, Portree, Isle of Skye, IV51 9EH. Looking for a drink too? See our <a href="menus.html#coffee">coffee menu</a>.</p>
     </section>
 
     <section class="menu-section" id="breakfast">
@@ -455,6 +508,6 @@
     </section>
   </main>
 
-  <footer>The Granary, Portree, Isle of Skye</footer>
+  <footer>The Granary, Somerled Square, Portree, Isle of Skye, IV51 9EH · <a href="menus.html#coffee">Coffee in Portree</a></footer>
 </body>
 </html>

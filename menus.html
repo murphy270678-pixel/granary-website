@@ -3,14 +3,53 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Drinks Menu | Coffee, Wine and Spirits at The Granary Portree</title>
-  <meta name="description" content="View The Granary Portree menus for coffee, tea, soft drinks, wine, beers, ciders, gin, malt whisky, spirits and perfect serve gins.">
+  <title>Coffee in Portree | Coffee &amp; Drinks Menu | The Granary</title>
+  <meta name="description" content="Looking for coffee in Portree? View espresso, flat white, latte, cappuccino, tea and iced coffee at The Granary on Somerled Square, plus our full drinks menu.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://granaryportree.uk/menus.html">
-  <meta property="og:title" content="Menus | The Granary Portree">
-  <meta property="og:description" content="Coffee, tea, soft drinks, wine, beers, ciders, gin, whisky and spirits at The Granary in Portree.">
+  <meta property="og:title" content="Coffee in Portree | The Granary Drinks Menu">
+  <meta property="og:description" content="Espresso, flat white, latte, cappuccino, tea, iced coffee and drinks at The Granary on Somerled Square in Portree.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://granaryportree.uk/menus.html">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CafeOrCoffeeShop",
+        "@id": "https://granaryportree.uk/#cafe",
+        "name": "The Granary",
+        "url": "https://granaryportree.uk/menus.html",
+        "image": "https://granaryportree.uk/portree-harbour.jpg",
+        "telephone": "+44 1478 612873",
+        "priceRange": "££",
+        "servesCuisine": ["Coffee", "Tea", "Cafe", "Breakfast", "Lunch"],
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Somerled Square",
+          "addressLocality": "Portree",
+          "addressRegion": "Isle of Skye",
+          "postalCode": "IV51 9EH",
+          "addressCountry": "GB"
+        },
+        "hasMenu": { "@id": "https://granaryportree.uk/menus.html#menu" }
+      },
+      {
+        "@type": "Menu",
+        "@id": "https://granaryportree.uk/menus.html#menu",
+        "name": "The Granary coffee and drinks menu",
+        "url": "https://granaryportree.uk/menus.html"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "The Granary", "item": "https://granaryportree.uk/" },
+          { "@type": "ListItem", "position": 2, "name": "Coffee in Portree", "item": "https://granaryportree.uk/menus.html" }
+        ]
+      }
+    ]
+  }
+  </script>
   <style>
     :root {
       --ink: #17201b;
@@ -405,8 +444,8 @@
       <a class="brand" href="index.html"><span class="mark">G</span><span>The Granary</span></a>
       <nav aria-label="Main navigation">
         <a href="index.html#luggage-storage">Luggage Storage</a>
-        <a href="food-menu.html">Food</a>
-        <a href="menus.html">Drinks</a>
+        <a href="food-menu.html">Lunch Menu</a>
+        <a href="menus.html#coffee">Coffee &amp; Drinks</a>
         <a href="skye-companion.html">Skye Guide</a>
         <a href="index.html#find-us">Find Us</a>
       </nav>
@@ -415,8 +454,8 @@
 
   <main>
     <section class="hero">
-      <h1>Drinks</h1>
-      <p class="lead">Coffee, tea, soft drinks, wine, beer, cider, gin, whisky and spirits at The Granary in Portree.</p>
+      <h1>Coffee in Portree</h1>
+      <p class="lead">Espresso, flat white, latte, cappuccino, tea and iced coffee at The Granary on Somerled Square, plus soft drinks, wine, beer, cider, gin and whisky.</p>
       <div class="menu-nav" aria-label="Menu sections">
         <a class="button" href="food-menu.html">Food menu</a>
         <a class="button" href="#coffee">Coffee</a>
@@ -424,6 +463,14 @@
         <a class="button" href="#wine">Wine</a>
         <a class="button" href="#perfect-serve-gins">Perfect Serve Gins</a>
       </div>
+    </section>
+
+    <section class="menu-section" aria-labelledby="portree-coffee-heading">
+      <div class="section-head">
+        <h2 id="portree-coffee-heading">A central Portree coffee stop</h2>
+      </div>
+      <p class="lead">Meet for coffee in the centre of Portree or stop by before exploring the Isle of Skye. Choose from classic espresso drinks, tea and iced coffee, with oat milk and extra shots available.</p>
+      <p class="note">Find us on Somerled Square, Portree, Isle of Skye, IV51 9EH. Hungry? See our <a href="food-menu.html">breakfast and lunch menu</a> for soup, toasties and sides.</p>
     </section>
 
     <section class="menu-section" id="coffee">
@@ -607,6 +654,6 @@
     </section>
   </main>
 
-  <footer>The Granary, Portree, Isle of Skye</footer>
+  <footer>The Granary, Somerled Square, Portree, Isle of Skye, IV51 9EH · <a href="food-menu.html">Lunch in Portree</a></footer>
 </body>
 </html>
