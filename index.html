@@ -33,7 +33,7 @@
     "name": "The Granary Luggage Storage",
     "url": "https://granaryportree.uk/",
     "image": "https://granaryportree.uk/portree-harbour.jpg",
-    "email": "contact@granaryportree.uk",
+    "email": "Kevin@granaryportree.uk",
     "hasMap": "https://www.google.com/maps/search/?api=1&query=The%20Granary%20Portree%20Isle%20of%20Skye",
     "address": {
       "@type": "PostalAddress",
@@ -2192,7 +2192,7 @@
 	          <section class="find-us" id="find-us">
             <h2>Find us</h2>
             <p>You'll find The Granary in central Portree on the Isle of Skye.</p>
-            <p>Questions? Email <a href="mailto:contact@granaryportree.uk">contact@granaryportree.uk</a>.</p>
+            <p>Questions? Email <a href="mailto:Kevin@granaryportree.uk">Kevin@granaryportree.uk</a>.</p>
             <a class="secondary" href="https://www.google.com/maps/search/?api=1&query=The%20Granary%20Portree%20Isle%20of%20Skye" target="_blank" rel="noopener">Get directions</a>
           </section>
 
@@ -3351,7 +3351,7 @@ const STORAGE_KEY = "granaryHubBookings";
         actions.className = "actions";
         actions.appendChild(actionButton("Arrived", () => updateBooking(booking.id, { arrivedAt: new Date().toISOString() }), Boolean(booking.arrivedAt || booking.collectedAt)));
         actions.appendChild(actionButton("Paid", () => updateBooking(booking.id, { paymentReceivedAt: new Date().toISOString(), arrivedAt: booking.arrivedAt || new Date().toISOString() }), Boolean(booking.paymentReceivedAt || booking.collectedAt)));
-        actions.appendChild(actionButton("Collected", () => updateBooking(booking.id, { collectedAt: new Date().toISOString() }), Boolean(booking.collectedAt)));
+        actions.appendChild(actionButton("Collected", () => updateBooking(booking.id, { collectedAt: new Date().toISOString(), tagNumbers: [] }), Boolean(booking.collectedAt)));
         actions.appendChild(actionButton("Edit tags", () => editTagsForBooking(booking), Boolean(booking.collectedAt), "ghost"));
         const whatsAppButton = actionButton("WhatsApp", () => openWhatsAppForBooking(booking), !WHATSAPP_ENABLED || !normalisePhoneForWhatsApp(booking.mobile), "ghost");
         whatsAppButton.classList.add("whatsapp-button");

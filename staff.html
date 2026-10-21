@@ -574,8 +574,8 @@
             <input id="manualItems" type="number" min="1" value="1" required>
           </div>
           <div>
-            <label for="manualTags">Tag numbers</label>
-            <input id="manualTags" placeholder="001, 002" required>
+            <label for="manualTags">Tag numbers <span class="muted">(automatic)</span></label>
+            <input id="manualTags" placeholder="Assigned automatically; edit if needed">
           </div>
           <div style="grid-column: 1 / -1;">
             <label for="manualNotes">Notes</label>
@@ -621,7 +621,7 @@
     const STAFF_REMEMBER_KEY = "granaryStaffRemembered";
     const WHATSAPP_ENABLED = false;
     const WHATSAPP_BUSINESS_NUMBER = "";
-    const TOTAL_TAGS = 80;
+    const TOTAL_TAGS = 60;
     const PRICE_PER_ITEM = 7;
     const LUNCH_NOTE_START = "[[GRANARY_PACKED_LUNCHES_V1]]";
     const LUNCH_NOTE_END = "[[/GRANARY_PACKED_LUNCHES_V1]]";
@@ -868,16 +868,26 @@
       window.open(`https://wa.me/${number}?text=${message}`, "_blank", "noopener");
     }
 
-    function usedTags() {
+    function normaliseTag(tag) {
+      const number = Number(String(tag || "").trim());
+      return Number.isInteger(number) && number >= 1 && number <= TOTAL_TAGS
+        ? String(number).padStart(3, "0")
+        : "";
+    }
+
+    function usedTags(dateKey = todayKey(), currentId = "") {
       const used = new Set();
       state.bookings
-        .filter((booking) => !booking.collected_at)
-        .forEach((booking) => (booking.tag_numbers || []).forEach((tag) => used.add(String(tag).padStart(3, "0"))));
+        .filter((booking) => booking.booking_date === dateKey && !booking.collected_at && booking.id !== currentId)
+        .forEach((booking) => (booking.tag_numbers || []).forEach((tag) => {
+          const normalised = normaliseTag(tag);
+          if (normalised) used.add(normalised);
+        }));
       return used;
     }
 
-    function getNextTags(count) {
-      const used = usedTags();
+    function getNextTags(count, dateKey = todayKey(), currentId = "") {
+      const used = usedTags(dateKey, currentId);
       const tags = [];
       for (let tag = 1; tag <= TOTAL_TAGS && tags.length < count; tag += 1) {
         const formatted = String(tag).padStart(3, "0");
@@ -922,7 +932,9 @@
       $("activeBookings").textContent = String(active.length);
       $("itemsInStore").textContent = String(activeItems);
       $("paidToday").textContent = money(paid.reduce((sum, booking) => sum + Number(booking.total_cost || 0), 0));
-      $("availableTags").textContent = String(Math.max(0, TOTAL_TAGS - usedTags().size));
+      $("availableTags").textContent = state.dateMode === "future"
+        ? "-"
+        : String(Math.max(0, TOTAL_TAGS - usedTags(selectedStaffDate()).size));
       $("packedLunchCount").textContent = String(lunchOrders()
         .filter(({ booking, order }) => dateInStaffScope(orderDateForLunch(booking, order)))
         .reduce((sum, { order }) => sum + order.lunches.length, 0));
@@ -1046,7 +1058,7 @@
                 <button type="button" class="blue" onclick="markBooking('${booking.id}', 'arrived_at')" ${booking.arrived_at ? "disabled" : ""}>Arrived</button>
                 <button type="button" class="amber" onclick="markBooking('${booking.id}', 'payment_received_at')" ${booking.payment_received_at ? "disabled" : ""}>Paid</button>
                 <button type="button" onclick="markBooking('${booking.id}', 'collected_at')" ${booking.collected_at ? "disabled" : ""}>Collected</button>
-                <button type="button" class="secondary" onclick="editTags('${booking.id}')">Edit tags</button>
+                <button type="button" class="secondary" onclick="editTags('${booking.id}')" ${booking.collected_at ? "disabled" : ""}>Edit tags</button>
                 <button type="button" class="secondary" onclick="openWhatsAppForBookingById('${booking.id}')" ${whatsappLive ? "" : "disabled"} title="${whatsappLive ? "Open WhatsApp" : "WhatsApp contact not live yet"}">WhatsApp</button>
                 <button type="button" class="danger" onclick="removeBooking('${booking.id}')">Remove</button>
               </div>
@@ -1100,8 +1112,10 @@
         ]);
         state.bookings = bookings || [];
         state.blockedDates = blockedDates || [];
+        await releaseCollectedTags();
         renderStaffView();
         renderBlockedDates();
+        if (!$("manualTags").value) suggestManualTags();
       } catch (error) {
         setNotice("Could not load staff data. Please refresh and try again.", true);
       }
@@ -1116,9 +1130,38 @@
       await loadStaffData();
     }
 
+    async function releaseCollectedTags() {
+      const stale = state.bookings.filter((booking) => booking.collected_at && (booking.tag_numbers || []).length);
+      if (!stale.length) return;
+      const results = await Promise.allSettled(stale.map((booking) => supabaseFetch(`bookings?id=eq.${encodeURIComponent(booking.id)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ tag_numbers: [] }),
+      })));
+      results.forEach((result, index) => {
+        if (result.status === "fulfilled") stale[index].tag_numbers = [];
+      });
+      if (results.some((result) => result.status === "rejected")) {
+        setNotice("Some collected tags could not be cleared. Refresh to try again.", true);
+      }
+    }
+
     window.markBooking = async function markBooking(id, field) {
+      const booking = state.bookings.find((item) => item.id === id);
+      if (!booking) return;
+      const updates = { [field]: new Date().toISOString() };
+      if (field === "collected_at") {
+        updates.tag_numbers = [];
+      } else if ((field === "arrived_at" || field === "payment_received_at") && (booking.tag_numbers || []).length < luggageItemCountForBooking(booking)) {
+        const tags = getNextTags(luggageItemCountForBooking(booking), booking.booking_date, booking.id);
+        if (tags.length < luggageItemCountForBooking(booking)) {
+          setNotice("There are not enough available tags for this booking.", true);
+          return;
+        }
+        updates.tag_numbers = tags;
+      }
+      if (field === "payment_received_at" && !booking.arrived_at) updates.arrived_at = updates[field];
       try {
-        await patchBooking(id, { [field]: new Date().toISOString() });
+        await patchBooking(id, updates);
       } catch {
         setNotice("Could not update booking.", true);
       }
@@ -1153,7 +1196,24 @@
       const current = (booking.tag_numbers || []).join(", ");
       const value = prompt("Enter tag numbers separated by commas", current);
       if (value === null) return;
-      const tags = value.split(",").map((tag) => tag.trim().replace(/^0*(\d+)$/, (_, n) => String(n).padStart(3, "0"))).filter(Boolean);
+      const entered = value.split(",").map((tag) => tag.trim()).filter(Boolean);
+      const tags = entered.length
+        ? entered.map(normaliseTag).filter(Boolean)
+        : getNextTags(luggageItemCountForBooking(booking), booking.booking_date, booking.id);
+      const hasInvalidEntry = entered.length > 0 && tags.length !== entered.length;
+      if (tags.length !== luggageItemCountForBooking(booking) || hasInvalidEntry) {
+        setNotice(`Enter ${luggageItemCountForBooking(booking)} valid tag number${luggageItemCountForBooking(booking) === 1 ? "" : "s"} from 001 to ${String(TOTAL_TAGS).padStart(3, "0")}.`, true);
+        return;
+      }
+      if (new Set(tags).size !== tags.length) {
+        setNotice("Each tag number must be different.", true);
+        return;
+      }
+      const unavailable = tags.filter((tag) => usedTags(booking.booking_date, booking.id).has(tag));
+      if (unavailable.length) {
+        setNotice(`Tag ${unavailable.join(", ")} is already in use for that date.`, true);
+        return;
+      }
       try {
         await patchBooking(id, { tag_numbers: tags });
       } catch {
@@ -1271,15 +1331,28 @@
       renderStaffView();
     });
 
+    function suggestManualTags() {
+      const items = Math.max(1, Number($("manualItems").value || 1));
+      const tags = getNextTags(items, todayKey());
+      $("manualTags").value = tags.join(", ");
+      if (tags.length < items) setNotice("There are not enough tags available for this booking.", true);
+    }
+
+    $("manualItems").addEventListener("input", suggestManualTags);
+    $("manualItems").addEventListener("change", suggestManualTags);
+
     $("manualBookingForm").addEventListener("submit", async (event) => {
       event.preventDefault();
       const items = Math.max(1, Number($("manualItems").value || 1));
-      const tags = $("manualTags").value
-        .split(",")
-        .map((tag) => tag.trim().replace(/^0*(\d+)$/, (_, n) => String(n).padStart(3, "0")))
+      const enteredTags = $("manualTags").value.split(",").map((tag) => tag.trim()).filter(Boolean);
+      let tags = enteredTags
+        .map(normaliseTag)
         .filter(Boolean);
       if (!tags.length) {
-        setNotice("Please enter the luggage tag number before creating the booking.", true);
+        tags = getNextTags(items, todayKey());
+      }
+      if (enteredTags.length && tags.length !== enteredTags.length) {
+        setNotice(`Tag numbers must be between 001 and ${String(TOTAL_TAGS).padStart(3, "0")}.`, true);
         $("manualTags").focus();
         return;
       }
@@ -1293,7 +1366,7 @@
         $("manualTags").focus();
         return;
       }
-      const unavailableTags = tags.filter((tag) => usedTags().has(tag));
+      const unavailableTags = tags.filter((tag) => usedTags(todayKey()).has(tag));
       if (unavailableTags.length) {
         setNotice(`Tag ${unavailableTags.join(", ")} is already in use on an active booking.`, true);
         $("manualTags").focus();
@@ -1319,6 +1392,7 @@
         });
         $("manualBookingForm").reset();
         $("manualItems").value = "1";
+        suggestManualTags();
         setNotice(`Manual booking ${booking.reference} created.`);
         if (created && created[0]) sendConfirmationEmail(created[0].id);
         await loadStaffData();
