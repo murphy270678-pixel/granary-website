@@ -513,6 +513,7 @@
         <div class="control-row control-actions">
           <input id="bookingSearch" type="search" placeholder="Search name, reference, mobile">
           <button id="refreshButton" type="button" class="secondary">Refresh</button>
+          <button id="collectOldBookingsButton" type="button" class="secondary">Collect old bookings</button>
           <button id="exportCsvButton" type="button">Export CSV</button>
           <button id="printPrepButton" type="button" class="secondary">Print prep list</button>
         </div>
@@ -1167,6 +1168,39 @@
       }
     };
 
+    async function collectOldBookings() {
+      const oldBookings = state.bookings.filter((booking) =>
+        String(booking.booking_date || "") < todayKey()
+        && !booking.collected_at
+        && luggageItemCountForBooking(booking) > 0
+      );
+      if (!oldBookings.length) {
+        setNotice("There are no uncollected luggage bookings from before today.");
+        return;
+      }
+      if (!confirm(`Mark ${oldBookings.length} old luggage booking${oldBookings.length === 1 ? "" : "s"} as collected? Today's and future bookings will not be changed.`)) return;
+
+      const button = $("collectOldBookingsButton");
+      button.disabled = true;
+      button.textContent = "Collecting…";
+      const collectedAt = new Date().toISOString();
+      const results = await Promise.allSettled(oldBookings.map((booking) =>
+        supabaseFetch(`bookings?id=eq.${encodeURIComponent(booking.id)}`, {
+          method: "PATCH",
+          body: JSON.stringify({ collected_at: collectedAt, tag_numbers: [] }),
+        })
+      ));
+      const failed = results.filter((result) => result.status === "rejected").length;
+      await loadStaffData();
+      button.disabled = false;
+      button.textContent = "Collect old bookings";
+      if (failed) {
+        setNotice(`${oldBookings.length - failed} old booking${oldBookings.length - failed === 1 ? "" : "s"} collected; ${failed} could not be updated. Please try again.`, true);
+      } else {
+        setNotice(`${oldBookings.length} old luggage booking${oldBookings.length === 1 ? "" : "s"} marked as collected. Their tags are now available.`);
+      }
+    }
+
     window.markLunchStatus = async function markLunchStatus(id, status) {
       const booking = state.bookings.find((item) => item.id === id);
       if (!booking) return;
@@ -1309,6 +1343,7 @@
       setTimeout(() => window.print(), 50);
     });
     $("bookingSearch").addEventListener("input", renderBookings);
+    $("collectOldBookingsButton").addEventListener("click", collectOldBookings);
     $("staffDate").addEventListener("change", () => {
       state.selectedDate = $("staffDate").value || todayKey();
       state.dateMode = "day";
